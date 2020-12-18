@@ -12,8 +12,6 @@ class MongoDriver implements Closeable {
         mongoClient = MongoClients.create(connectionString);
     }
 
-
-
     @Override
     public void close() {
         mongoClient.close();

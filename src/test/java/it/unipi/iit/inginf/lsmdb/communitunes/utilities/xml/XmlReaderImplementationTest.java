@@ -6,6 +6,8 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,6 +26,9 @@ public class XmlReaderImplementationTest {
                                 "<Test>\n" +
                                 "    <MyElement attribute1=\"value1\"/>\n" +
                                 "    <MyOtherElement attribute2=\"value2\" attribute3=\"value3\" attribute4=\"value4\"/>\n" +
+                                "    <Parent>\n" +
+                                "       <Child childAttribute=\"myVal\"/>\n" +
+                                "    </Parent>\n" +
                                 "</Test>";
         reader = new XmlReaderImplementation(new ByteArrayInputStream(testXmlString.getBytes()));
     }
@@ -94,5 +99,54 @@ public class XmlReaderImplementationTest {
         String expectedValue = "value4";
         Node returnedNode = reader.getXmlNode("MyOtherElement");
         assertEquals(reader.getXmlAttribute(returnedNode, "attribute4").getNodeValue(), expectedValue);
+    }
+
+    @Test
+    public void WHEN_getXmlChild_invokedWithNullNode_THEN_return_null(){
+        assertNull(reader.getXmlChild(null, "Child"));
+    }
+
+    @Test
+    public void WHEN_getXmlChild_invokedWithNullChildName_THEN_return_null(){
+        Node returnedNode = reader.getXmlNode("Parent");
+        assertNull(reader.getXmlChild(returnedNode, null));
+    }
+
+    @Test
+    public void WHEN_getXmlChild_invokedWithNonExistingChildName_THEN_return_null(){
+        Node returnedNode = reader.getXmlNode("Parent");
+        assertNull(reader.getXmlChild(returnedNode, "GrandChild"));
+    }
+
+    @Test
+    public void WHEN_getXmlChild_invokedWithExistingChildName_THEN_return_ExpectedValue(){
+        Node returnedNode = reader.getXmlNode("Parent");
+        assertEquals("Child", reader.getXmlChild(returnedNode, "Child").getNodeName());
+    }
+
+    @Test
+    public void WHEN_getXmlChildren_invokedWithNullNode_THEN_return_null(){
+        assertNull(reader.getXmlChildren(null));
+    }
+
+    @Test
+    public void WHEN_getXmlChildren_invokedWithParent_THEN_return_ExpectedValue(){
+        Node returnedNode = reader.getXmlNode("Parent");
+        assertEquals("Child", reader.getXmlChildren(returnedNode).get(0).getNodeName());
+    }
+
+    @Test
+    public void WHEN_getLastNodeOfPath_invokedWithNullPath_THEN_return_null(){
+        assertNull(reader.getLastNodeOfPath(null));
+    }
+
+    @Test
+    public void WHEN_getLastNodeOfPath_invokedWithValidPath_THEN_return_ExpectedValue(){
+        assertEquals("Child", reader.getLastNodeOfPath(new ArrayList<>(Arrays.asList("Parent", "Child"))).getNodeName());
+    }
+
+    @Test
+    public void WHEN_getLastNodeOfPath_invokedWithInvalidPath_THEN_return_ExpectedValue(){
+        assertNull(reader.getLastNodeOfPath(new ArrayList<>(Arrays.asList("Parent", "NotChild"))));
     }
 }
