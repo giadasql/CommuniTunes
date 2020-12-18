@@ -28,11 +28,6 @@ public class XmlReaderImplementationTest {
         reader = new XmlReaderImplementation(new ByteArrayInputStream(testXmlString.getBytes()));
     }
 
-    @AfterEach
-    public void close(){
-        reader.close();
-    }
-
     @Test
     public void WHEN_getXmlNode_invokedWithNull_THEN_return_null(){
         assertNull(reader.getXmlNode(null));
@@ -49,6 +44,32 @@ public class XmlReaderImplementationTest {
         String expectedNodeName = "MyElement";
         Node returnedNode = reader.getXmlNode("MyElement");
         assertEquals(expectedNodeName, returnedNode.getNodeName());
+    }
+
+    @Test
+    public void WHEN_getXmlAttributeValue_invokedWithNullNode_THEN_return_null(){
+        assertNull(reader.getXmlAttributeValue(null, "attribute1"));
+    }
+
+    @Test
+    public void WHEN_getXmlAttributeValue_invokedWithNullAttribute_THEN_return_null(){
+        assertNull(reader.getXmlAttributeValue("MyElement", null));
+    }
+
+    @Test
+    public void WHEN_getXmlAttributeValue_invokedWithTestDocAndExistingNodeAndNonExistingAttribute_THEN_return_null(){
+        assertNull(reader.getXmlAttributeValue("MyOtherElement", "NonExistingAttribute"));
+    }
+
+    @Test
+    public void WHEN_getXmlAttributeValue_invokedWithTestDocAndNonExistingNodeAndNonExistingAttribute_THEN_return_null(){
+        assertNull(reader.getXmlAttributeValue("NonExistingNode", "attribute4"));
+    }
+
+    @Test
+    public void WHEN_getXmlAttributeValue_invokedWithTestDocAndExistingNodeAndExistingAttribute_THEN_return_expectedValue(){
+        String expectedValue = "value4";
+        assertEquals(reader.getXmlAttributeValue("MyOtherElement", "attribute4"), expectedValue);
     }
 
     @Test
@@ -72,6 +93,6 @@ public class XmlReaderImplementationTest {
     public void WHEN_getXmlAttribute_invokedWithTestDocAndExistingNodeAndExistingAttribute_THEN_return_expectedValue(){
         String expectedValue = "value4";
         Node returnedNode = reader.getXmlNode("MyOtherElement");
-        assertEquals(reader.getXmlAttribute(returnedNode, "attribute4"), expectedValue);
+        assertEquals(reader.getXmlAttribute(returnedNode, "attribute4").getNodeValue(), expectedValue);
     }
 }

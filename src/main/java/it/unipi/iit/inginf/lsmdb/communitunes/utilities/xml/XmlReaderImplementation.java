@@ -16,7 +16,7 @@ import java.io.InputStream;
 class XmlReaderImplementation implements XmlReader {
 
     @VisibleForTesting
-    private Document parsedDocument;
+    private final Document parsedDocument;
 
     @VisibleForTesting
     XmlReaderImplementation(InputStream xmlSource) throws NullPointerException, IOException, ParserConfigurationException, SAXException {
@@ -30,10 +30,6 @@ class XmlReaderImplementation implements XmlReader {
             parsedDocument = builder.parse(xmlSource);
         }
         xmlSource.close();
-    }
-
-    @Override
-    public void close() {
     }
 
     @Override
@@ -56,22 +52,28 @@ class XmlReaderImplementation implements XmlReader {
     }
 
     @Override
-    public String getXmlAttribute(Node node, String attributeName) {
+    public Node getXmlAttribute(Node node, String attributeName) {
         if(node == null || attributeName == null){
             return null;
         }
         NamedNodeMap attributes = node.getAttributes();
         if(attributes.getLength() > 0){
-            Node attribute = attributes.getNamedItem(attributeName);
-            if(attribute == null){
-                return null;
-            }
-            else{
-                return attribute.getNodeValue();
-            }
+            return attributes.getNamedItem(attributeName);
         }
         else{
             return null;
         }
+    }
+
+    @Override
+    public String getXmlAttributeValue(String nodeName, String attributeName) {
+        Node node = getXmlNode(nodeName);
+        if(node != null){
+            Node attribute = getXmlAttribute(node, attributeName);
+            if(attribute != null){
+                return attribute.getNodeValue();
+            }
+        }
+        return null;
     }
 }

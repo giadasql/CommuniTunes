@@ -4,7 +4,9 @@ import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
 
-class Neo4jDriver implements AutoCloseable {
+import java.io.Closeable;
+
+class Neo4jDriver implements Closeable {
     private final Driver driver;
 
     Neo4jDriver(String uri, String user, String password) {
