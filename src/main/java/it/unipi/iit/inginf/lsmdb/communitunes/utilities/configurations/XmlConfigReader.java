@@ -9,6 +9,9 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 class XmlConfigReader implements  ConfigReader{
@@ -35,6 +38,11 @@ class XmlConfigReader implements  ConfigReader{
             }
         }
         return null;
+    }
+
+    @Override
+    public String getStringConfigValue(String element, String attribute) {
+        return getStringConfigValue(new ArrayList<>(Collections.singletonList(element)), attribute);
     }
 
 }

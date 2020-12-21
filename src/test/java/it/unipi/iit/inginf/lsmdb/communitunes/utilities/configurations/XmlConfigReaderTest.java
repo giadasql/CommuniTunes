@@ -34,7 +34,7 @@ public class XmlConfigReaderTest {
 
     @Test
     public void WHEN_getStringConfigValue_invokedWithNullPath_THEN_returnNull(){
-        assertNull(xmlReader.getStringConfigValue(null, "attribute1"));
+        assertNull(xmlReader.getStringConfigValue((List<String>) null, "attribute1"));
     }
 
     @Test
