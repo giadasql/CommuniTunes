@@ -10,7 +10,19 @@ class Neo4jDriver implements Closeable {
     private final Driver driver;
 
     Neo4jDriver(String uri, String user, String password) {
-        driver = GraphDatabase.driver(uri, AuthTokens.basic(user, password));
+        if(uri == null || user == null){
+            // TODO: raise exception
+            driver = null;
+        }
+        else{
+            try{
+                driver = GraphDatabase.driver(uri, AuthTokens.basic(user, password));
+            }
+            catch (IllegalArgumentException exc){
+                // TODO: log
+                throw(exc);
+            }
+        }
     }
 
     @Override

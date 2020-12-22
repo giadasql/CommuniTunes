@@ -9,7 +9,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 
-class PersistenceImplementation {
+class PersistenceImplementation implements Persistence {
 
     private ConfigReader reader;
 
@@ -24,6 +24,7 @@ class PersistenceImplementation {
         }
         catch (ParserConfigurationException | IOException | SAXException e) {
             e.printStackTrace();
+            // TODO: log
             return;
         }
         if(reader == null){

@@ -9,7 +9,13 @@ class MongoDriver implements Closeable {
     private final MongoClient mongoClient;
 
     MongoDriver(String connectionString){
-        mongoClient = MongoClients.create(connectionString);
+        if(connectionString != null){
+            mongoClient = MongoClients.create(connectionString);
+        }
+        else{
+            // TODO: raise exception
+            mongoClient = null;
+        }
     }
 
     @Override
