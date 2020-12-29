@@ -1,5 +1,6 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.persistence;
 
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReader;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderType;
@@ -46,5 +47,13 @@ class PersistenceImplementation implements Persistence {
     private void mongoInit(){
         String connectionString = reader.getStringConfigValue("MongoDB", "connectionString");
         mongo = new MongoDriver(connectionString);
+    }
+
+    public boolean checkIfUserExists(User newUser){
+        return mongo.checkIfEmailExists(newUser.Email) || mongo.checkIfUsernameExists(newUser.Username) || neo4j.checkIfUsernameExists(newUser.Username);
+    }
+
+    public boolean addNewUser(User newUser){
+        return false;
     }
 }

@@ -1,13 +1,16 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.persistence;
 
-import org.neo4j.driver.AuthTokens;
-import org.neo4j.driver.Driver;
-import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.*;
 
 import java.io.Closeable;
 
+import static com.mongodb.client.model.Filters.eq;
+import static org.neo4j.driver.Values.parameters;
+
 class Neo4jDriver implements Closeable {
     private final Driver driver;
+
+    // TODO: mettere il giusto database nelle sessioni
 
     Neo4jDriver(String uri, String user, String password) {
         if(uri == null || user == null){
@@ -22,6 +25,16 @@ class Neo4jDriver implements Closeable {
                 // TODO: log
                 throw(exc);
             }
+        }
+    }
+
+    public boolean checkIfUsernameExists(String username){
+        try ( Session session = driver.session())
+        {
+            return session.readTransaction(tx -> {
+                Result res = tx.run( "MATCH (u:User { username: \"$username\" }) RETURN u", parameters("username", username));
+                return res.hasNext();
+            });
         }
     }
 

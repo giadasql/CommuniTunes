@@ -1,5 +1,8 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.persistence;
 
-public interface Persistence {
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 
+public interface Persistence {
+    boolean checkIfUserExists(User newUser);
+    boolean addNewUser(User newUser);
 }
