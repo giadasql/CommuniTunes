@@ -9,5 +9,7 @@ public class Artist extends User {
 
     List<Artist> Groups = new ArrayList<>();
 
-
+    public Artist(String username, String email) {
+        super(username, email);
+    }
 }

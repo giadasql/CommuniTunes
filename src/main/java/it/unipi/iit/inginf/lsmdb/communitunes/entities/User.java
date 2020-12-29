@@ -17,4 +17,9 @@ public class User extends Entity {
     public List<User> LoadedFollows = new ArrayList<>();
 
     public List<User> LoadedFollowers = new ArrayList<>();
+
+    public User(String username, String email){
+        Email = email;
+        Username = username;
+    }
 }
