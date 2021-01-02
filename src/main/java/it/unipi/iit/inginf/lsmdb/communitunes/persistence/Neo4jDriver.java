@@ -1,8 +1,13 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.persistence;
 
+import com.mongodb.client.result.InsertOneResult;
+import org.bson.Document;
 import org.neo4j.driver.*;
 
 import java.io.Closeable;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.neo4j.driver.Values.parameters;
@@ -34,6 +39,20 @@ class Neo4jDriver implements Closeable {
             return session.readTransaction(tx -> {
                 Result res = tx.run( "MATCH (u:User { username: \"$username\" }) RETURN u", parameters("username", username));
                 return res.hasNext();
+            });
+        }
+    }
+
+    public int addUser(String username) {
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MERGE (u:User {username: $username}) RETURN ID(u)",
+                        parameters( "username", username));
+                if (res.hasNext()) {
+                    return res.single().get(0).asInt();
+                }
+                return -1;
             });
         }
     }

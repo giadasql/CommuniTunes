@@ -54,6 +54,20 @@ class PersistenceImplementation implements Persistence {
     }
 
     public boolean addNewUser(User newUser){
-        return false;
+        String mongoID = mongo.addUser(newUser.Username, newUser.Email, newUser.Password);
+        if(mongoID != null){
+            int neoID = neo4j.addUser(newUser.Username);
+            if(neoID != -1){
+                return true;
+            }
+            else{
+                // TODO: eliminare l'utente anche da mongoDB perché non è stato aggiunto correttamente su neo4j
+                System.out.println("Utente aggiunto su mongoDB ma non aggiunto su neo4j.");
+                return false;
+            }
+        }
+        else{
+            return false;
+        }
     }
 }
