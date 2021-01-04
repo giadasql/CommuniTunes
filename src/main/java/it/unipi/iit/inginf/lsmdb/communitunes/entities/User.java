@@ -1,10 +1,6 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.entities;
-
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import org.apache.commons.codec.digest.DigestUtils;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -27,13 +23,6 @@ public class User extends Entity {
     public User(String username, String email, String password){
         Email = email;
         Username = username;
-        try{
-            MessageDigest pswdDigest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = pswdDigest.digest(password.getBytes(StandardCharsets.UTF_8));
-            Password = Arrays.toString(hash);
-        }
-        catch(NoSuchAlgorithmException exc){
-            Password = password;
-        }
+        Password =  DigestUtils.sha256Hex(password);
     }
 }
