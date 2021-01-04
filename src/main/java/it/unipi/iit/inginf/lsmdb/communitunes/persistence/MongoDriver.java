@@ -4,17 +4,12 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
-import org.bson.BsonString;
-import org.bson.BsonValue;
 import org.bson.Document;
 
 import static com.mongodb.client.model.Filters.*;
-
 import java.io.Closeable;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 class MongoDriver implements Closeable {
     private final MongoClient mongoClient;
@@ -51,7 +46,13 @@ class MongoDriver implements Closeable {
         user.append("email", email);
         user.append("password", psw);
         InsertOneResult insertOneResult = usersCollection.insertOne(user);
+        // TODO: probabilmente non serve ritornare l'ID
         return insertOneResult.getInsertedId() == null ? null : insertOneResult.getInsertedId().asObjectId().getValue().toString();
+    }
+
+    public boolean deleteUser(String username) {
+        DeleteResult deleteResult = usersCollection.deleteOne(eq("username", username));
+        return deleteResult.wasAcknowledged() && deleteResult.getDeletedCount() >= 1;
     }
 
     @Override

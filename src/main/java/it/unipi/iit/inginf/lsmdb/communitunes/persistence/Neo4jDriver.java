@@ -3,6 +3,7 @@ package it.unipi.iit.inginf.lsmdb.communitunes.persistence;
 import com.mongodb.client.result.InsertOneResult;
 import org.bson.Document;
 import org.neo4j.driver.*;
+import org.neo4j.driver.summary.ResultSummary;
 
 import java.io.Closeable;
 import java.nio.charset.StandardCharsets;
@@ -37,7 +38,7 @@ class Neo4jDriver implements Closeable {
         try ( Session session = driver.session())
         {
             return session.readTransaction(tx -> {
-                Result res = tx.run( "MATCH (u:User { username: \"$username\" }) RETURN u", parameters("username", username));
+                Result res = tx.run( "MATCH (u:User { username: $username }) RETURN u", parameters("username", username));
                 return res.hasNext();
             });
         }
@@ -50,9 +51,20 @@ class Neo4jDriver implements Closeable {
                 Result res = tx.run( "MERGE (u:User {username: $username}) RETURN ID(u)",
                         parameters( "username", username));
                 if (res.hasNext()) {
+                    // TODO: probabilmente non serve ritornare l'ID
                     return res.single().get(0).asInt();
                 }
                 return -1;
+            });
+        }
+    }
+
+    public boolean deleteUser(String username){
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (u:User { username: $username }) DETACH DELETE u RETURN count(u)", parameters("username", username));
+                return (res.single().get(0).asInt() >= 1);
             });
         }
     }

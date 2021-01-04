@@ -70,4 +70,19 @@ class PersistenceImplementation implements Persistence {
             return false;
         }
     }
+
+    // TODO: deve diventare una funzione più complessa che elimina anche le review
+    // questa è una funzione per eseguire i test
+    public boolean deleteUser(User user){
+        return (mongo.deleteUser(user.Username) && neo4j.deleteUser(user.Username));
+    }
+
+    public void close(){
+        if(mongo != null){
+            mongo.close();
+        }
+        if(neo4j != null){
+            neo4j.close();
+        }
+    }
 }
