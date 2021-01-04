@@ -5,6 +5,8 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.result.InsertOneResult;
+import org.bson.BsonString;
+import org.bson.BsonValue;
 import org.bson.Document;
 
 import static com.mongodb.client.model.Filters.*;
@@ -49,7 +51,7 @@ class MongoDriver implements Closeable {
         user.append("email", email);
         user.append("password", psw);
         InsertOneResult insertOneResult = usersCollection.insertOne(user);
-        return insertOneResult.getInsertedId() == null ? null : String.valueOf(insertOneResult.getInsertedId().asString());
+        return insertOneResult.getInsertedId() == null ? null : insertOneResult.getInsertedId().asObjectId().getValue().toString();
     }
 
     @Override
