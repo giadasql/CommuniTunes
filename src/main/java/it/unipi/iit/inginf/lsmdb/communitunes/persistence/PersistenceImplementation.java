@@ -50,8 +50,12 @@ class PersistenceImplementation implements Persistence {
         mongo = new MongoDriver(connectionString);
     }
 
-    public boolean checkIfUserExists(User newUser){
-        return mongo.checkIfEmailExists(newUser.Email) || mongo.checkIfUsernameExists(newUser.Username) || neo4j.checkIfUsernameExists(newUser.Username);
+    public boolean checkIfUsernameExists(String username){
+        return mongo.checkIfUsernameExists(username) || neo4j.checkIfUsernameExists(username);
+    }
+
+    public boolean checkIfEmailExists(String email){
+        return mongo.checkIfEmailExists(email);
     }
 
     public boolean addNewUser(User newUser) throws PersistenceInconsistencyException {
@@ -82,8 +86,8 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean checkPassword(User user) {
-        return mongo.checkPassword(user.Username, user.Password);
+    public boolean checkPassword(String username, String password) {
+        return mongo.checkPassword(username, password);
     }
 
     public void close(){
