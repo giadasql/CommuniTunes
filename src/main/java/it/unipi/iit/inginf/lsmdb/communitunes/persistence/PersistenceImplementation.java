@@ -4,6 +4,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReader;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderType;
+import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceInconsistencyException;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -53,7 +54,7 @@ class PersistenceImplementation implements Persistence {
         return mongo.checkIfEmailExists(newUser.Email) || mongo.checkIfUsernameExists(newUser.Username) || neo4j.checkIfUsernameExists(newUser.Username);
     }
 
-    public boolean addNewUser(User newUser){
+    public boolean addNewUser(User newUser) throws PersistenceInconsistencyException {
         String mongoID = mongo.addUser(newUser.Username, newUser.Email, newUser.Password);
         if(mongoID != null){
             int neoID = neo4j.addUser(newUser.Username);
@@ -61,9 +62,12 @@ class PersistenceImplementation implements Persistence {
                 return true;
             }
             else{
-                // TODO: eliminare l'utente anche da mongoDB perché non è stato aggiunto correttamente su neo4j
-                System.out.println("Utente aggiunto su mongoDB ma non aggiunto su neo4j.");
-                return false;
+                if(mongo.deleteUser(newUser.Username)){
+                    return false;
+                }
+                else{
+                    throw new PersistenceInconsistencyException("User " + newUser.Username + " was not correctly added, but due to unexpected errors the user might be present in the database. This my cause inconsistencies.");
+                }
             }
         }
         else{
@@ -75,6 +79,11 @@ class PersistenceImplementation implements Persistence {
     // questa è una funzione per eseguire i test
     public boolean deleteUser(User user){
         return (mongo.deleteUser(user.Username) && neo4j.deleteUser(user.Username));
+    }
+
+    @Override
+    public boolean checkPassword(User user) {
+        return mongo.checkPassword(user.Username, user.Password);
     }
 
     public void close(){

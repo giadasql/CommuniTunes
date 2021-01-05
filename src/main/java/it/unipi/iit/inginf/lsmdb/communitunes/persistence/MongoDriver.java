@@ -1,5 +1,6 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.persistence;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -53,6 +54,14 @@ class MongoDriver implements Closeable {
     public boolean deleteUser(String username) {
         DeleteResult deleteResult = usersCollection.deleteOne(eq("username", username));
         return deleteResult.wasAcknowledged() && deleteResult.getDeletedCount() >= 1;
+    }
+
+    public boolean checkPassword(String username, String password){
+        BasicDBObject criteria = new BasicDBObject();
+        criteria.append("username", username);
+        criteria.append("password", password);
+
+        return usersCollection.find(criteria).first() != null;
     }
 
     @Override
