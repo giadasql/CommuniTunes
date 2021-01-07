@@ -11,7 +11,6 @@ class AuthenticationManagerImplementation implements AuthenticationManager {
     private final String UsernameTaken = "This username is already taken";
     private final String UsernameInvalidChars = "The username must contain only letters, numbers, or \"-\", \"_\" and \".\"";
     private final String InvalidEmail = "Please specify an email in the correct format.";
-    private String NoConnection = "Cannot reach the server. Please try again later";
     private final Persistence persistenceManager;
 
     AuthenticationManagerImplementation(){
