@@ -3,6 +3,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceIn
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 
 class AuthenticationManagerImplementation implements AuthenticationManager {
@@ -19,7 +20,7 @@ class AuthenticationManagerImplementation implements AuthenticationManager {
 
     @Override
     public AuthResult Login(String username, String psw) {
-        if(persistenceManager.checkPassword(username, psw)){
+        if(persistenceManager.checkPassword(username, DigestUtils.sha256Hex(psw))){
             return new AuthResult(username, true, null);
         }
         else{
@@ -41,7 +42,7 @@ class AuthenticationManagerImplementation implements AuthenticationManager {
             return new AuthResult(null, false, UsernameTaken);
         }
         else{
-            User newUser = new User(username, email, psw);
+            User newUser = new User(username, email, DigestUtils.sha256Hex(psw));
             persistenceManager.addNewUser(newUser);
             return new AuthResult(username, true, null);
         }
