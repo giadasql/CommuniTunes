@@ -23,6 +23,6 @@ public class User extends Entity {
     public User(String username, String email, String password){
         Email = email;
         Username = username;
-        Password =  DigestUtils.sha256Hex(password);
+        Password =  password;
     }
 }

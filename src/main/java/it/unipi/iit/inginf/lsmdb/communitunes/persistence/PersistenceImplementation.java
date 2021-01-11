@@ -1,5 +1,8 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.persistence;
 
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.Review;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReader;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderFactory;
@@ -82,12 +85,89 @@ class PersistenceImplementation implements Persistence {
     // TODO: deve diventare una funzione più complessa che elimina anche le review
     // questa è una funzione per eseguire i test
     public boolean deleteUser(User user){
-        return (mongo.deleteUser(user.Username) && neo4j.deleteUser(user.Username));
+        boolean neo4jDelete = neo4j.deleteUser(user.Username);
+        boolean mongoDelete = mongo.deleteUser(user.Username);
+        return (mongoDelete && neo4jDelete && deleteReviews(user.Username));
+    }
+
+    @Override
+    public boolean updateUser(User user) {
+        return false;
+    }
+
+    @Override
+    public boolean addArtist(Artist newArtist) throws PersistenceInconsistencyException {
+        return false;
+    }
+
+    @Override
+    public boolean deleteArtist(Artist artist) {
+        return false;
+    }
+
+    @Override
+    public boolean updateArtist(Artist artist) {
+        return false;
+    }
+
+    @Override
+    public boolean addSong(Song newSong) throws PersistenceInconsistencyException {
+        return false;
+    }
+
+    @Override
+    public boolean deleteSong(Song song) {
+        return false;
+    }
+
+    @Override
+    public boolean editSong(Song song) {
+        return false;
+    }
+
+    @Override
+    public boolean addReview(Review review) {
+        return false;
+    }
+
+    @Override
+    public boolean deleteReview(Review review) {
+        return false;
+    }
+
+    @Override
+    public boolean editReview(Review review) {
+        return false;
+    }
+
+    @Override
+    public boolean deleteReviews(String username) {
+        return mongo.deleteReviews(username);
     }
 
     @Override
     public boolean checkPassword(String username, String password) {
         return mongo.checkPassword(username, password);
+    }
+
+    @Override
+    public User getUser(String username) {
+        return null;
+    }
+
+    @Override
+    public Artist getArtist(String username) {
+        return null;
+    }
+
+    @Override
+    public Song getSong(String songID) {
+        return null;
+    }
+
+    @Override
+    public Song getReview(String reviewID) {
+        return null;
     }
 
     public void close(){

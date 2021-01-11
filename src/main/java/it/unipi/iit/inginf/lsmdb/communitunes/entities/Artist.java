@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Artist extends User {
 
-    List<Song> Songs;
+    List<Song> LoadedSongs;
 
     List<Artist> Groups = new ArrayList<>();
 

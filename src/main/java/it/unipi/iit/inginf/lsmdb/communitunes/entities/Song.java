@@ -10,7 +10,7 @@ public class Song extends Entity {
 
     public long Duration;
 
-    public String title;
+    public String Title;
 
     public List<Review> LoadedReviews = new ArrayList<>();
 
