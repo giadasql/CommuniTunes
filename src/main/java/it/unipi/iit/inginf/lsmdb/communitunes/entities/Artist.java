@@ -1,13 +1,19 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.entities;
 
+import org.javatuples.Pair;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Artist extends User {
 
-    List<Song> LoadedSongs;
+    public String StageName;
 
-    List<Artist> Groups = new ArrayList<>();
+    // <SongTitle, SongID>
+    public List<Pair<String, String>> LoadedSongs;
+
+    // <GroupName, GroupID>
+    public List<Pair<String, String>> Groups = new ArrayList<>();
 
     public Artist(String username, String email, String password) {
         super(username, email, password);

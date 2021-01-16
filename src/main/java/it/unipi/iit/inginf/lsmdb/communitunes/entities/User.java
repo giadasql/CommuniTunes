@@ -1,8 +1,8 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.entities;
 import org.apache.commons.codec.digest.DigestUtils;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import org.javatuples.Pair;
+
+import java.util.*;
 
 public class User extends Entity {
 
@@ -14,11 +14,11 @@ public class User extends Entity {
 
     public Date Birthday;
 
-    public List<Song> LoadedLikes = new ArrayList<>();
+    public List<Pair<String, String>> LoadedLikes = new ArrayList<>();
 
-    public List<User> LoadedFollows = new ArrayList<>();
+    public List<String> LoadedFollows = new ArrayList<>();
 
-    public List<User> LoadedFollowers = new ArrayList<>();
+    public List<String> LoadedFollowers = new ArrayList<>();
 
     public User(String username, String email, String password){
         Email = email;
