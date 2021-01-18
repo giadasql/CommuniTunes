@@ -8,11 +8,14 @@ import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigRea
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderType;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceInconsistencyException;
+import org.javatuples.Pair;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InvalidClassException;
+import java.util.*;
 
 class PersistenceImplementation implements Persistence {
 
@@ -82,8 +85,6 @@ class PersistenceImplementation implements Persistence {
         }
     }
 
-    // TODO: deve diventare una funzione più complessa che elimina anche le review
-    // questa è una funzione per eseguire i test
     public boolean deleteUser(User user){
         boolean neo4jDelete = neo4j.deleteUser(user.Username);
         boolean mongoDelete = mongo.deleteUser(user.Username);
@@ -152,7 +153,60 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public User getUser(String username) {
-        return null;
+        Hashtable<String, Object> userData = (Hashtable<String, Object>)mongo.getUserData(username);
+        userData.putAll((Hashtable<String, Object>)neo4j.getUserData(username));
+        String email = null, password = null, country = null;
+        Date birthday = null;
+        List<String> followed = new ArrayList<>(), followers = new ArrayList<>(), artistFollowers = new ArrayList<>(), artistFollowed = new ArrayList<>();
+        List<Pair<String, String>> likes = new ArrayList<>();
+        for (String key :
+                userData.keySet()) {
+            try{
+                switch (key){
+                    case "email":
+                        email = (String)userData.get(key);
+                        break;
+                    case "password":
+                        password = (String)userData.get(key);
+                        break;
+                    case "country":
+                        country = (String)userData.get(key);
+                        break;
+                    case "birthday":
+                        birthday = (Date)userData.get(key);
+                        break;
+                    case "followed":
+                        followed.addAll((List<String>)userData.get(key));
+                        break;
+                    case "followers":
+                        followers.addAll((List<String>)userData.get(key));
+                        break;
+                    case "followedArtists":
+                        artistFollowed.addAll((List<String>)userData.get(key));
+                        break;
+                    case "followerArtists":
+                        artistFollowers.addAll((List<String>)userData.get(key));
+                        break;
+                    case "likes":
+                        likes.addAll((List<Pair<String, String>>)userData.get(key));
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch (ClassCastException exception){
+                // TODO: log the exception, but do nothing. Missing fields are okay.
+            }
+        }
+        User toReturn = new User(username, email, password);
+        toReturn.LoadedFollowers = followers;
+        toReturn.LoadedFollowed = followed;
+        toReturn.LoadedArtistFollowers = artistFollowers;
+        toReturn.LoadedLikes = likes;
+        toReturn.LoadedArtistFollowed = artistFollowed;
+        toReturn.Country = country;
+        toReturn.Birthday = birthday;
+        return toReturn;
     }
 
     @Override

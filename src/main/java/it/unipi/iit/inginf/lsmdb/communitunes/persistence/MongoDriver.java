@@ -12,6 +12,9 @@ import org.bson.Document;
 
 import static com.mongodb.client.model.Filters.*;
 import java.io.Closeable;
+import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.Hashtable;
 
 class MongoDriver implements Closeable {
     private final MongoClient mongoClient;
@@ -76,6 +79,19 @@ class MongoDriver implements Closeable {
         criteria.append("password", password);
 
         return usersCollection.find(criteria).first() != null;
+    }
+
+    public Dictionary<String, Object> getUserData(String username){
+        Dictionary<String, Object> userValues = new Hashtable<>();
+        Document user = usersCollection.find(eq("username", username)).first();
+        if(user != null){
+            userValues.put("username", username);
+            userValues.put("email", user.get("email"));
+            userValues.put("password", user.get("password"));
+            userValues.put("birthday", user.get("birthday"));
+            return userValues;
+        }
+        return null;
     }
 
     @Override
