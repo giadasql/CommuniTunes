@@ -12,13 +12,19 @@ public class User extends Entity {
 
     public String Password;
 
+    public String Country;
+
     public Date Birthday;
 
     public List<Pair<String, String>> LoadedLikes = new ArrayList<>();
 
-    public List<String> LoadedFollows = new ArrayList<>();
+    public List<String> LoadedFollowed = new ArrayList<>();
+
+    public List<String> LoadedArtistFollowed = new ArrayList<>();
 
     public List<String> LoadedFollowers = new ArrayList<>();
+
+    public List<String> LoadedArtistFollowers = new ArrayList<>();
 
     public User(String username, String email, String password){
         Email = email;
