@@ -9,12 +9,11 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 import static com.mongodb.client.model.Filters.*;
 import java.io.Closeable;
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.*;
 
 class MongoDriver implements Closeable {
     private final MongoClient mongoClient;
@@ -81,15 +80,34 @@ class MongoDriver implements Closeable {
         return usersCollection.find(criteria).first() != null;
     }
 
-    public Dictionary<String, Object> getUserData(String username){
-        Dictionary<String, Object> userValues = new Hashtable<>();
+    public Map<String, Object> getUserData(String username){
+        Map<String, Object> userValues = new HashMap<>();
         Document user = usersCollection.find(eq("username", username)).first();
         if(user != null){
             userValues.put("username", username);
             userValues.put("email", user.get("email"));
+            userValues.put("id", user.getObjectId("_id").toString());
             userValues.put("password", user.get("password"));
             userValues.put("birthday", user.get("birthday"));
+            userValues.put("country", user.get("country"));
             return userValues;
+        }
+        return null;
+    }
+
+    public Map<String, Object> getArtistData(String username){
+        HashMap<String, Object> artistValues = new HashMap<>();
+        Document artist = usersCollection.find(eq("username", username)).first();
+        if(artist != null){
+            artistValues.put("username", username);
+            artistValues.put("email", artist.get("email"));
+            artistValues.put("id", artist.getObjectId("_id").toString());
+            artistValues.put("password", artist.get("password"));
+            artistValues.put("birthday", artist.get("birthday"));
+            artistValues.put("stageName", artist.get("stageName"));
+            artistValues.put("biography", artist.get("biography"));
+            artistValues.put("activity", artist.get("activity"));
+            return artistValues;
         }
         return null;
     }

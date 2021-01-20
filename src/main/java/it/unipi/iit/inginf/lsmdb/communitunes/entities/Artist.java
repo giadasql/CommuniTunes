@@ -12,9 +12,6 @@ public class Artist extends User {
     // <SongTitle, SongID>
     public List<Pair<String, String>> LoadedSongs;
 
-    // <GroupName, GroupID>
-    public List<Pair<String, String>> Groups = new ArrayList<>();
-
     public Artist(String username, String email, String password) {
         super(username, email, password);
     }

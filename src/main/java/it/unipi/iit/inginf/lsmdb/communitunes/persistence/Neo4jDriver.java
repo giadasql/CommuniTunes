@@ -11,7 +11,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.neo4j.driver.Values.parameters;
@@ -72,8 +74,8 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    public Dictionary<String, Object> getUserData(String username){
-        Dictionary<String, Object> userValues = new Hashtable<>();
+    public Map<String, Object> getUserData(String username){
+        Map<String, Object> userValues = new HashMap<>();
         try ( Session session = driver.session())
         {
             Record result = session.readTransaction(tx -> {
@@ -92,6 +94,33 @@ class Neo4jDriver implements Closeable {
                 userValues.put(("followedArtists"), result.get("FollowedArtists").asList());
                 userValues.put(("followerArtists"), result.get("FollowerArtists").asList());
                 return userValues;
+            }
+        }
+        return null;
+    }
+
+    public Map<String, Object> getArtistData(String username){
+        Map<String, Object> artistValues = new HashMap<>();
+        try ( Session session = driver.session())
+        {
+            Record result = session.readTransaction(tx -> {
+                Result res = tx.run( "MATCH (a:Artist { username: $username })\n" +
+                        "OPTIONAL MATCH (a)-[:FOLLOWS]->(followed:User) WHERE NOT followed:Artist\n" +
+                        "OPTIONAL MATCH (a)<-[:FOLLOWS]-(follower:User) WHERE NOT follower:Artist\n" +
+                        "OPTIONAL MATCH (a)-[:FOLLOWS]->(followedArtist:Artist)\n" +
+                        "OPTIONAL MATCH (a)<-[:FOLLOWS]-(followerArtist:Artist)\n" +
+                        "OPTIONAL MATCH (a)-[:PERFORMS]->(s:Song)\n" +
+                        "RETURN a AS Artist, COLLECT(DISTINCT(follower.username))[0..15] AS Followers, COLLECT(DISTINCT(followed.username))[0..15] AS Followed, COLLECT(DISTINCT(followedArtist.stageName))[0..15] AS FollowedArtists, COLLECT(DISTINCT(followerArtist))[0..15] AS FollowerArtists, COLLECT(DISTINCT({title: s.title, id: s.songID})) AS Songs", parameters("username", username));
+
+                return res.single();
+            });
+            if(result != null){
+                artistValues.put(("followers"), result.get("Followers").asList());
+                artistValues.put(("followed"), result.get("Followed").asList());
+                artistValues.put(("followedArtists"), result.get("FollowedArtists").asList());
+                artistValues.put(("followerArtists"), result.get("FollowerArtists").asList());
+                artistValues.put(("songs"), result.get("Songs").asList());
+                return artistValues;
             }
         }
         return null;

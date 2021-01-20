@@ -153,8 +153,8 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public User getUser(String username) {
-        Hashtable<String, Object> userData = (Hashtable<String, Object>)mongo.getUserData(username);
-        userData.putAll((Hashtable<String, Object>)neo4j.getUserData(username));
+        Map<String, Object> userData = mongo.getUserData(username);
+        userData.putAll(neo4j.getUserData(username));
         String email = null, password = null, country = null;
         Date birthday = null;
         List<String> followed = new ArrayList<>(), followers = new ArrayList<>(), artistFollowers = new ArrayList<>(), artistFollowed = new ArrayList<>();
@@ -206,12 +206,75 @@ class PersistenceImplementation implements Persistence {
         toReturn.LoadedArtistFollowed = artistFollowed;
         toReturn.Country = country;
         toReturn.Birthday = birthday;
+        toReturn.ID = (String)userData.get("id");
         return toReturn;
     }
 
     @Override
     public Artist getArtist(String username) {
-        return null;
+        Map<String, Object> artistData = mongo.getArtistData(username);
+        artistData.putAll(neo4j.getArtistData(username));
+        String email = null, password = null, country = null, stageName = null;
+        Date birthday = null;
+        List<String> followed = new ArrayList<>(), followers = new ArrayList<>(), artistFollowers = new ArrayList<>(), artistFollowed = new ArrayList<>();
+        List<Pair<String, String>> likes = new ArrayList<>(), songs = new ArrayList<>();
+        for (String key :
+                artistData.keySet()) {
+            try{
+                switch (key){
+                    case "email":
+                        email = (String)artistData.get(key);
+                        break;
+                    case "password":
+                        password = (String)artistData.get(key);
+                        break;
+                    case "country":
+                        country = (String)artistData.get(key);
+                        break;
+                    case "birthday":
+                        birthday = (Date)artistData.get(key);
+                        break;
+                    case "stageName":
+                        stageName = (String)artistData.get(key);
+                        break;
+                    case "followed":
+                        followed.addAll((List<String>)artistData.get(key));
+                        break;
+                    case "followers":
+                        followers.addAll((List<String>)artistData.get(key));
+                        break;
+                    case "followedArtists":
+                        artistFollowed.addAll((List<String>)artistData.get(key));
+                        break;
+                    case "followerArtists":
+                        artistFollowers.addAll((List<String>)artistData.get(key));
+                        break;
+                    case "likes":
+                        likes.addAll((List<Pair<String, String>>)artistData.get(key));
+                        break;
+                    case "songs":
+                        songs.addAll((List<Pair<String, String>>)artistData.get(key));
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch (ClassCastException exception){
+                // TODO: log the exception, but do nothing. Missing fields are okay.
+            }
+        }
+        Artist toReturn = new Artist(username, email, password);
+        toReturn.LoadedFollowers = followers;
+        toReturn.LoadedFollowed = followed;
+        toReturn.LoadedArtistFollowers = artistFollowers;
+        toReturn.LoadedLikes = likes;
+        toReturn.LoadedArtistFollowed = artistFollowed;
+        toReturn.Country = country;
+        toReturn.Birthday = birthday;
+        toReturn.StageName = stageName;
+        toReturn.LoadedSongs = songs;
+        toReturn.ID = (String)artistData.get("id");
+        return toReturn;
     }
 
     @Override
