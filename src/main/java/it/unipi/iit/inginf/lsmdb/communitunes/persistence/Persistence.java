@@ -5,6 +5,10 @@ import it.unipi.iit.inginf.lsmdb.communitunes.entities.Review;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceInconsistencyException;
+import org.javatuples.Pair;
+import org.javatuples.Triplet;
+
+import java.util.List;
 
 public interface Persistence {
     boolean checkIfUsernameExists(String username);
@@ -33,6 +37,12 @@ public interface Persistence {
     boolean addReview(Review review);
     boolean deleteReview(Review review);
     boolean editReview(Review review);
+
+    List<Pair<String, String>> getSuggestedSongs(User user);
+    List<Pair<String, String>> getSuggestedSongs(String genre);
+    List<String> getSuggestedArtists(User user);
+    List<String> getSuggestedUsers(User user);
+
 
     void close();
 }

@@ -9,6 +9,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigRea
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderType;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceInconsistencyException;
 import org.javatuples.Pair;
+import org.javatuples.Triplet;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -142,6 +143,26 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
+    public List<Pair<String, String>> getSuggestedSongs(User user) {
+        return null;
+    }
+
+    @Override
+    public List<Pair<String, String>> getSuggestedSongs(String genre) {
+        return null;
+    }
+
+    @Override
+    public List<String> getSuggestedArtists(User user) {
+        return null;
+    }
+
+    @Override
+    public List<String> getSuggestedUsers(User user) {
+        return null;
+    }
+
+    @Override
     public boolean deleteReviews(String username) {
         return mongo.deleteReviews(username);
     }
@@ -187,7 +208,7 @@ class PersistenceImplementation implements Persistence {
                     case "followerArtists":
                         artistFollowers.addAll((List<String>)userData.get(key));
                         break;
-                    case "likes":
+                    case "likedSongs":
                         likes.addAll((List<Pair<String, String>>)userData.get(key));
                         break;
                     default:
@@ -279,6 +300,67 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public Song getSong(String songID) {
+        Map<String, Object> songData = mongo.getSongData(songID);
+
+        if(songData != null){
+            songData.putAll(neo4j.getSongData(songID));
+            String artist = null, title = null, image = null, album = null, duration = null, link = null;
+            List<String> genres = new ArrayList<>();
+            List<Pair<String, String>> featurings = new ArrayList<>();
+            List<Review> loadedReviews = new ArrayList<>();
+            List<String> loadedLikes = new ArrayList<>();
+
+            for (String key :
+                    songData.keySet()) {
+                try {
+                    switch (key) {
+                        case "title":
+                            title = (String) songData.get(key);
+                            break;
+                        case "image":
+                            image = (String) songData.get(key);
+                            break;
+                        case "album":
+                            album = (String) songData.get(key);
+                            break;
+                        case "duration":
+                            duration = (String) songData.get(key);
+                            break;
+                        case "link":
+                            link = (String) songData.get(key);
+                            break;
+                        case "mainArtist":
+                            artist = (String) songData.get(key);
+                            break;
+                        case "genres":
+                            if(songData.get(key) != null){
+                                genres.addAll((List<String>) songData.get(key));
+                            }
+                            break;
+                        case "featurings":
+                            featurings.addAll((List<Pair<String, String>>) songData.get(key));
+                            break;
+                        case "likers":
+                            loadedLikes.addAll((List<String>)songData.get(key));
+                            break;
+                        case "reviews":
+                            List<HashMap<String, Object>> rawReviews = (List<HashMap<String, Object>>) songData.get(key);
+                            for (HashMap<String, Object> rawReview:
+                                    rawReviews) {
+                                loadedReviews.add(new Review((String)rawReview.get("user"), (int)rawReview.get("rating"), (String)rawReview.get("text"), songID));
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                } catch (ClassCastException exception) {
+                    System.out.println(exception.getMessage());
+                    // TODO: log the exception, but do nothing. Missing fields are okay.
+                }
+            }
+            return new Song(artist, duration, title, image, album, loadedReviews, new ArrayList<>(Collections.singletonList(link)), genres, featurings, songID);
+        }
+
         return null;
     }
 

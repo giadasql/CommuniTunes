@@ -1,18 +1,31 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.persistence;
 
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Aggregates;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
+import org.bson.BSONObject;
+import org.bson.BsonDocument;
 import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.bson.types.BasicBSONList;
 import org.bson.types.ObjectId;
 
+import static com.mongodb.client.model.Aggregates.limit;
+import static com.mongodb.client.model.Aggregates.project;
 import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Projections.*;
+
 import java.io.Closeable;
+import java.lang.reflect.Array;
 import java.util.*;
 
 class MongoDriver implements Closeable {
@@ -81,35 +94,93 @@ class MongoDriver implements Closeable {
     }
 
     public Map<String, Object> getUserData(String username){
-        Map<String, Object> userValues = new HashMap<>();
         Document user = usersCollection.find(eq("username", username)).first();
         if(user != null){
-            userValues.put("username", username);
-            userValues.put("email", user.get("email"));
-            userValues.put("id", user.getObjectId("_id").toString());
-            userValues.put("password", user.get("password"));
-            userValues.put("birthday", user.get("birthday"));
-            userValues.put("country", user.get("country"));
-            return userValues;
+            return getUserMap(user);
         }
         return null;
     }
 
     public Map<String, Object> getArtistData(String username){
-        HashMap<String, Object> artistValues = new HashMap<>();
         Document artist = usersCollection.find(eq("username", username)).first();
         if(artist != null){
-            artistValues.put("username", username);
-            artistValues.put("email", artist.get("email"));
-            artistValues.put("id", artist.getObjectId("_id").toString());
-            artistValues.put("password", artist.get("password"));
-            artistValues.put("birthday", artist.get("birthday"));
-            artistValues.put("stageName", artist.get("stageName"));
-            artistValues.put("biography", artist.get("biography"));
-            artistValues.put("activity", artist.get("activity"));
-            return artistValues;
+            return getArtistMap(artist);
         }
         return null;
+    }
+
+    public Map<String, Object> getSongData(String SongID){
+
+        Bson match = Aggregates.match((eq("_id", new ObjectId(SongID))));
+
+        BasicDBList list = new BasicDBList();
+        list.add("$reviews");
+        list.add(15);
+        Bson slice = new BasicDBObject("reviews", new BasicDBObject("$slice", list));
+        Bson project = Aggregates.project(Projections.fields(include("_id", "name", "length", "songLink", "album", "reviews", "genres", "image"), slice));
+
+        Bson limit = limit(1);
+
+        Document song = songsCollection.aggregate(Arrays.asList(match, limit, project)).first();
+        if(song != null){
+            return getSongMap(song);
+        }
+        return null;
+    }
+
+    private Map<String, Object> getSongMap(Document song){
+        if(song == null){
+            return null;
+        }
+        HashMap<String, Object> songValues = new HashMap<>();
+        songValues.put("title", song.get("name"));
+        songValues.put("id", song.getObjectId("_id").toString());
+        songValues.put("duration", song.get("length"));
+        songValues.put("image", song.get("image"));
+        songValues.put("link", song.get("songLink"));
+        songValues.put("album", song.get("album"));
+        List<HashMap<String, Object>> reviews = new ArrayList<>();
+        for (Document reviewDoc:
+                (ArrayList<Document>)song.get("reviews")) {
+            HashMap<String, Object> reviewMap = new HashMap<>();
+            reviewMap.put("user", reviewDoc.getString("user"));
+            reviewMap.put("text", reviewDoc.getString("text"));
+            reviewMap.put("rating", reviewDoc.getDouble("rating").intValue());
+            reviews.add(reviewMap);
+        }
+        songValues.put("reviews", reviews);
+        songValues.put("genres", song.get("genres"));
+        return songValues;
+    }
+
+    private Map<String, Object> getUserMap(Document user){
+        if(user == null){
+            return null;
+        }
+        HashMap<String, Object> userValues = new HashMap<>();
+        userValues.put("username", user.get("username"));
+        userValues.put("email", user.get("email"));
+        userValues.put("id", user.getObjectId("_id").toString());
+        userValues.put("password", user.get("password"));
+        userValues.put("birthday", user.get("birthday"));
+        userValues.put("country", user.get("country"));
+        return userValues;
+    }
+
+    private Map<String, Object> getArtistMap(Document artist){
+        if(artist == null){
+            return null;
+        }
+        HashMap<String, Object> artistValues = new HashMap<>();
+        artistValues.put("email", artist.get("email"));
+        artistValues.put("username", artist.get("username"));
+        artistValues.put("id", artist.getObjectId("_id").toString());
+        artistValues.put("password", artist.get("password"));
+        artistValues.put("birthday", artist.get("birthday"));
+        artistValues.put("stageName", artist.get("stageName"));
+        artistValues.put("biography", artist.get("biography"));
+        artistValues.put("activity", artist.get("activity"));
+        return artistValues;
     }
 
     @Override

@@ -9,6 +9,10 @@ public class Artist extends User {
 
     public String StageName;
 
+    public String Image;
+
+    public String ActiveYears;
+
     // <SongTitle, SongID>
     public List<Pair<String, String>> LoadedSongs;
 
