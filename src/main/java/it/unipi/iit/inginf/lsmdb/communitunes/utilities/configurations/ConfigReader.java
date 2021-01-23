@@ -2,6 +2,9 @@ package it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations;
 
 import java.util.List;
 
+/**
+ *
+ */
 public interface ConfigReader {
 
     /**
