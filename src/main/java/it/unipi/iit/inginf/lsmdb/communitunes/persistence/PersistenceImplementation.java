@@ -16,6 +16,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InvalidClassException;
+import java.lang.reflect.Type;
 import java.util.*;
 
 class PersistenceImplementation implements Persistence {
@@ -24,6 +25,8 @@ class PersistenceImplementation implements Persistence {
 
     private MongoDriver mongo;
     private Neo4jDriver neo4j;
+
+    private final List<String> SongConstructorParameters = new ArrayList<>(Arrays.asList("mainArtist", "duration", "title", "image", "album", "loadedReviews", "links", "genres", "featurings", "id"));
 
     public PersistenceImplementation() {
         String settingsFileName = "Settings.xml";
@@ -309,61 +312,18 @@ class PersistenceImplementation implements Persistence {
 
         if(songData != null){
             songData.putAll(neo4j.getSongData(songID));
-            String artist = null, title = null, image = null, album = null, duration = null, link = null;
-            List<String> genres = new ArrayList<>();
-            List<Pair<String, String>> featurings = new ArrayList<>();
-            List<Review> loadedReviews = new ArrayList<>();
-            List<String> loadedLikes = new ArrayList<>();
+            Object artist = songData.get("mainArtist"),
+                    title = songData.get("title"),
+                    image = songData.get("image"),
+                    album = songData.get("album"),
+                    duration = songData.get("duration"),
+                    link = songData.get("link"),
+                    genres = songData.get("genres"),
+                    featurings = songData.get("featurings"),
+                    loadedLikes = songData.get("likers"),
+                    loadedReviews = songData.get("reviews");
 
-            for (String key :
-                    songData.keySet()) {
-                try {
-                    switch (key) {
-                        case "title":
-                            title = (String) songData.get(key);
-                            break;
-                        case "image":
-                            image = (String) songData.get(key);
-                            break;
-                        case "album":
-                            album = (String) songData.get(key);
-                            break;
-                        case "duration":
-                            duration = (String) songData.get(key);
-                            break;
-                        case "link":
-                            link = (String) songData.get(key);
-                            break;
-                        case "mainArtist":
-                            artist = (String) songData.get(key);
-                            break;
-                        case "genres":
-                            if(songData.get(key) != null){
-                                genres.addAll((List<String>) songData.get(key));
-                            }
-                            break;
-                        case "featurings":
-                            featurings.addAll((List<Pair<String, String>>) songData.get(key));
-                            break;
-                        case "likers":
-                            loadedLikes.addAll((List<String>)songData.get(key));
-                            break;
-                        case "reviews":
-                            List<HashMap<String, Object>> rawReviews = (List<HashMap<String, Object>>) songData.get(key);
-                            for (HashMap<String, Object> rawReview:
-                                    rawReviews) {
-                                loadedReviews.add(new Review((String)rawReview.get("id"), (String)rawReview.get("user"), ((Double)rawReview.get("rating")).intValue(), (String)rawReview.get("text"), songID));
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-                } catch (ClassCastException exception) {
-                    System.out.println(exception.getMessage());
-                    // TODO: log the exception, but do nothing. Missing fields are okay.
-                }
-            }
-            return new Song(artist, duration, title, image, album, loadedReviews, new ArrayList<>(Collections.singletonList(link)), genres, featurings, songID);
+            return new Song(artist, duration, title, image, album, loadedReviews, new ArrayList<Object>(Collections.singletonList(link)), loadedLikes, genres, featurings, songID);
         }
 
         return null;
