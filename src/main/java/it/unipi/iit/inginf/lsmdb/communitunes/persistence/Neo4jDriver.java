@@ -165,8 +165,8 @@ class Neo4jDriver implements Closeable {
             });
             if(result != null){
                 songValues.put(("mainArtist"), result.get("MainArtist").asString());
-                songValues.put(("featurings"), result.get("Featurings"));
-                songValues.put(("likers"), result.get("Likers"));
+                songValues.put(("featurings"), result.get("Featurings").asList());
+                songValues.put(("likers"), result.get("Likers").asList());
                 return songValues;
             }
         }

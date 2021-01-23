@@ -6,9 +6,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Aggregates;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Projections;
+import com.mongodb.client.model.*;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
@@ -23,6 +21,7 @@ import static com.mongodb.client.model.Aggregates.limit;
 import static com.mongodb.client.model.Aggregates.project;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.*;
+import static com.mongodb.client.model.Updates.*;
 
 import java.io.Closeable;
 import java.lang.reflect.Array;
@@ -128,6 +127,23 @@ class MongoDriver implements Closeable {
         return null;
     }
 
+    // TODO: try to add timestamp
+    public boolean addReview(String user, int rating, String text, String songID){
+        Bson filter = new BasicDBObject("_id", new ObjectId(songID));
+
+        Document reviewDoc = new Document("user", user)
+                .append("rating", rating)
+                .append("text", text)
+                .append("_id", new ObjectId());
+
+        // Bson updateWithTimestamp = currentTimestamp("posted");
+        Bson update = addToSet("reviews", reviewDoc);
+
+        UpdateOptions options = new UpdateOptions().upsert(true);
+        Document result = songsCollection.findOneAndUpdate(filter, update);
+        return result != null;
+    }
+
     private Map<String, Object> getSongMap(Document song){
         if(song == null){
             return null;
@@ -140,12 +156,11 @@ class MongoDriver implements Closeable {
         songValues.put("link", song.get("songLink"));
         songValues.put("album", song.get("album"));
         List<HashMap<String, Object>> reviews = new ArrayList<>();
-        for (Document reviewDoc:
-                (ArrayList<Document>)song.get("reviews")) {
+        for (Document reviewDoc: song.getList("reviews", Document.class)) {
             HashMap<String, Object> reviewMap = new HashMap<>();
             reviewMap.put("user", reviewDoc.getString("user"));
             reviewMap.put("text", reviewDoc.getString("text"));
-            reviewMap.put("rating", reviewDoc.getDouble("rating").intValue());
+            reviewMap.put("rating", reviewDoc.getInteger("rating"));
             reviews.add(reviewMap);
         }
         songValues.put("reviews", reviews);

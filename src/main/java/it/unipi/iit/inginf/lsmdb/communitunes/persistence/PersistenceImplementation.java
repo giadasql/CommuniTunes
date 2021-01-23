@@ -129,7 +129,7 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean addReview(Review review) {
-        return false;
+        return mongo.addReview(review.User, review.Rating, review.Text, review.Song);
     }
 
     @Override
@@ -347,7 +347,7 @@ class PersistenceImplementation implements Persistence {
                             List<HashMap<String, Object>> rawReviews = (List<HashMap<String, Object>>) songData.get(key);
                             for (HashMap<String, Object> rawReview:
                                     rawReviews) {
-                                loadedReviews.add(new Review((String)rawReview.get("user"), (int)rawReview.get("rating"), (String)rawReview.get("text"), songID));
+                                loadedReviews.add(new Review((String)rawReview.get("user"), ((Double)rawReview.get("rating")).intValue(), (String)rawReview.get("text"), songID));
                             }
                             break;
                         default:
