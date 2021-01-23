@@ -2,6 +2,14 @@ package it.unipi.iit.inginf.lsmdb.communitunes.entities;
 
 public class Review extends Entity {
 
+    public Review(String id, String user, int rating, String text, String song) {
+        ID = id;
+        User = user;
+        Rating = rating;
+        Text = text;
+        Song = song;
+    }
+
     public Review(String user, int rating, String text, String song) {
         User = user;
         Rating = rating;

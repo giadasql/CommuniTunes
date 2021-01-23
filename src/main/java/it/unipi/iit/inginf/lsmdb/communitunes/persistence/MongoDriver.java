@@ -128,20 +128,63 @@ class MongoDriver implements Closeable {
     }
 
     // TODO: try to add timestamp
-    public boolean addReview(String user, int rating, String text, String songID){
+    public String addReview(String user, int rating, String text, String songID){
         Bson filter = new BasicDBObject("_id", new ObjectId(songID));
+
+        ObjectId reviewId = new ObjectId();
 
         Document reviewDoc = new Document("user", user)
                 .append("rating", rating)
                 .append("text", text)
-                .append("_id", new ObjectId());
+                .append("_id", reviewId);
 
         // Bson updateWithTimestamp = currentTimestamp("posted");
         Bson update = addToSet("reviews", reviewDoc);
 
-        UpdateOptions options = new UpdateOptions().upsert(true);
         Document result = songsCollection.findOneAndUpdate(filter, update);
-        return result != null;
+        return result != null ? reviewId.toString() : null;
+    }
+
+    public List<Map<String, Object>> getSongReviews(String songID, int nMax){
+        List<Map<String, Object>> reviews = new ArrayList<>();
+
+        Bson match = Aggregates.match((eq("_id", new ObjectId(songID))));
+
+        BasicDBList list = new BasicDBList();
+        list.add("$reviews");
+        list.add(nMax);
+        Bson slice = new BasicDBObject("reviews", new BasicDBObject("$slice", list));
+
+        Bson project = Aggregates.project(Projections.fields(include("reviews"), slice));
+
+        Bson limit = limit(1);
+
+        Document song = songsCollection.aggregate(Arrays.asList(match, limit, project)).first();
+        if(song != null){
+            for (Document reviewDoc: song.getList("reviews", Document.class)) {
+                Map<String, Object> reviewMap = getReviewMap(reviewDoc, song.getObjectId("_id").toString());
+                reviews.add(reviewMap);
+            }
+        }
+        return reviews;
+    }
+
+    public boolean deleteReview(String songID, String reviewID){
+        Bson filter = new BasicDBObject("_id", new ObjectId(songID));
+        Bson pullReview = pull("reviews", new BasicDBObject("_id", new ObjectId(reviewID)));
+
+        Document result = songsCollection.findOneAndUpdate(filter, pullReview);
+        return  result != null;
+    }
+
+    private Map<String, Object> getReviewMap(Document review, String songID){
+        HashMap<String, Object> reviewMap = new HashMap<>();
+        reviewMap.put("user", review.getString("user"));
+        reviewMap.put("text", review.getString("text"));
+        reviewMap.put("rating", review.getInteger("rating"));
+        reviewMap.put("id", review.getObjectId("_id").toString());
+        reviewMap.put("songID", songID);
+        return reviewMap;
     }
 
     private Map<String, Object> getSongMap(Document song){
@@ -155,12 +198,9 @@ class MongoDriver implements Closeable {
         songValues.put("image", song.get("image"));
         songValues.put("link", song.get("songLink"));
         songValues.put("album", song.get("album"));
-        List<HashMap<String, Object>> reviews = new ArrayList<>();
+        List<Map<String, Object>> reviews = new ArrayList<>();
         for (Document reviewDoc: song.getList("reviews", Document.class)) {
-            HashMap<String, Object> reviewMap = new HashMap<>();
-            reviewMap.put("user", reviewDoc.getString("user"));
-            reviewMap.put("text", reviewDoc.getString("text"));
-            reviewMap.put("rating", reviewDoc.getInteger("rating"));
+            Map<String, Object> reviewMap = getReviewMap(reviewDoc, song.getObjectId("_id").toString());
             reviews.add(reviewMap);
         }
         songValues.put("reviews", reviews);

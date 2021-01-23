@@ -129,12 +129,17 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean addReview(Review review) {
-        return mongo.addReview(review.User, review.Rating, review.Text, review.Song);
+        String insertedId = mongo.addReview(review.User, review.Rating, review.Text, review.Song);
+        if(insertedId != null){
+            review.ID = insertedId;
+            return true;
+        }
+        return false;
     }
 
     @Override
     public boolean deleteReview(Review review) {
-        return false;
+        return mongo.deleteReview(review.Song, review.ID);
     }
 
     @Override
@@ -347,7 +352,7 @@ class PersistenceImplementation implements Persistence {
                             List<HashMap<String, Object>> rawReviews = (List<HashMap<String, Object>>) songData.get(key);
                             for (HashMap<String, Object> rawReview:
                                     rawReviews) {
-                                loadedReviews.add(new Review((String)rawReview.get("user"), ((Double)rawReview.get("rating")).intValue(), (String)rawReview.get("text"), songID));
+                                loadedReviews.add(new Review((String)rawReview.get("id"), (String)rawReview.get("user"), ((Double)rawReview.get("rating")).intValue(), (String)rawReview.get("text"), songID));
                             }
                             break;
                         default:
@@ -365,9 +370,31 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public Song getReview(String reviewID) {
-        return null;
+    public List<Review> getReviews(String songID, int nMax) {
+        List<Review> toReturn = new ArrayList<>();
+        List<Map<String, Object>> reviewsData = mongo.getSongReviews(songID, nMax);
+        for (Map<String, Object> review:
+             reviewsData) {
+            int rating = -1;
+            String text = null, user = null, id = null;
+            if(review.get("user") != null && review.get("user").getClass() == String.class){
+                user = (String)review.get("user");
+            }
+            if(review.get("rating") != null && review.get("rating").getClass() == Integer.class){
+                rating = (Integer)review.get("rating");
+            }
+            if(review.get("text") != null && review.get("text").getClass() == String.class){
+                text = (String)review.get("text");
+            }
+            if(review.get("id") != null && review.get("id").getClass() == String.class){
+                id = (String)review.get("id");
+            }
+            Review newReview = new Review(id, user, rating, text, songID);
+            toReturn.add(newReview);
+        }
+        return toReturn;
     }
+
 
     public void close(){
         if(mongo != null){

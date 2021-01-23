@@ -20,7 +20,7 @@ public interface Persistence {
     User getUser(String username);
     Artist getArtist(String username);
     Song getSong(String songID);
-    Song getReview(String reviewID);
+    List<Review> getReviews(String songID, int nMax);
 
     boolean addNewUser(User newUser) throws PersistenceInconsistencyException;
     boolean deleteUser(User user);
