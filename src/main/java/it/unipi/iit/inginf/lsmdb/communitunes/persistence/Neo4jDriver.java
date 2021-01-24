@@ -5,6 +5,7 @@ import org.bson.Document;
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.summary.ResultSummary;
+import org.neo4j.driver.types.MapAccessor;
 
 import java.io.Closeable;
 import java.nio.charset.StandardCharsets;
@@ -89,7 +90,7 @@ class Neo4jDriver implements Closeable {
                         "OPTIONAL MATCH (u)<-[:FOLLOWS]-(followerArtist:Artist)\n" +
                         "WITH COLLECT(DISTINCT(followerArtist.username))[0..15] AS FollowerArtists, FollowedArtists, Followers, Followed, u\n" +
                         "OPTIONAL MATCH (u)-[:LIKES]->(likedSong:Song)\n" +
-                        "RETURN u AS User, Followers, Followed, FollowedArtists, FollowerArtists, COLLECT(DISTINCT { title: likedSong.title, id: likedSong.songID  }) AS Songs", parameters("username", username));
+                        "RETURN u AS User, Followers, Followed, FollowedArtists, FollowerArtists, COLLECT(DISTINCT(likedSong { .songID, .title }))[0..15] AS LikedSongs", parameters("username", username));
 
                 return res.single();
             });
@@ -98,7 +99,7 @@ class Neo4jDriver implements Closeable {
                 userValues.put(("followed"), result.get("Followed").asList());
                 userValues.put(("followedArtists"), result.get("FollowedArtists").asList());
                 userValues.put(("followerArtists"), result.get("FollowerArtists").asList());
-                userValues.put(("likedSongs"), result.get("Songs").asList());
+                userValues.put(("likes"), result.get("LikedSongs").asList());
                 return userValues;
             }
         }
@@ -120,7 +121,9 @@ class Neo4jDriver implements Closeable {
                         "OPTIONAL MATCH (followerArtist:Artist)-[:FOLLOWS]->(a)\n" +
                         "WITH COLLECT(DISTINCT followerArtist.stageName)[0..15] AS FollowerArtists, FollowedArtists, Follower, Followed, a\n" +
                         "OPTIONAL MATCH (a)-[:PERFORMS]->(s:Song)\n" +
-                        "RETURN a AS Artist, Followed, Follower, FollowedArtists, FollowerArtists, COLLECT(DISTINCT({title: s.title, id: s.songID})) AS Songs", parameters("username", username));
+                        "WITH COLLECT(DISTINCT(s { .songID, .title }))[0..15] AS Songs, FollowerArtists, FollowedArtists, Follower, Followed, a\n" +
+                        "OPTIONAL MATCH (a)-[:LIKES]->(likedSong:Song)\n" +
+                        "RETURN Followed, Follower, FollowedArtists, FollowerArtists, Songs, COLLECT(DISTINCT(likedSong { .songID, .title }))[0..15] AS LikedSongs", parameters("username", username));
                 if(res != null && res.hasNext()){
                     return res.single();
                 }
@@ -134,6 +137,7 @@ class Neo4jDriver implements Closeable {
                 artistValues.put(("followedArtists"), result.get("FollowedArtists").asList());
                 artistValues.put(("followerArtists"), result.get("FollowerArtists").asList());
                 artistValues.put(("songs"), result.get("Songs").asList());
+                artistValues.put(("likes"), result.get("LikedSongs").asList());
                 return artistValues;
             }
         }

@@ -182,177 +182,111 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public User getUser(String username) {
-        Map<String, Object> userData = mongo.getUserData(username);
+        Map<String, Object> userData = new HashMap<>(mongo.getUserData(username));
         userData.putAll(neo4j.getUserData(username));
-        String email = null, password = null, country = null;
-        Date birthday = null;
-        List<String> followed = new ArrayList<>(), followers = new ArrayList<>(), artistFollowers = new ArrayList<>(), artistFollowed = new ArrayList<>();
-        List<Pair<String, String>> likes = new ArrayList<>();
-        for (String key :
-                userData.keySet()) {
-            try{
-                switch (key){
-                    case "email":
-                        email = (String)userData.get(key);
-                        break;
-                    case "password":
-                        password = (String)userData.get(key);
-                        break;
-                    case "country":
-                        country = (String)userData.get(key);
-                        break;
-                    case "birthday":
-                        birthday = (Date)userData.get(key);
-                        break;
-                    case "followed":
-                        followed.addAll((List<String>)userData.get(key));
-                        break;
-                    case "followers":
-                        followers.addAll((List<String>)userData.get(key));
-                        break;
-                    case "followedArtists":
-                        artistFollowed.addAll((List<String>)userData.get(key));
-                        break;
-                    case "followerArtists":
-                        artistFollowers.addAll((List<String>)userData.get(key));
-                        break;
-                    case "likedSongs":
-                        likes.addAll((List<Pair<String, String>>)userData.get(key));
-                        break;
-                    default:
-                        break;
-                }
-            }
-            catch (ClassCastException exception){
-                // TODO: log the exception, but do nothing. Missing fields are okay.
-            }
-        }
-        User toReturn = new User(username, email, password);
-        toReturn.LoadedFollowers = followers;
-        toReturn.LoadedFollowed = followed;
-        toReturn.LoadedArtistFollowers = artistFollowers;
-        toReturn.LoadedLikes = likes;
-        toReturn.LoadedArtistFollowed = artistFollowed;
-        toReturn.Country = country;
-        toReturn.Birthday = birthday;
-        toReturn.ID = (String)userData.get("id");
-        return toReturn;
+        userData.put("username", username);
+        return buildUserFromMap(userData);
     }
 
     @Override
     public Artist getArtist(String username) {
-        Map<String, Object> artistData = mongo.getArtistData(username);
+        Map<String, Object> artistData = new HashMap<>(mongo.getArtistData(username));
         artistData.putAll(neo4j.getArtistData(username));
-        String email = null, password = null, country = null, stageName = null;
-        Date birthday = null;
-        List<String> followed = new ArrayList<>(), followers = new ArrayList<>(), artistFollowers = new ArrayList<>(), artistFollowed = new ArrayList<>();
-        List<Pair<String, String>> likes = new ArrayList<>(), songs = new ArrayList<>();
-        for (String key :
-                artistData.keySet()) {
-            try{
-                switch (key){
-                    case "email":
-                        email = (String)artistData.get(key);
-                        break;
-                    case "password":
-                        password = (String)artistData.get(key);
-                        break;
-                    case "country":
-                        country = (String)artistData.get(key);
-                        break;
-                    case "birthday":
-                        birthday = (Date)artistData.get(key);
-                        break;
-                    case "stageName":
-                        stageName = (String)artistData.get(key);
-                        break;
-                    case "followed":
-                        followed.addAll((List<String>)artistData.get(key));
-                        break;
-                    case "followers":
-                        followers.addAll((List<String>)artistData.get(key));
-                        break;
-                    case "followedArtists":
-                        artistFollowed.addAll((List<String>)artistData.get(key));
-                        break;
-                    case "followerArtists":
-                        artistFollowers.addAll((List<String>)artistData.get(key));
-                        break;
-                    case "likes":
-                        likes.addAll((List<Pair<String, String>>)artistData.get(key));
-                        break;
-                    case "songs":
-                        songs.addAll((List<Pair<String, String>>)artistData.get(key));
-                        break;
-                    default:
-                        break;
-                }
-            }
-            catch (ClassCastException exception){
-                // TODO: log the exception, but do nothing. Missing fields are okay.
-            }
-        }
-        Artist toReturn = new Artist(username, email, password);
-        toReturn.LoadedFollowers = followers;
-        toReturn.LoadedFollowed = followed;
-        toReturn.LoadedArtistFollowers = artistFollowers;
-        toReturn.LoadedLikes = likes;
-        toReturn.LoadedArtistFollowed = artistFollowed;
-        toReturn.Country = country;
-        toReturn.Birthday = birthday;
-        toReturn.StageName = stageName;
-        toReturn.LoadedSongs = songs;
-        toReturn.ID = (String)artistData.get("id");
-        return toReturn;
+        artistData.put("username", username);
+        return buildArtistFromMap(artistData);
     }
 
     @Override
     public Song getSong(String songID) {
-        Map<String, Object> songData = mongo.getSongData(songID);
-
-        if(songData != null){
-            songData.putAll(neo4j.getSongData(songID));
-            Object artist = songData.get("mainArtist"),
-                    title = songData.get("title"),
-                    image = songData.get("image"),
-                    album = songData.get("album"),
-                    duration = songData.get("duration"),
-                    link = songData.get("link"),
-                    genres = songData.get("genres"),
-                    featurings = songData.get("featurings"),
-                    loadedLikes = songData.get("likers"),
-                    loadedReviews = songData.get("reviews");
-
-            return new Song(artist, duration, title, image, album, loadedReviews, new ArrayList<Object>(Collections.singletonList(link)), loadedLikes, genres, featurings, songID);
-        }
-
-        return null;
+        Map<String, Object> songData = new HashMap<>(mongo.getSongData(songID));
+        songData.putAll(neo4j.getSongData(songID));
+        songData.put("id", songID);
+        return buildSongFromMap(songData);
     }
 
     @Override
     public List<Review> getReviews(String songID, int nMax) {
         List<Review> toReturn = new ArrayList<>();
-        List<Map<String, Object>> reviewsData = mongo.getSongReviews(songID, nMax);
-        for (Map<String, Object> review:
+        List<Map<String, Object>> reviewsData = new ArrayList<>(mongo.getSongReviews(songID, nMax));
+        for (Map<String, Object> reviewData:
              reviewsData) {
-            int rating = -1;
-            String text = null, user = null, id = null;
-            if(review.get("user") != null && review.get("user").getClass() == String.class){
-                user = (String)review.get("user");
-            }
-            if(review.get("rating") != null && review.get("rating").getClass() == Integer.class){
-                rating = (Integer)review.get("rating");
-            }
-            if(review.get("text") != null && review.get("text").getClass() == String.class){
-                text = (String)review.get("text");
-            }
-            if(review.get("id") != null && review.get("id").getClass() == String.class){
-                id = (String)review.get("id");
-            }
-            Review newReview = new Review(id, user, rating, text, songID);
-            toReturn.add(newReview);
+            toReturn.add(buildReviewFromMap(reviewData));
         }
+
         return toReturn;
+    }
+
+    private User buildUserFromMap(Map<String, Object> userData){
+        Object email = userData.get("email"),
+                password = userData.get("password"),
+                country = userData.get("country"),
+                birthday = userData.get("birthday"),
+                followed = userData.get("followed"),
+                followers = userData.get("followers"),
+                artistFollowers = userData.get("followerArtists"),
+                artistFollowed = userData.get("followedArtists"),
+                likes = userData.get("likes"),
+                username = userData.get("username"),
+                id = userData.get("id");
+        return new User(email, username, password, country, birthday, likes, followed, artistFollowed, followers, artistFollowers, id);
+    }
+
+    private Artist buildArtistFromMap( Map<String, Object> artistData){
+        Object email = artistData.get("email"),
+                password = artistData.get("password"),
+                country = artistData.get("country"),
+                stageName = artistData.get("stageName"),
+                birthday = artistData.get("birthday"),
+                followed = artistData.get("followed"),
+                followers = artistData.get("followers"),
+                artistFollowers = artistData.get("followerArtists"),
+                artistFollowed = artistData.get("followedArtists"),
+                likes = artistData.get("likes"),
+                songs = artistData.get("songs"),
+                image = artistData.get("image"),
+                yearsActive = artistData.get("activity"),
+                username = artistData.get("username"),
+                id = artistData.get("id");
+
+        return new Artist(email, username, password, country, birthday, likes, followed, artistFollowed, followers, artistFollowers, stageName, image, yearsActive, songs, id);
+    }
+
+    private Song buildSongFromMap( Map<String, Object> songData){
+        Object artist = songData.get("mainArtist"),
+                title = songData.get("title"),
+                image = songData.get("image"),
+                album = songData.get("album"),
+                duration = songData.get("duration"),
+                link = songData.get("link"),
+                genres = songData.get("genres"),
+                featurings = songData.get("featurings"),
+                loadedLikes = songData.get("likers"),
+                songID = songData.get("id");
+
+        // TODO: find a way to not do this high level operation at Persistence level
+        List<Review> loadedReviews = new ArrayList<>();
+        try{
+            List<Map<String, Object>> reviewsData = (List<Map<String, Object>>)songData.get("reviews");
+            for(Map<String, Object> review:
+                    reviewsData){
+                loadedReviews.add(buildReviewFromMap(review));
+            }
+        }
+        catch(ClassCastException exc){
+            // TODO: log
+        }
+
+        return new Song(artist, duration, title, image, album, loadedReviews, link, loadedLikes, genres, featurings, songID);
+    }
+
+    private Review buildReviewFromMap( Map<String, Object> reviewData){
+        Object rating = reviewData.get("rating"),
+                text = reviewData.get("text"),
+                id = reviewData.get("id"),
+                user = reviewData.get("user"),
+                songID = reviewData.get("songID");
+
+        return new Review(id, user, rating, text, songID);
     }
 
 
