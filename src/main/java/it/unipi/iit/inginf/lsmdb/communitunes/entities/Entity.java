@@ -5,4 +5,18 @@ abstract class Entity {
 
     public String ID;
 
+    public Entity(String ID) {
+        this.ID = ID;
+    }
+
+    public Entity(Object ID) {
+        if(ID != null){
+            try{
+                this.ID = (String)ID;
+            }
+            catch (ClassCastException exc){
+                // TODO: log the exception
+            }
+        }
+    }
 }

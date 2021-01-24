@@ -6,20 +6,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Song extends Entity {
-    public Song(String artist, String duration, String title, String image, String album, List<Review> loadedReviews, List<String> links, List<String> likes, List<String> genres, List<Pair<String, String>> featurings, String id) {
+    public Song(String artist, String duration, String title, String image, String album, List<Review> loadedReviews, String link, List<String> likes, List<String> genres, List<Pair<String, String>> featurings, String id) {
+        super(id);
         Artist = artist;
         Duration = duration;
         Title = title;
         Image = image;
         Album = album;
         LoadedReviews = loadedReviews;
-        Links = links;
+        Link = link;
         Genres = genres;
         Featurings = featurings;
-        ID = id;
     }
 
-    public Song(Object artist, Object duration, Object title, Object image, Object album, Object loadedReviews, Object links, Object likes, Object genres, Object featurings, String id){
+    public Song(Object artist, Object duration, Object title, Object image, Object album, Object loadedReviews, Object link, Object likes, Object genres, Object featurings, Object id){
+        super(id);
         if(artist != null){
             try{
                 Artist = (String)artist;
@@ -60,9 +61,9 @@ public class Song extends Entity {
                 // TODO: log the exception
             }
         }
-        if(links != null){
+        if(link != null){
             try{
-                Links.addAll((List<String>)links);
+                Link = (String)link;
             }
             catch (ClassCastException exc){
                 // TODO: log the exception
@@ -100,7 +101,6 @@ public class Song extends Entity {
                 // TODO: log the exception
             }
         }
-        ID = id;
     }
 
     public String Artist;
@@ -115,7 +115,7 @@ public class Song extends Entity {
 
     public List<Review> LoadedReviews = new ArrayList<>();
 
-    public List<String> Links = new ArrayList<>();
+    public String Link;
 
     public List<String> Genres = new ArrayList<>();
 
