@@ -96,11 +96,11 @@ public interface Persistence {
 
     /**
      *
-     * @param newArtist
+     * @param newArtist, stageName
      * @return
      * @throws PersistenceInconsistencyException
      */
-    boolean addArtist(Artist newArtist) throws PersistenceInconsistencyException;
+    boolean addArtist(Artist newArtist, String stageName) throws PersistenceInconsistencyException;
 
     /**
      *

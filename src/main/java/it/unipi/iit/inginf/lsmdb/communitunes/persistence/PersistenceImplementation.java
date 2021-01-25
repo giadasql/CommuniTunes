@@ -101,13 +101,33 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean addArtist(Artist newArtist) throws PersistenceInconsistencyException {
-        return false;
+    public boolean addArtist(Artist newArtist, String stageName) throws PersistenceInconsistencyException {
+        newArtist.StageName = stageName;
+        String mongoID = mongo.addArtist(newArtist.Username, stageName);
+        if(mongoID != null){
+            int neoID = neo4j.addArtist(newArtist.Username, newArtist.StageName);
+            if(neoID != -1){
+                return true;
+            }
+            else{
+                if(mongo.deleteArtist(newArtist.Username)){
+                    return false;
+                }
+                else{
+                    throw new PersistenceInconsistencyException("Artist " + newArtist.Username + " was not correctly added, but due to unexpected errors the artist might be present in the database, causing an inconsistency.");
+                }
+            }
+        }
+        else{
+            return false;
+        }
     }
 
     @Override
     public boolean deleteArtist(Artist artist) {
-        return false;
+        boolean neo4jDelete = neo4j.deleteArtist(artist.Username);
+        boolean mongoDelete = mongo.deleteArtist(artist.Username);
+        return (mongoDelete && neo4jDelete && deleteReviews(artist.Username));
     }
 
     @Override
@@ -115,14 +135,34 @@ class PersistenceImplementation implements Persistence {
         return false;
     }
 
+        // TODO: Forse conviene passare l'artista insieme alla canzone?
     @Override
     public boolean addSong(Song newSong) throws PersistenceInconsistencyException {
-        return false;
+        String mongoID = mongo.addSong(newSong.Artist, newSong.Duration, newSong.Title, newSong.Album);
+        if(mongoID != null){
+            int neoID = neo4j.addSong(newSong.Artist, newSong.Title);
+            if(neoID != -1){
+                return true;
+            }
+            else{
+                if(mongo.deleteSong(newSong.ID)){
+                    return false;
+                }
+                else{
+                    throw new PersistenceInconsistencyException("Song " + newSong.Title + " was not correctly added, but due to unexpected errors the song might be present in the database, causing an inconsistency.");
+                }
+            }
+        }
+        else{
+            return false;
+        }
     }
 
     @Override
     public boolean deleteSong(Song song) {
-        return false;
+        boolean neo4jDelete = neo4j.deleteSong(song.Artist, song.Title);
+        boolean mongoDelete = mongo.deleteSong(song.ID);
+        return (mongoDelete && neo4jDelete);
     }
 
     @Override

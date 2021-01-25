@@ -59,6 +59,11 @@ class MongoDriver implements Closeable {
         return usersCollection.find(eq("email", email)).first() != null;
     }
 
+    private String getIdFromUsername(String username){
+        Document doc = usersCollection.find(Filters.eq("username", username)).first();
+        return doc == null ? null : (String)doc.get("_id");
+    }
+
     public String addUser(String username, String email, String psw) {
         Document user = new Document();
         user.append("username", username);
@@ -71,6 +76,39 @@ class MongoDriver implements Closeable {
 
     public boolean deleteUser(String username) {
         DeleteResult deleteResult = usersCollection.deleteOne(eq("username", username));
+        return deleteResult.wasAcknowledged() && deleteResult.getDeletedCount() >= 1;
+    }
+
+    public String addArtist(String username, String stageName){
+        BasicDBObject query = new BasicDBObject("username", username);
+        BasicDBObject fields = new BasicDBObject("stageName", stageName);
+        BasicDBObject update = new BasicDBObject("$set", fields);
+        UpdateResult updateRes = usersCollection.updateOne(query, update);
+        String id = getIdFromUsername(username);
+
+        return updateRes.getModifiedCount() == 0 ? null : id;
+    }
+
+        // We don't check the number of deleted songs to understand if the query was performed correctly,
+        // since we may have deleted a user without songs
+    public boolean deleteArtist(String username) {
+        String id = getIdFromUsername(username);
+        DeleteResult songsDelete = songsCollection.deleteMany(eq("artistId", id));
+        DeleteResult deleteResult = usersCollection.deleteOne(eq("username", username));
+        return deleteResult.wasAcknowledged() && songsDelete.wasAcknowledged() && deleteResult.getDeletedCount() >= 1;
+    }
+
+    public String addSong(String artist, String duration, String title, String album){
+        Document song = new Document();
+        song.append("name", title);
+        song.append("lenght", duration);
+        song.append("album", album);
+        InsertOneResult insertOneResult = songsCollection.insertOne(song);
+        return insertOneResult.getInsertedId() == null ? null : insertOneResult.getInsertedId().asObjectId().getValue().toString();
+    }
+
+    public boolean deleteSong(String id) {
+        DeleteResult deleteResult = songsCollection.deleteOne(new Document("_id", new ObjectId(id)));
         return deleteResult.wasAcknowledged() && deleteResult.getDeletedCount() >= 1;
     }
 
