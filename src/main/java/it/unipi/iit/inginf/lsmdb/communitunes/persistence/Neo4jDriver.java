@@ -75,6 +75,69 @@ class Neo4jDriver implements Closeable {
         }
     }
 
+    public int addArtist(String username, String stageName) {
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                HashMap<String, Object> parameters = new HashMap<String, Object>();
+                parameters.put("username", username);
+                parameters.put("stageName", stageName);
+                Result res = tx.run( "MATCH (u:User {username: $username}) SET u:Artist, u.stageName = $stageName  RETURN ID(u)",
+                        parameters);
+                if (res.hasNext()) {
+                    // TODO: probabilmente non serve ritornare l'ID
+                    return res.single().get(0).asInt();
+                }
+                return -1;
+            });
+        }
+    }
+
+    public boolean deleteArtist(String username){
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (a:Artist { username: $username })-[:PERFORMS {isMainArtist: true}]->(s:Song)" +
+                        "DETACH DELETE s, a RETURN count(a)", parameters("username", username));
+                return (res.single().get(0).asInt() >= 1);
+            });
+        }
+    }
+
+    public int addSong(String artist, String title) {
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                HashMap<String, Object> parameters = new HashMap<String, Object>();
+                parameters.put("username", artist);
+                parameters.put("title", title);
+                Result res = tx.run( "MATCH (a:Artist) WHERE a.username = $username " +
+                                "CREATE (s:Song {title: $title})," +
+                                "(a)-[:PERFORMS {isMainArtist: true}]->(s) RETURN ID(s)",
+                      parameters);
+                if (res.hasNext()) {
+                    // TODO: probabilmente non serve ritornare l'ID
+                    return res.single().get(0).asInt();
+                }
+                return -1;
+            });
+        }
+    }
+
+    public boolean deleteSong(String artist, String title){
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                HashMap<String, Object> parameters = new HashMap<String, Object>();
+                parameters.put("username", artist);
+                parameters.put("title", title);
+                Result res = tx.run( "MATCH (a:Artist { username: $username })-[:PERFORMS {isMainArtist: true}]->(s:Song {title: $title})" +
+                        "DETACH DELETE s RETURN count(s)", parameters);
+                return (res.single().get(0).asInt() >= 1);
+            });
+        }
+    }
+
     public Map<String, Object> getUserData(String username){
         Map<String, Object> userValues = new HashMap<>();
         try ( Session session = driver.session())
