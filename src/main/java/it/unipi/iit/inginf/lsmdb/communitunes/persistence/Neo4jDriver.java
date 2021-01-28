@@ -2,6 +2,7 @@ package it.unipi.iit.inginf.lsmdb.communitunes.persistence;
 
 import com.mongodb.client.result.InsertOneResult;
 import org.bson.Document;
+import org.javatuples.Pair;
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.summary.ResultSummary;
@@ -11,10 +12,7 @@ import java.io.Closeable;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
+import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.neo4j.driver.Values.parameters;
@@ -104,6 +102,20 @@ class Neo4jDriver implements Closeable {
         }
     }
 
+    public boolean updateArtist(String username, String stageName){
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                HashMap<String, Object> parameters = new HashMap<String, Object>();
+                parameters.put("username", username);
+                parameters.put("stageName", stageName);
+                Result res = tx.run( "MATCH (a:Artist { username: $username}) SET a.stageName = $stageName RETURN count(a)",
+                        parameters);
+                return (res.single().get(0).asInt() >= 1);
+            });
+        }
+    }
+
     public int addSong(String artist, String title) {
         try ( Session session = driver.session())
         {
@@ -133,6 +145,22 @@ class Neo4jDriver implements Closeable {
                 parameters.put("title", title);
                 Result res = tx.run( "MATCH (a:Artist { username: $username })-[:PERFORMS {isMainArtist: true}]->(s:Song {title: $title})" +
                         "DETACH DELETE s RETURN count(s)", parameters);
+                return (res.single().get(0).asInt() >= 1);
+            });
+        }
+    }
+
+    public boolean updateSong(String title, String artist, List<Pair<String, String>> Featurings){
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                HashMap<String, Object> parameters = new HashMap<String, Object>();
+                parameters.put("username", artist);
+                parameters.put("title", title);
+                Result res = tx.run( "MATCH (a:Artist {username: $username})-[:PERFORMS {isMainArtist: true}]->(s:Song {title: $title})," +
+                                "FOREACH(ar IN {$artists} |" +
+                                "MERGE (s)<-[:PERFORMS {isMainArtist: false}]-(ar:Artist",
+                        parameters);
                 return (res.single().get(0).asInt() >= 1);
             });
         }

@@ -10,12 +10,17 @@ import com.mongodb.client.model.*;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import org.bson.BSONObject;
 import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.BasicBSONList;
 import org.bson.types.ObjectId;
+
+import javax.print.Doc;
 
 import static com.mongodb.client.model.Aggregates.limit;
 import static com.mongodb.client.model.Aggregates.project;
@@ -79,10 +84,28 @@ class MongoDriver implements Closeable {
         return deleteResult.wasAcknowledged() && deleteResult.getDeletedCount() >= 1;
     }
 
+    public boolean updateUser(User newUser){
+        Document query = new Document();
+        query.append("_id", new ObjectId(newUser.ID));
+        Document setData = new Document();
+        setData.append("password", newUser.Password).append("email", newUser.Email)
+                .append("country", newUser.Country).append("birthday", newUser.Birthday);
+        Document update = new Document();
+        update.append("$set", setData);
+
+        UpdateResult updateRes = usersCollection.updateOne(query, update);
+
+        return updateRes.getModifiedCount() != 0;
+    }
+
     public String addArtist(String username, String stageName){
-        BasicDBObject query = new BasicDBObject("username", username);
-        BasicDBObject fields = new BasicDBObject("stageName", stageName);
-        BasicDBObject update = new BasicDBObject("$set", fields);
+        Document query = new Document();
+        query.append("username", username);
+        Document setData = new Document();
+        setData.append("stageName", stageName);
+        Document update = new Document();
+        update.append("$set", setData);
+
         UpdateResult updateRes = usersCollection.updateOne(query, update);
         String id = getIdFromUsername(username);
 
@@ -96,6 +119,22 @@ class MongoDriver implements Closeable {
         DeleteResult songsDelete = songsCollection.deleteMany(eq("artistId", id));
         DeleteResult deleteResult = usersCollection.deleteOne(eq("username", username));
         return deleteResult.wasAcknowledged() && songsDelete.wasAcknowledged() && deleteResult.getDeletedCount() >= 1;
+    }
+
+    public boolean updateArtist(Artist newArtist){
+        Document query = new Document();
+        query.append("_id", new ObjectId(newArtist.ID));
+        Document setData = new Document();
+        setData.append("password", newArtist.Password).append("email", newArtist.Email)
+                .append("country", newArtist.Country).append("birthday", newArtist.Birthday)
+                .append("activity", newArtist.ActiveYears).append("image", newArtist.Image)
+                .append("biography", newArtist.Biography).append("stageName", newArtist.StageName);
+        Document update = new Document();
+        update.append("$set", setData);
+
+        UpdateResult updateRes = usersCollection.updateOne(query, update);
+
+        return updateRes.getModifiedCount() != 0;
     }
 
     public String addSong(String artist, String duration, String title, String album){
@@ -120,6 +159,33 @@ class MongoDriver implements Closeable {
 
         UpdateResult updateRes = songsCollection.updateMany( query, update );
         return updateRes.wasAcknowledged();
+    }
+
+    public boolean updateSong(Song newSong){
+        Document query = new Document();
+        query.append("_id", new ObjectId(newSong.ID));
+        Document setData = new Document();
+        setData.append("songLink", newSong.Link).append("image", newSong.Image).append("genres", newSong.Genres);
+        Document update = new Document();
+        update.append("$set", setData);
+
+        UpdateResult updateRes = usersCollection.updateOne(query, update);
+
+        return updateRes.getModifiedCount() != 0;
+    }
+
+        // TODO: Controllare che prenda l'_id della review e non quello della canzone
+    public boolean updateReview(String id, int rating, String text){
+        Document query = new Document();
+        query.append("reviews._id", new ObjectId(id));
+        Document setData = new Document();
+        setData.append("rating", rating).append("text", text);
+        Document update = new Document();
+        update.append("$set", setData);
+
+        UpdateResult updateRes = songsCollection.updateOne(query, update);
+
+        return updateRes.getModifiedCount() != 0;
     }
 
     public boolean checkPassword(String username, String password){

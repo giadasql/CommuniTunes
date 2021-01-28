@@ -4,6 +4,9 @@ import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Review;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReader;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderType;
@@ -96,8 +99,20 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean updateUser(User user) {
-        return false;
+    public boolean updateUser(User newUser) {
+        /*User toUpdate = getUser(newUser.Username);
+        if(toUpdate == null || newUser.equals(toUpdate)){
+            return false;
+        }
+
+        toUpdate.Birthday = newUser.Birthday;
+        toUpdate.Country = newUser.Country;
+        toUpdate.Email = newUser.Email;
+        toUpdate.Password = newUser.Password;
+
+         */
+
+        return mongo.updateUser(newUser);
     }
 
     @Override
@@ -131,8 +146,32 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean updateArtist(Artist artist) {
-        return false;
+    public boolean updateArtist(Artist newArtist) {
+        /*
+        Artist toUpdate = getArtist(newArtist.Username);
+        if(toUpdate == null || newArtist.equals(toUpdate)){
+            return false;
+        }
+
+
+            Before contacting Neo4j, we check that the stage name of the artist, the only thing
+            beside the username we save about the artist, is still the same or not, in order to
+            avoid overhead for a communication that won't really change anything.
+
+        boolean check = toUpdate.StageName == newArtist.StageName;
+
+        toUpdate.Birthday = newArtist.Birthday;
+        toUpdate.Country = newArtist.Country;
+        toUpdate.Email = newArtist.Email;
+        toUpdate.Password = newArtist.Password;
+        toUpdate.StageName = newArtist.StageName;
+        toUpdate.Image = newArtist.Image;
+        toUpdate.ActiveYears = newArtist.ActiveYears;
+        toUpdate.Biography = newArtist.Biography;
+
+         */
+
+        return mongo.updateArtist(newArtist) && neo4j.updateArtist(newArtist.Username, newArtist.StageName);
     }
 
         // TODO: Forse conviene passare l'artista insieme alla canzone?
@@ -166,8 +205,25 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean editSong(Song song) {
-        return false;
+    public boolean editSong(Song newSong) {
+
+        /*Song toUpdate = getSong(newSong.ID);
+        if(toUpdate == null || newSong.equals(toUpdate)){
+            return false;
+        }
+
+
+            Before contacting Neo4j, we check if th list of featurings , in order to
+            avoid overhead for a communication that won't really change anything.
+
+        boolean check = toUpdate.Featurings.equals(newSong.Featurings);
+
+        toUpdate.Link = newSong.Link;
+        toUpdate.Image = newSong.Image;
+        toUpdate.Genres.addAll(newSong.Genres);
+         */
+
+        return mongo.updateSong(newSong) && neo4j.updateSong(newSong.Title, newSong.Artist, newSong.Featurings);
     }
 
     @Override
@@ -186,29 +242,50 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean editReview(Review review) {
-        return false;
+    public boolean editReview(Review newReview) {
+        return mongo.updateReview(newReview.ID, newReview.Rating, newReview.Text);
     }
 
     @Override
-    public List<Pair<String, String>> getSuggestedSongs(User user) {
+    public List<SongPreview> getSuggestedSongs(User user) {
         return null;
     }
 
     @Override
-    public List<Pair<String, String>> getSuggestedSongs(String genre) {
+    public List<Pair<String, Integer>> getApprAlbum(Artist artist){ return null; }
+
+    @Override
+    public List<ArtistPreview> getRepresentativeArtist(String genre){ return null; }
+
+    @Override
+    public List<SongPreview> getSuggestedSongs(String genre) {
         return null;
     }
 
     @Override
-    public List<String> getSuggestedArtists(User user) {
+    public List<ArtistPreview> getSuggestedArtists(User user) {
         return null;
     }
 
     @Override
-    public List<String> getSuggestedUsers(User user) {
+    public List<UserPreview> getSuggestedUsers(User user) {
         return null;
     }
+
+    @Override
+    public List<UserPreview> getLikeMindedUsers(User user){ return null; }
+
+    @Override
+    public List<SongPreview> getLikeMindedSongs(User user){ return null; }
+
+    @Override
+    public List<UserPreview> getTopFans(Artist artist){ return null; }
+
+    @Override
+    public List<ArtistPreview> getSimilarArtists(Artist artist){ return null; }
+
+    @Override
+    public List<SongPreview> getPopularSongs(Artist artist) { return null; }
 
     @Override
     public boolean deleteReviews(String username) {
@@ -276,6 +353,7 @@ class PersistenceImplementation implements Persistence {
                 password = artistData.get("password"),
                 country = artistData.get("country"),
                 stageName = artistData.get("stageName"),
+                biography = artistData.get("biography"),
                 birthday = artistData.get("birthday"),
                 followed = artistData.get("followed"),
                 followers = artistData.get("followers"),
@@ -288,7 +366,7 @@ class PersistenceImplementation implements Persistence {
                 username = artistData.get("username"),
                 id = artistData.get("id");
 
-        return new Artist(email, username, password, country, birthday, likes, followed, artistFollowed, followers, artistFollowers, stageName, image, yearsActive, songs, id);
+        return new Artist(email, username, password, country, birthday, likes, followed, artistFollowed, followers, artistFollowers, stageName, biography, image, yearsActive, songs, id);
     }
 
     private Song buildSongFromMap( Map<String, Object> songData){
