@@ -1,5 +1,7 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.entities;
 
+import java.util.Date;
+
 public class Review extends Entity {
 
     public Review(String id, String user, int rating, String text, String song) {
@@ -8,6 +10,7 @@ public class Review extends Entity {
         Rating = rating;
         Text = text;
         Song = song;
+        timestamp = new Date();
     }
 
     public Review(String user, int rating, String text, String song) {
@@ -16,6 +19,7 @@ public class Review extends Entity {
         Rating = rating;
         Text = text;
         Song = song;
+        timestamp = new Date();
     }
 
     public Review(Object id, Object user, Object rating, Object text, Object song) {
@@ -52,6 +56,7 @@ public class Review extends Entity {
                 // TODO: log the exception
             }
         }
+        timestamp = new Date();
     }
 
     public String User;
@@ -61,5 +66,7 @@ public class Review extends Entity {
     public String Text;
 
     public String Song;
+
+    public Date timestamp;
 
 }

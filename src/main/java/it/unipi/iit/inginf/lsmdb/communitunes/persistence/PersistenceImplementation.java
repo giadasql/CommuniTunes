@@ -248,7 +248,8 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<SongPreview> getSuggestedSongs(User user) {
-        return null;
+        List<Pair<String, String>> songs = neo4j.getSuggestedSongs(user.Username);
+        return mongo.getSuggestedSongs(songs);
     }
 
     @Override
@@ -258,8 +259,8 @@ class PersistenceImplementation implements Persistence {
     public List<ArtistPreview> getRepresentativeArtist(String genre){ return null; }
 
     @Override
-    public List<SongPreview> getSuggestedSongs(String genre) {
-        return null;
+    public HashMap<String, List<SongPreview>> getSuggestedSongs() {
+        return mongo.getSuggestedSongs();
     }
 
     @Override

@@ -11,6 +11,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceIn
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -170,7 +171,7 @@ public interface Persistence {
      * @param genre
      * @return
      */
-    List<SongPreview> getSuggestedSongs(String genre);
+    HashMap<String, List<SongPreview>> getSuggestedSongs();
 
     /**
      *

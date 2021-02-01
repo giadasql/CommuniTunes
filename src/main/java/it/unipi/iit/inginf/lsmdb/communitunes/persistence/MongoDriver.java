@@ -13,12 +13,19 @@ import com.mongodb.client.result.UpdateResult;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
 import org.bson.BSONObject;
 import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.BasicBSONList;
 import org.bson.types.ObjectId;
+import org.javatuples.Pair;
+
+import static com.mongodb.client.model.Aggregates.*;
+import static com.mongodb.client.model.Projections.*;
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Accumulators.*;
 
 import javax.print.Doc;
 
@@ -188,6 +195,42 @@ class MongoDriver implements Closeable {
         return updateRes.getModifiedCount() != 0;
     }
 
+    public HashMap<String, List<SongPreview>> getSuggestedSongs(){
+        HashMap<String, List<SongPreview>> res = new HashMap<>();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.DAY_OF_MONTH, -30);
+
+        Bson myMatch = match(gte("review.timestamp", cal.getTimeInMillis()));
+        Bson myUnwind = unwind("genre");
+        Bson myGroup = new Document("$group", new Document("_id", new Document("genre", "$genre")).
+                append("songs", new Document("$push", new Document("songId", "$songId").append("title", "$title")
+                .append("stageName", "$stageName").append("artistId", "$artistId").append("avgRev", new Document("$avg", "$reviews.rating")))));
+
+        songsCollection.aggregate(Arrays.asList(myMatch, myUnwind, myGroup)).forEach(doc ->{
+            String genre = doc.getString("genre");
+            List<Document> list = doc.get("songs", new ArrayList<Document>().getClass());
+            HashMap<SongPreview, Double> songs = new HashMap<SongPreview, Double>();
+            for(Document embDoc : list){
+                SongPreview song = new SongPreview(embDoc.getObjectId("songId").toString(), embDoc.getString("stageName"),
+                        embDoc.getObjectId("artistId").toString(), embDoc.getString("title"));
+                Double avg = embDoc.getDouble("avg");
+                songs.put(song, avg);
+            }
+
+        });
+
+        return res;
+    }
+
+    public List<SongPreview> getSuggestedSongs(List<Pair<String,String>> songs){
+        if(songs == null)
+            return null;
+        List<SongPreview> res;
+
+        return null;
+    }
+
     public boolean checkPassword(String username, String password){
         BasicDBObject criteria = new BasicDBObject();
         criteria.append("username", username);
@@ -243,7 +286,7 @@ class MongoDriver implements Closeable {
                 .append("_id", reviewId);
 
         // Bson updateWithTimestamp = currentTimestamp("posted");
-        Bson update = addToSet("reviews", reviewDoc);
+        Bson update = Updates.addToSet("reviews", reviewDoc);
 
         Document result = songsCollection.findOneAndUpdate(filter, update);
         return result != null ? reviewId.toString() : null;

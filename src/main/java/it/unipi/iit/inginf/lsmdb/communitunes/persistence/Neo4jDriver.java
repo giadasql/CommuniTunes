@@ -150,6 +150,7 @@ class Neo4jDriver implements Closeable {
         }
     }
 
+    // TODO: Da finire qua!
     public boolean updateSong(String title, String artist, List<Pair<String, String>> Featurings){
         try ( Session session = driver.session())
         {
@@ -162,6 +163,25 @@ class Neo4jDriver implements Closeable {
                                 "MERGE (s)<-[:PERFORMS {isMainArtist: false}]-(ar:Artist",
                         parameters);
                 return (res.single().get(0).asInt() >= 1);
+            });
+        }
+    }
+
+    // Returns a List of Pairs where the first value is the title of the song and the second is the
+    // stage name of the artist performing it.
+    public List<Pair<String, String>> getSuggestedSongs(String username){
+        List<Pair<String, String>> songs = new ArrayList<>();
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (u:User {username: $username})-[:FOLLOWS]->(f:User)," +
+                        "(f)-[:LIKES]->(s:Song)<-[:PERFORMS {isMainArtist: true}]-(a:Artist) RETURN s.title AS Title, a.username AS Artist",
+                        parameters("username", username));
+                while(res.hasNext()){
+                    Record r = res.next();
+                    songs.add(new Pair<>(r.get("Title").asString(), r.get("Artist").asString()));
+                }
+                return songs;
             });
         }
     }
