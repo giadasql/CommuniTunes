@@ -179,7 +179,7 @@ class PersistenceImplementation implements Persistence {
     public boolean addSong(Song newSong) throws PersistenceInconsistencyException {
         String mongoID = mongo.addSong(newSong.Artist, newSong.Duration, newSong.Title, newSong.Album);
         if(mongoID != null){
-            int neoID = neo4j.addSong(newSong.Artist, newSong.Title);
+            int neoID = neo4j.addSong(newSong.Artist, newSong.Title, newSong.ID);
             if(neoID != -1){
                 return true;
             }
@@ -248,8 +248,7 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<SongPreview> getSuggestedSongs(User user) {
-        List<Pair<String, String>> songs = neo4j.getSuggestedSongs(user.Username);
-        return mongo.getSuggestedSongs(songs);
+        return neo4j.getSuggestedSongs(user.Username);
     }
 
     @Override
@@ -270,23 +269,29 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<UserPreview> getSuggestedUsers(User user) {
-        return null;
+        return neo4j.getSuggestedUsers(user.Username);
     }
 
     @Override
-    public List<UserPreview> getLikeMindedUsers(User user){ return null; }
+    public List<UserPreview> getLikeMindedUsers(User user){
+        return neo4j.getLikeMindedUsers(user.Username);
+    }
 
     @Override
-    public List<SongPreview> getLikeMindedSongs(User user){ return null; }
+    public List<SongPreview> getLikeMindedSongs(User user){
+        return neo4j.getLikeMindedSongs(user.Username);
+    }
 
     @Override
-    public List<UserPreview> getTopFans(Artist artist){ return null; }
+    public List<UserPreview> getTopFans(Artist artist){
+        return neo4j.getTopFans(artist.Username);
+    }
 
     @Override
-    public List<ArtistPreview> getSimilarArtists(Artist artist){ return null; }
+    public List<ArtistPreview> getSimilarArtists(Artist artist){ return neo4j.getSimilarArtists(artist.Username); }
 
     @Override
-    public List<SongPreview> getPopularSongs(Artist artist) { return null; }
+    public List<SongPreview> getPopularSongs(Artist artist) { return neo4j.getPopularSongs(artist.Username); }
 
     @Override
     public boolean deleteReviews(String username) {

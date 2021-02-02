@@ -233,7 +233,7 @@ public interface Persistence {
 
     /**
      *
-     * Get songs by user's like-minded users.
+     * Get songs liked by user's like-minded users.
      *
      * @param user
      * @return

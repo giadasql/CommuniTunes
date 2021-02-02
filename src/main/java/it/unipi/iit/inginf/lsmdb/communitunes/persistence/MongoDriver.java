@@ -223,13 +223,20 @@ class MongoDriver implements Closeable {
         return res;
     }
 
-    public List<SongPreview> getSuggestedSongs(List<Pair<String,String>> songs){
+    /*public List<SongPreview> getSuggestedSongs(List<Pair<String,String>> songs){
         if(songs == null)
             return null;
-        List<SongPreview> res;
+        List<SongPreview> res = new ArrayList<>();
 
-        return null;
-    }
+        for(Pair<String,String> iter : songs){
+            Bson myMatch = and(match(eq("title", iter.getValue0())), match(eq("artist", iter.getValue1())));
+            Bson myProject = project(fields(include("artistId")));
+            Document doc = songsCollection.aggregate(Arrays.asList(myMatch, myProject)).first();
+            res.add(new SongPreview(doc.getObjectId("_id").toString(), iter.getValue1(),
+                    doc.getObjectId("artistId").toString(), iter.getValue0()));
+        }
+        return res;
+    }*/
 
     public boolean checkPassword(String username, String password){
         BasicDBObject criteria = new BasicDBObject();
