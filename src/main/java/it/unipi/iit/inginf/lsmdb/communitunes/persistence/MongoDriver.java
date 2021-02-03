@@ -2,23 +2,21 @@ package it.unipi.iit.inginf.lsmdb.communitunes.persistence;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.MongoCommandException;
+import com.mongodb.client.*;
 import com.mongodb.client.model.*;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.BSONObject;
+import org.bson.BasicBSONObject;
 import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.BasicBSONList;
 import org.bson.types.ObjectId;
 
-import static com.mongodb.client.model.Aggregates.limit;
-import static com.mongodb.client.model.Aggregates.project;
+import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.*;
 import static com.mongodb.client.model.Updates.*;
@@ -148,7 +146,7 @@ class MongoDriver implements Closeable {
 
     public Map<String, Object> getSongData(String SongID){
 
-        Bson match = Aggregates.match((eq("_id", new ObjectId(SongID))));
+        Bson match = match((eq("_id", new ObjectId(SongID))));
 
         BasicDBList list = new BasicDBList();
         list.add("$reviews");
@@ -171,22 +169,31 @@ class MongoDriver implements Closeable {
 
         ObjectId reviewId = new ObjectId();
 
-        Document reviewDoc = new Document("user", user)
-                .append("rating", rating)
-                .append("text", text)
-                .append("_id", reviewId);
+        Document doc = mongoClient.getDatabase("project").runCommand(new BasicDBObject("serverStatus", 1));
 
-        // Bson updateWithTimestamp = currentTimestamp("posted");
-        Bson update = addToSet("reviews", reviewDoc);
+        Date current = (Date) doc.get("localTime");
 
-        Document result = songsCollection.findOneAndUpdate(filter, update);
-        return result != null ? reviewId.toString() : null;
+        if(current != null){
+            Document reviewDoc = new Document("user", user)
+                    .append("rating", rating)
+                    .append("text", text)
+                    .append("_id", reviewId)
+                    .append("posted", current);
+
+            Bson update = addToSet("reviews", reviewDoc);
+
+            Document result = songsCollection.findOneAndUpdate(filter, update);
+            if (result != null) {
+                return reviewId.toString();
+            }
+        }
+        return null;
     }
 
     public List<Map<String, Object>> getSongReviews(String songID, int nMax){
         List<Map<String, Object>> reviews = new ArrayList<>();
 
-        Bson match = Aggregates.match((eq("_id", new ObjectId(songID))));
+        Bson match = match((eq("_id", new ObjectId(songID))));
 
         BasicDBList list = new BasicDBList();
         list.add("$reviews");
