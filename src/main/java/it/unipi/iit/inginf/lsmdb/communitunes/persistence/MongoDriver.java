@@ -8,6 +8,10 @@ import com.mongodb.client.model.*;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 import org.bson.BsonDocument;
@@ -15,6 +19,14 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.BasicBSONList;
 import org.bson.types.ObjectId;
+import org.javatuples.Pair;
+
+import static com.mongodb.client.model.Aggregates.*;
+import static com.mongodb.client.model.Projections.*;
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Accumulators.*;
+
+import javax.print.Doc;
 
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Filters.*;
@@ -77,10 +89,28 @@ class MongoDriver implements Closeable {
         return deleteResult.wasAcknowledged() && deleteResult.getDeletedCount() >= 1;
     }
 
+    public boolean updateUser(User newUser){
+        Document query = new Document();
+        query.append("_id", new ObjectId(newUser.ID));
+        Document setData = new Document();
+        setData.append("password", newUser.Password).append("email", newUser.Email)
+                .append("country", newUser.Country).append("birthday", newUser.Birthday);
+        Document update = new Document();
+        update.append("$set", setData);
+
+        UpdateResult updateRes = usersCollection.updateOne(query, update);
+
+        return updateRes.getModifiedCount() != 0;
+    }
+
     public String addArtist(String username, String stageName){
-        BasicDBObject query = new BasicDBObject("username", username);
-        BasicDBObject fields = new BasicDBObject("stageName", stageName);
-        BasicDBObject update = new BasicDBObject("$set", fields);
+        Document query = new Document();
+        query.append("username", username);
+        Document setData = new Document();
+        setData.append("stageName", stageName);
+        Document update = new Document();
+        update.append("$set", setData);
+
         UpdateResult updateRes = usersCollection.updateOne(query, update);
         String id = getIdFromUsername(username);
 
@@ -94,6 +124,22 @@ class MongoDriver implements Closeable {
         DeleteResult songsDelete = songsCollection.deleteMany(eq("artistId", id));
         DeleteResult deleteResult = usersCollection.deleteOne(eq("username", username));
         return deleteResult.wasAcknowledged() && songsDelete.wasAcknowledged() && deleteResult.getDeletedCount() >= 1;
+    }
+
+    public boolean updateArtist(Artist newArtist){
+        Document query = new Document();
+        query.append("_id", new ObjectId(newArtist.ID));
+        Document setData = new Document();
+        setData.append("password", newArtist.Password).append("email", newArtist.Email)
+                .append("country", newArtist.Country).append("birthday", newArtist.Birthday)
+                .append("activity", newArtist.ActiveYears).append("image", newArtist.Image)
+                .append("biography", newArtist.Biography).append("stageName", newArtist.StageName);
+        Document update = new Document();
+        update.append("$set", setData);
+
+        UpdateResult updateRes = usersCollection.updateOne(query, update);
+
+        return updateRes.getModifiedCount() != 0;
     }
 
     public String addSong(String artist, String duration, String title, String album){
@@ -119,6 +165,76 @@ class MongoDriver implements Closeable {
         UpdateResult updateRes = songsCollection.updateMany( query, update );
         return updateRes.wasAcknowledged();
     }
+
+    public boolean updateSong(Song newSong){
+        Document query = new Document();
+        query.append("_id", new ObjectId(newSong.ID));
+        Document setData = new Document();
+        setData.append("songLink", newSong.Link).append("image", newSong.Image).append("genres", newSong.Genres);
+        Document update = new Document();
+        update.append("$set", setData);
+
+        UpdateResult updateRes = usersCollection.updateOne(query, update);
+
+        return updateRes.getModifiedCount() != 0;
+    }
+
+        // TODO: Controllare che prenda l'_id della review e non quello della canzone
+    public boolean updateReview(String id, int rating, String text){
+        Document query = new Document();
+        query.append("reviews._id", new ObjectId(id));
+        Document setData = new Document();
+        setData.append("rating", rating).append("text", text);
+        Document update = new Document();
+        update.append("$set", setData);
+
+        UpdateResult updateRes = songsCollection.updateOne(query, update);
+
+        return updateRes.getModifiedCount() != 0;
+    }
+
+    public HashMap<String, List<SongPreview>> getSuggestedSongs(){
+        HashMap<String, List<SongPreview>> res = new HashMap<>();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        cal.add(Calendar.DAY_OF_MONTH, -30);
+
+        Bson myMatch = match(gte("review.timestamp", cal.getTimeInMillis()));
+        Bson myUnwind = unwind("genre");
+        Bson myGroup = new Document("$group", new Document("_id", new Document("genre", "$genre")).
+                append("songs", new Document("$push", new Document("songId", "$songId").append("title", "$title")
+                .append("stageName", "$stageName").append("artistId", "$artistId").append("avgRev", new Document("$avg", "$reviews.rating")))));
+
+        songsCollection.aggregate(Arrays.asList(myMatch, myUnwind, myGroup)).forEach(doc ->{
+            String genre = doc.getString("genre");
+            List<Document> list = doc.get("songs", new ArrayList<Document>().getClass());
+            HashMap<SongPreview, Double> songs = new HashMap<SongPreview, Double>();
+            for(Document embDoc : list){
+                SongPreview song = new SongPreview(embDoc.getObjectId("songId").toString(), embDoc.getString("stageName"),
+                        embDoc.getObjectId("artistId").toString(), embDoc.getString("title"));
+                Double avg = embDoc.getDouble("avg");
+                songs.put(song, avg);
+            }
+
+        });
+
+        return res;
+    }
+
+    /*public List<SongPreview> getSuggestedSongs(List<Pair<String,String>> songs){
+        if(songs == null)
+            return null;
+        List<SongPreview> res = new ArrayList<>();
+
+        for(Pair<String,String> iter : songs){
+            Bson myMatch = and(match(eq("title", iter.getValue0())), match(eq("artist", iter.getValue1())));
+            Bson myProject = project(fields(include("artistId")));
+            Document doc = songsCollection.aggregate(Arrays.asList(myMatch, myProject)).first();
+            res.add(new SongPreview(doc.getObjectId("_id").toString(), iter.getValue1(),
+                    doc.getObjectId("artistId").toString(), iter.getValue0()));
+        }
+        return res;
+    }*/
 
     public boolean checkPassword(String username, String password){
         BasicDBObject criteria = new BasicDBObject();

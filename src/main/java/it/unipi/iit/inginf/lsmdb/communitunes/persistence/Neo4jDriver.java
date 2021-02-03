@@ -1,7 +1,11 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.persistence;
 
 import com.mongodb.client.result.InsertOneResult;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
 import org.bson.Document;
+import org.javatuples.Pair;
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.summary.ResultSummary;
@@ -11,10 +15,7 @@ import java.io.Closeable;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Dictionary;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
+import java.util.*;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.neo4j.driver.Values.parameters;
@@ -104,15 +105,30 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    public int addSong(String artist, String title) {
+    public boolean updateArtist(String username, String stageName){
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                HashMap<String, Object> parameters = new HashMap<String, Object>();
+                parameters.put("username", username);
+                parameters.put("stageName", stageName);
+                Result res = tx.run( "MATCH (a:Artist { username: $username}) SET a.stageName = $stageName RETURN count(a)",
+                        parameters);
+                return (res.single().get(0).asInt() >= 1);
+            });
+        }
+    }
+
+    public int addSong(String artist, String title, String songID) {
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
                 HashMap<String, Object> parameters = new HashMap<String, Object>();
                 parameters.put("username", artist);
                 parameters.put("title", title);
+                parameters.put("songID", songID);
                 Result res = tx.run( "MATCH (a:Artist) WHERE a.username = $username " +
-                                "CREATE (s:Song {title: $title})," +
+                                "CREATE (s:Song {title: $title, songID: $songID})," +
                                 "(a)-[:PERFORMS {isMainArtist: true}]->(s) RETURN ID(s)",
                       parameters);
                 if (res.hasNext()) {
@@ -134,6 +150,178 @@ class Neo4jDriver implements Closeable {
                 Result res = tx.run( "MATCH (a:Artist { username: $username })-[:PERFORMS {isMainArtist: true}]->(s:Song {title: $title})" +
                         "DETACH DELETE s RETURN count(s)", parameters);
                 return (res.single().get(0).asInt() >= 1);
+            });
+        }
+    }
+
+    // TODO: Da finire qua!
+    public boolean updateSong(String title, String artist, List<Pair<String, String>> Featurings){
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                HashMap<String, Object> parameters = new HashMap<String, Object>();
+                parameters.put("username", artist);
+                parameters.put("title", title);
+                Result res = tx.run( "MATCH (a:Artist {username: $username})-[:PERFORMS {isMainArtist: true}]->(s:Song {title: $title})," +
+                                "FOREACH(ar IN {$artists} |" +
+                                "MERGE (s)<-[:PERFORMS {isMainArtist: false}]-(ar:Artist",
+                        parameters);
+                return (res.single().get(0).asInt() >= 1);
+            });
+        }
+    }
+
+    public List<SongPreview> getSuggestedSongs(String username){
+        List<SongPreview> songs = new ArrayList<>();
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (u:User {username: $username})-[:FOLLOWS]->(f:User) WHERE NOT f:Artist," +
+                                "(f)-[:LIKES]->(s:Song)<-[:PERFORMS {isMainArtist: true}]-(a:Artist)" +
+                                "WITH COLLECT(DISTINCT(s.title))[0..15] AS Songs, a " +
+                                "RETURN Songs.title AS title, a.username AS artistUsername, Songs.songID AS ID, a.stageName AS stageName",
+                        parameters("username", username));
+                while(res.hasNext()){
+                    Record r = res.next();
+                    songs.add(new SongPreview(r.get("songID").asString(), r.get("stageName").asString(),
+                            r.get("artistUsername").asString(), r.get("title").asString()));
+                }
+                return songs;
+            });
+        }
+    }
+
+    public List<UserPreview> getSuggestedUsers(String username){
+        List<UserPreview> users = new ArrayList<>();
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (u:User {username: $username})-[:FOLLOWS]->(m:User) WHERE NOT m:Artist," +
+                                "(m)-[:FOLLOWS]->(f:User) WHERE NOT f:Artist AND NOT f.username = u.username" +
+                                "WITH COLLECT(DISTINCT(f.username))[0..15] AS User" +
+                                        "RETURN User",
+                        parameters("username", username));
+                while(res.hasNext()){
+                    Record r = res.next();
+                    users.add(new UserPreview(r.get("User").asString()));
+                }
+                return users;
+            });
+        }
+    }
+    //  In this function, we find all the users (that are not artists) that like a song our target user likes. Then, we
+    //  count how many songs our user likes and how many songs in common our target user and the other user like. We then
+    // choose as like-minded users those that like 60% or more of the songs that our target user likes.
+    public List<UserPreview> getLikeMindedUsers(String username){
+        List<UserPreview> users = new ArrayList<>();
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (u:User {username: $username})-[:LIKES]->(:Song)<-[:LIKES]-(f:User) WHERE NOT f:Artist," +
+                                "(u)-[:LIKES]->(s1:Song)" +
+                                "WITH u, f, COUNT(DISTINCT s1) AS s1Count" +
+                                "MATCH (u)-[:LIKES]->(s:Song)<-[:LIKES]-(f)" +
+                                "WITH f,s1Count, COUNT(DISTINCT s) AS commonSongsCount" +
+                                "WHERE commonSongsCount >= s1Count * 0.6" +
+                                "RETURN f.username LIMIT 15 ",
+                        parameters("username", username));
+                while(res.hasNext()){
+                    Record r = res.next();
+                    users.add(new UserPreview(r.get("User").asString()));
+                }
+                return users;
+            });
+        }
+    }
+
+    public List<SongPreview> getLikeMindedSongs(String username){
+        List<SongPreview> songs = new ArrayList<>();
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (u:User {username: $username})-[:LIKES]->(:Song)<-[:LIKES]-(f:User) WHERE NOT f:Artist," +
+                                "(u)-[:LIKES]->(s1:Song), (f)-[:LIKES]->(s2:Song)" +
+                                "WITH u, f, s2, COUNT(DISTINCT s1) AS s1Count" +
+                                "MATCH (u)-[:LIKES]->(s:Song)<-[:LIKES]-(f)" +
+                                "WITH s1Count,s2, COUNT(DISTINCT s) AS commonSongsCount" +
+                                "WHERE commonSongsCount >= s1Count * 0.6" +
+                                "RETURN s2.title AS title, a.username AS artistUsername, s2.songID AS ID, a.stageName AS stageName LIMIT 15",
+                        parameters("username", username));
+                while(res.hasNext()){
+                    Record r = res.next();
+                    songs.add(new SongPreview(r.get("songID").asString(), r.get("stageName").asString(),
+                            r.get("artistUsername").asString(), r.get("title").asString()));
+                }
+                return songs;
+            });
+        }
+    }
+
+    public List<UserPreview> getTopFans(String username){
+        List<UserPreview> users = new ArrayList<>();
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (a:Artist {username: $username})<-[:FOLLOWS]-(u:User) WHERE NOT u:Artist," +
+                                "(a)-[:PERFORMS {isMainArtist: true}]->(s:Song)" +
+                                "WITH u, s, COUNT(DISTINCT s) AS totalSongs" +
+                                "MATCH (s)<-[:LIKES]-(u)" +
+                                "WITH u, totalSongs, COUNT(DISTINCT s) AS likedSongs" +
+                                "WHERE likedSongs >= totalSongs * 0.6" +
+                                "RETURN u.username AS User LIMIT 15",
+                        parameters("username", username));
+                while(res.hasNext()){
+                    Record r = res.next();
+                    users.add(new UserPreview(r.get("User").asString()));
+                }
+                return users;
+            });
+        }
+    }
+
+    // TODO: aggiungere immagine agli artisti
+    public List<ArtistPreview> getSimilarArtists(String username){
+        List<ArtistPreview> artists = new ArrayList<>();
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (a:Artist {username: $username})<-[:FOLLOWS]-(u:User) WHERE NOT u:Artist" +
+                                "WITH u, a, COUNT(DISTINCT u) AS totFollowers" +
+                                "MATCH (u)-[:FOLLOWS]->(a1:Artist) WHERE NOT a1.username = a.username" +
+                                "WITH u, a, totFollowers, a1, COUNT(DISTINCT u) AS followOthers" +
+                                "WHERE followOthers >= totFollowers * 0.3" +
+                                "RETURN a1.username AS username, a1.stageName AS stageName LIMIT 15",
+                        parameters("username", username));
+                while(res.hasNext()){
+                    Record r = res.next();
+                    artists.add(new ArtistPreview(r.get("username").toString(), r.get("stageName").toString(), null));
+                }
+                return artists;
+            });
+        }
+    }
+
+    public List<SongPreview> getPopularSongs(String username){
+        List<SongPreview> songs = new ArrayList<>();
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (a:Artist {username: $username})-[:PERFORMS {isMainArtist: true}]->(s:Song)," +
+                                "(s)<-[:LIKES]-(u:User) WHERE NOT u:Artist AND NOT u.username = a.username" +
+                                "WITH s, a, u, COUNT(DISTINCT u) AS totalLikes" +
+                                "MATCH (u), (s), (a)" +
+                                "WITH u,s,a,totalLikes, COUNT(DISTINCT u) AS externalLikes" +
+                                "WHERE NOT (u)-[:FOLLOWS]->(a) AND (u)-[:LIKES]->(s)" +
+                                "MATCH (s)" +
+                                "WHERE externalLikes >= totalLikes * 0.3" +
+                                "RETURN s.songID AS songID, a.stageName AS stageName, s.title AS title LIMIT 15",
+                        parameters("username", username));
+                while(res.hasNext()){
+                    Record r = res.next();
+                    songs.add(new SongPreview(r.get("songID").asString(), r.get("stageName").asString(),
+                            username, r.get("title").asString()));
+                }
+                return songs;
             });
         }
     }

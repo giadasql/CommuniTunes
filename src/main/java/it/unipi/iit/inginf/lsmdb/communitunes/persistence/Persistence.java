@@ -4,10 +4,14 @@ import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Review;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceInconsistencyException;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -161,31 +165,113 @@ public interface Persistence {
 
     /**
      *
-     * @param user
-     * @return
-     */
-    List<Pair<String, String>> getSuggestedSongs(User user);
-
-    /**
+     * For each genre, display the ten songs that obtained the highest average rating,
+     * only considering the user ratings posted in the last month.
      *
      * @param genre
      * @return
      */
-    List<Pair<String, String>> getSuggestedSongs(String genre);
+    HashMap<String, List<SongPreview>> getSuggestedSongs();
 
     /**
+     *
+     * Find the most and least appreciated album for each artist, based on the ratings
+     * given to the songs contained in each album.
+     *
+     * @param artist
+     * @return List(album name, average rating of songs)
+     *
+     */
+    List<Pair<String, Integer>> getApprAlbum(Artist artist);
+
+    /**
+     *
+     * For each genre, find the most representative artist, combining the number of
+     * the artist's songs belonging to that genre and their reviews.
+     *
+     * @param genre
+     * @return
+     *
+     */
+    List<ArtistPreview> getRepresentativeArtist(String genre);
+
+    /**
+     *
+     * Get songs liked by user's followed users.
      *
      * @param user
      * @return
      */
-    List<String> getSuggestedArtists(User user);
+    List<SongPreview> getSuggestedSongs(User user);
 
     /**
+     *
+     * Get artists that worked with user's followed artists.
      *
      * @param user
      * @return
      */
-    List<String> getSuggestedUsers(User user);
+    List<ArtistPreview> getSuggestedArtists(User user);
+
+    /**
+     *
+     * Get users followed by user's followed users.
+     *
+     * @param user
+     * @return
+     */
+    List<UserPreview> getSuggestedUsers(User user);
+
+    /**
+     *
+     * Get user's like-minded users, that like many songs that user likes.
+     *
+     * @param user
+     * @return
+     */
+    List<UserPreview> getLikeMindedUsers(User user);
+
+    /**
+     *
+     * Get songs liked by user's like-minded users.
+     *
+     * @param user
+     * @return
+     *
+     */
+    List<SongPreview> getLikeMindedSongs(User user);
+
+    /**
+     *
+     * Get top fans, i.e. followers of artist that also like many
+     * of the songs performed by artist.
+     *
+     * @param artist
+     * r@return
+     *
+     */
+    List<UserPreview> getTopFans(Artist artist);
+
+    /**
+     *
+     * Get similar artists, which are largely followed by artist's followers.
+     *
+     * @param artist
+     * @return
+     *
+     */
+    List<ArtistPreview> getSimilarArtists(Artist artist);
+
+    /**
+     *
+     * Get popular songs performed by artist that are largely
+     * liked by non-fans, i.e. users that do not follow artist.
+     *
+     * @param artist
+     * @return
+     *
+     */
+    List<SongPreview> getPopularSongs(Artist artist);
 
     /**
      *

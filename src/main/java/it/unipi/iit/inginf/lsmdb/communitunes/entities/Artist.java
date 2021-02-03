@@ -16,13 +16,15 @@ public class Artist extends User {
 
     public String ActiveYears;
 
+    public String Biography;
+
     public List<SongPreview> LoadedSongs = new ArrayList<>();
 
     public Artist(String username, String email, String password) {
         super(username, email, password);
     }
 
-    public Artist(Object email, Object username, Object password, Object country, Object birthday, Object loadedLikes, Object loadedFollowed, Object loadedArtistFollowed, Object loadedFollowers, Object loadedArtistFollowers, Object stageName, Object image, Object activeYears, Object loadedSongs, Object id) {
+    public Artist(Object email, Object username, Object password, Object country, Object birthday, Object loadedLikes, Object loadedFollowed, Object loadedArtistFollowed, Object loadedFollowers, Object loadedArtistFollowers, Object stageName, Object biography, Object image, Object activeYears, Object loadedSongs, Object id) {
         super(email, username, password, country, birthday, loadedLikes, loadedFollowed, loadedArtistFollowed, loadedFollowers, loadedArtistFollowers, id);
         if(stageName != null){
             try{
@@ -48,6 +50,14 @@ public class Artist extends User {
                 // TODO: log the exception
             }
         }
+        if(biography != null){
+            try{
+                Biography = (String)biography;
+            }
+            catch(ClassCastException exc){
+                // TODO: log the exception
+            }
+        }
         if(loadedSongs != null){
             try{
                 List<Map<String, String>> loadedSongsMaps = (List<Map<String, String>>) loadedSongs;
@@ -61,5 +71,20 @@ public class Artist extends User {
                 // TODO: log the exception
             }
         }
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(o == this){
+            return true;
+        }
+        if(!(o instanceof Artist)){
+            return false;
+        }
+        Artist artist = (Artist)o;
+
+        return Email.equals(artist.Email) && Password.equals(artist.Password) && Country.equals(artist.Country)
+                && Birthday.equals(artist.Birthday) && StageName.equals(artist.StageName) && Image.equals(artist.Image)
+                && ActiveYears.equals(artist.ActiveYears) && Biography.equals(artist.Biography);
     }
 }
