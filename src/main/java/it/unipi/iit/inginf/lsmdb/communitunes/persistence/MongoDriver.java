@@ -296,7 +296,7 @@ class MongoDriver implements Closeable {
                     .append("_id", reviewId)
                     .append("posted", current);
 
-            Bson update = addToSet("reviews", reviewDoc);
+            Bson update = Updates.addToSet("reviews", reviewDoc);
 
             Document result = songsCollection.findOneAndUpdate(filter, update);
             if (result != null) {
