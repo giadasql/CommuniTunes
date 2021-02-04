@@ -1,6 +1,8 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.LayoutManager;
+import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -10,15 +12,15 @@ import javafx.stage.Stage;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class HomepageExample {
-
+public class HomepageExample implements UIController {
+    @FXML
     public Text message;
 
-    private Stage primary;
-
-    public void initialize(User authenticated, Stage primary) {
-        message.setText("Welcome " + authenticated.Username + "!");
-        message.setFill(Color.BLACK);
-        this.primary = primary;
+    @Override
+    public void init(LayoutManager manager) {
+        if(manager.authenticated != null){
+            message.setText("Welcome " + manager.authenticated.Username + "!");
+            message.setFill(Color.BLACK);
+        }
     }
 }

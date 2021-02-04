@@ -5,6 +5,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthResult;
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
 import javafx.event.ActionEvent;
@@ -21,7 +22,7 @@ import java.net.URL;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
-public class AuthenticationController {
+public class AuthenticationController implements UIController {
     @FXML
     private TextField username;
 
@@ -30,33 +31,23 @@ public class AuthenticationController {
 
     private Stage primary;
 
+    private LayoutManager manager;
+
     @FXML
     public void loginEventHandler(ActionEvent event) throws IOException {
         AuthenticationManager authManager = AuthenticationFactory.CreateAuthenticationManager();
         Persistence dbManager = PersistenceFactory.CreatePersistence();
         AuthResult result = authManager.Login(username.getText(), password.getText());
         if(result.Success){
-            User authenticated = dbManager.getUser(result.AuthenticatedUser);
-
-            FXMLLoader loader = new FXMLLoader(
-                    getClass().getClassLoader().getResource(
-                            "homepage_example.fxml"
-                    )
-            );
-
-
-            primary.setScene(
-                    new Scene(loader.load(), 900, 600)
-            );
-
-            HomepageExample controller = loader.getController();
-            controller.initialize(authenticated, primary);
-
-            primary.show();
+            manager.authenticated = dbManager.getUser(result.AuthenticatedUser);
+            manager.setContent(manager.HOMEPAGE_EXAMPLE);
         }
     }
 
-    public void init(Stage primaryStage){
-        primary = primaryStage;
+
+
+    @Override
+    public void init(LayoutManager manager) {
+        this.manager = manager;
     }
 }
