@@ -3,6 +3,7 @@ package it.unipi.iit.inginf.lsmdb.communitunes.entities;
 import org.javatuples.Pair;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Song extends Entity {
@@ -123,5 +124,22 @@ public class Song extends Entity {
 
     public List<String> LoadedLikes = new ArrayList<>();
 
+    @Override
+    public boolean equals(Object o){
+        if(o == this){
+            return true;
+        }
+        if(!(o instanceof Song)){
+            return false;
+        }
+        Song song = (Song)o;
+        Collections.sort(Genres);
+        Collections.sort(song.Genres);
+        Collections.sort(Featurings);
+        Collections.sort(song.Featurings);
+
+        return Link.equals(song.Link) && Image.equals(song.Image) &&
+                Genres.equals(song.Genres) && Featurings.equals(song.Featurings);
+    }
 }
 

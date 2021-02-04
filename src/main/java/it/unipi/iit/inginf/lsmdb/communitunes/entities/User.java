@@ -122,4 +122,18 @@ public class User extends Entity {
         Username = username;
         Password =  password;
     }
+
+    @Override
+    public boolean equals(Object o){
+        if(o == this){
+            return true;
+        }
+        if(!(o instanceof User)){
+            return false;
+        }
+        User user = (User)o;
+
+        return Email.equals(user.Email) && Password.equals(user.Password) && Country.equals(user.Country)
+                && Birthday.equals(user.Birthday);
+    }
 }
