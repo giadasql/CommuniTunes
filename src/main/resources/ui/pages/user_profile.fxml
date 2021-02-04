@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+
+<ScrollPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="534.0" prefWidth="900.0" style="-fx-background-color: #001a4d;" stylesheets="@../style/style.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.UserProfileController">
+   <content>
+      <Pane prefHeight="226.0" prefWidth="242.0" style="-fx-background-color: #001a4d;">
+         <children>
+            <Circle fill="#12ffe7dc" layoutX="121.0" layoutY="96.0" radius="82.0" stroke="BLACK" strokeType="INSIDE" />
+            <Text fx:id="username" fill="WHITE" layoutY="205.0" strokeType="OUTSIDE" strokeWidth="0.0" text="username" textAlignment="CENTER" wrappingWidth="242.9830722808838">
+               <font>
+                  <Font name="Book Antiqua Bold" size="19.0" />
+               </font>
+            </Text>
+         </children>
+      </Pane>
+   </content>
+</ScrollPane>
