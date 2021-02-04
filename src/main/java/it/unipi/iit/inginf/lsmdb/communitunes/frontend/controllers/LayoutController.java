@@ -1,16 +1,11 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.LayoutManager;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
-import javafx.stage.Stage;
 
 import java.io.IOException;
 
@@ -36,5 +31,10 @@ public class LayoutController implements UIController {
 
     public void setContent(Node node){
         content.getChildren().setAll(node);
+    }
+
+    public void logoutHandler( ) throws IOException {
+        manager.authenticated = null;
+        manager.showAuthenticationPage(manager.LOGIN);
     }
 }
