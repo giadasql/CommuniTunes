@@ -1,11 +1,14 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.LayoutManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.ApplicationContext;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import org.apache.commons.digester.annotations.rules.SetRoot;
 
 import java.io.IOException;
 
@@ -34,7 +37,12 @@ public class LayoutController implements UIController {
     }
 
     public void logoutHandler( ) throws IOException {
-        manager.authenticated = null;
-        manager.showAuthenticationPage(manager.LOGIN);
+        manager.context.authenticatedUser = null;
+        manager.showAuthenticationPage(Path.LOGIN);
+    }
+
+    public void showUserProfile(MouseEvent mouseEvent) throws IOException {
+        manager.context.focusedUser = manager.context.authenticatedUser;
+        manager.setContent(Path.USER_PROFILE);
     }
 }

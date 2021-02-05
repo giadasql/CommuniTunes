@@ -1,10 +1,7 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend;
 
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.LayoutController;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Main extends Application {

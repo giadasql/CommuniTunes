@@ -4,26 +4,18 @@ package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthResult;
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationManager;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.LayoutManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceInconsistencyException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
 
 public class AuthenticationController implements UIController {
     @FXML
@@ -46,8 +38,8 @@ public class AuthenticationController implements UIController {
             AuthResult result = authManager.Login(username.getText(), password.getText());
             if(result.Success){
                 errorMsg.setText("");
-                manager.authenticated = dbManager.getUser(result.AuthenticatedUser);
-                manager.setContent(manager.HOMEPAGE_EXAMPLE);
+                manager.context.authenticatedUser = dbManager.getUser(result.AuthenticatedUser);
+                manager.setContent(Path.HOMEPAGE_EXAMPLE);
             }
             else{
                 errorMsg.setText(result.ErrorMsg);
@@ -70,8 +62,8 @@ public class AuthenticationController implements UIController {
             AuthResult result = authManager.Register(username.getText(), email.getText(), password.getText());
             if (result.Success){
                 errorMsg.setText("");
-                manager.authenticated = dbManager.getUser(result.AuthenticatedUser);
-                manager.setContent(manager.HOMEPAGE_EXAMPLE);
+                manager.context.authenticatedUser = dbManager.getUser(result.AuthenticatedUser);
+                manager.setContent(Path.HOMEPAGE_EXAMPLE);
             }
             else{
                 errorMsg.setText(result.ErrorMsg);
@@ -81,7 +73,7 @@ public class AuthenticationController implements UIController {
 
     @FXML
     public void showLogin(ActionEvent actionEvent) throws IOException {
-        manager.showAuthenticationPage(manager.LOGIN);
+        manager.showAuthenticationPage(Path.LOGIN);
     }
 
     @FXML
@@ -91,6 +83,6 @@ public class AuthenticationController implements UIController {
 
     @FXML
     public void showRegister(ActionEvent actionEvent) throws IOException {
-        manager.showAuthenticationPage(manager.REGISTER);
+        manager.showAuthenticationPage(Path.REGISTER);
     }
 }

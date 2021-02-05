@@ -16,3 +16,13 @@
 .circle-image{
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
 }
+
+.hover-btn{  
+  -fx-background-color:transparent;
+  -fx-text-fill:white;
+}
+
+.hover-btn:hover{  
+  -fx-background-color:white;
+  -fx-text-fill: #001a4d;
+}

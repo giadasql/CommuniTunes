@@ -1,11 +1,14 @@
-package it.unipi.iit.inginf.lsmdb.communitunes.frontend;
+package it.unipi.iit.inginf.lsmdb.communitunes.frontend.context;
 
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.LayoutController;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.UIController;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -13,25 +16,22 @@ import java.io.IOException;
 public class LayoutManager {
 
     private Stage primary;
-    private final FXMLLoader layoutLoader;
-    private LayoutController layoutController;
+    private final LayoutController layoutController;
     private boolean layoutVisible = false;
-
-    public User authenticated;
-    public final String HOMEPAGE_EXAMPLE = "./ui/pages/homepage_example.fxml";
-    public final String LOGIN = "ui/pages/authentication/login.fxml";
-    public final String GENERAL_LAYOUT = "./ui/pages/general_layout.fxml";
-    public final String REGISTER = "./ui/pages/authentication/register.fxml";
+    private final Scene layoutScene;
+    public final ApplicationContext context = new ApplicationContext();
 
     public LayoutManager() throws IOException {
-        layoutLoader = getLoader(GENERAL_LAYOUT);
+        FXMLLoader layoutLoader = getLoader(Path.GENERAL_LAYOUT);
+        layoutScene = new Scene(layoutLoader.load(), 900, 600);
+        layoutController = layoutLoader.getController();
     }
 
     public void startApp(Stage primaryStage) throws IOException {
         primary = primaryStage;
         primaryStage.setTitle("Communitunes");
 
-        showAuthenticationPage(LOGIN);
+        showAuthenticationPage(Path.LOGIN);
         primaryStage.show();
     }
 
@@ -49,18 +49,13 @@ public class LayoutManager {
 
     public void setContent(String resource) throws IOException {
         if(!layoutVisible){
-            primary.setScene( new Scene(layoutLoader.load(), 900, 600));
-            layoutController = layoutLoader.getController();
+            primary.setScene( layoutScene);
             layoutController.init(this);
             layoutVisible = true;
         }
 
         FXMLLoader loader = getLoader(resource);
-        ScrollPane scrollPane = new ScrollPane(loader.load());
-        scrollPane.fitToWidthProperty().setValue(true);
-        scrollPane.fitToHeightProperty().setValue(true);
-
-        layoutController.setContent(scrollPane);
+        layoutController.setContent(loader.load());
 
         UIController controller = loader.getController();
         controller.init(this);
