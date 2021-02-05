@@ -26,3 +26,15 @@
   -fx-background-color:white;
   -fx-text-fill: #001a4d;
 }
+
+.user-info-label{
+	-fx-text-fill: white;
+	-fx-font-family: "Book Antiqua";
+	-fx-font-weight: bold;
+	-fx-font-size: 18px;
+}
+
+.user-info-text{
+	-fx-text-fill: white;
+	-fx-font-size: 18px;
+}
