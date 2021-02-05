@@ -3,10 +3,11 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.effect.ColorInput?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
@@ -14,49 +15,155 @@
 
 <ScrollPane minHeight="534.0" minWidth="-Infinity" prefWidth="900.0" style="-fx-background-color: #001a4d;" stylesheets="@../style/style.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.UserProfileController">
    <content>
-      <AnchorPane prefHeight="200.0" prefWidth="200.0">
+      <VBox>
          <children>
-            <Pane prefHeight="776.0" prefWidth="887.0" style="-fx-background-color: #001a4d;">
+            <AnchorPane prefHeight="200.0" prefWidth="200.0">
                <children>
-                  <Circle fx:id="avatarCircle" fill="#12ffe7dc" layoutX="121.0" layoutY="99.0" radius="63.0" stroke="BLACK" strokeType="INSIDE" />
-                  <Text fx:id="username" fill="WHITE" layoutX="6.0" layoutY="189.0" strokeType="OUTSIDE" strokeWidth="0.0" text="username" textAlignment="CENTER" wrappingWidth="229.9830722808838">
-                     <font>
-                        <Font name="Book Antiqua Bold" size="19.0" />
-                     </font>
-                  </Text>
-                  <VBox layoutX="6.0" layoutY="247.0" prefHeight="515.0" prefWidth="876.0" />
-                  <Pane fx:id="userInfo" layoutX="243.0" layoutY="34.0" maxHeight="206.0" maxWidth="595.0" minWidth="593.0" prefHeight="206.0" prefWidth="595.0" />
-                  <Button fx:id="followUnfollow" layoutX="73.0" layoutY="202.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="95.0" style="-fx-border-color: white;" styleClass="hover-btn" stylesheets="@../style/style.css" text="Follow" textAlignment="CENTER" textFill="WHITE">
-                     <cursor>
-                        <Cursor fx:constant="HAND" />
-                     </cursor>
-                     <font>
-                        <Font size="21.0" />
-                     </font>
-                     <opaqueInsets>
-                        <Insets top="10.0" />
-                     </opaqueInsets>
-                     <effect>
-                        <ColorInput paint="WHITE" />
-                     </effect>
-                  </Button>
-                  <Button fx:id="editProfile" layoutX="73.0" layoutY="202.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="95.0" style="-fx-border-color: white;" styleClass="hover-btn" stylesheets="@../style/style.css" text="Edit" textAlignment="CENTER" textFill="WHITE">
-                     <cursor>
-                        <Cursor fx:constant="HAND" />
-                     </cursor>
-                     <font>
-                        <Font size="21.0" />
-                     </font>
-                     <opaqueInsets>
-                        <Insets top="10.0" />
-                     </opaqueInsets>
-                     <effect>
-                        <ColorInput paint="WHITE" />
-                     </effect>
-                  </Button>
+                  <HBox prefHeight="243.0" prefWidth="893.0">
+                     <children>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                           <children>
+                              <Circle fx:id="avatarCircle" fill="#12ffe7dc" layoutX="115.0" layoutY="99.0" radius="63.0" stroke="BLACK" strokeType="INSIDE" />
+                              <Text fx:id="username" fill="WHITE" layoutY="180.0" strokeType="OUTSIDE" strokeWidth="0.0" text="username" textAlignment="CENTER" wrappingWidth="229.9830722808838">
+                                 <font>
+                                    <Font name="Book Antiqua Bold" size="19.0" />
+                                 </font>
+                              </Text>
+                              <Button fx:id="followUnfollow" layoutX="67.0" layoutY="192.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="95.0" style="-fx-border-color: white;" styleClass="hover-btn" stylesheets="@../style/style.css" text="Follow" textAlignment="CENTER" textFill="WHITE">
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                                 <font>
+                                    <Font size="21.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets top="10.0" />
+                                 </opaqueInsets>
+                                 <effect>
+                                    <ColorInput paint="WHITE" />
+                                 </effect>
+                              </Button>
+                              <Button fx:id="editProfile" layoutX="67.0" layoutY="192.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="95.0" style="-fx-border-color: white;" styleClass="hover-btn" stylesheets="@../style/style.css" text="Edit" textAlignment="CENTER" textFill="WHITE">
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                                 <font>
+                                    <Font size="21.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets top="10.0" />
+                                 </opaqueInsets>
+                                 <effect>
+                                    <ColorInput paint="WHITE" />
+                                 </effect>
+                              </Button>
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane prefHeight="243.0" prefWidth="662.0">
+                           <children>
+                              <VBox fx:id="infoVBox" layoutX="19.0" layoutY="19.0" prefHeight="203.0" prefWidth="625.0">
+                                 <children>
+                                    <HBox fx:id="firstNameBox">
+                                       <children>
+                                          <Label prefHeight="23.0" prefWidth="137.0" styleClass="user-info-label" stylesheets="@../style/style.css" text="First Name">
+                                             <HBox.margin>
+                                                <Insets left="15.0" />
+                                             </HBox.margin>
+                                             <font>
+                                                <Font name="Book Antiqua" size="20.0" />
+                                             </font>
+                                          </Label>
+                                          <Text fx:id="firstName" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="user-info-text" text="name">
+                                             <HBox.margin>
+                                                <Insets left="40.0" />
+                                             </HBox.margin>
+                                             <font>
+                                                <Font name="Book Antiqua" size="20.0" />
+                                             </font>
+                                          </Text>
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets top="15.0" />
+                                       </VBox.margin>
+                                    </HBox>
+                                    <HBox fx:id="lastNameBox">
+                                       <children>
+                                          <Label prefHeight="23.0" prefWidth="137.0" styleClass="user-info-label" stylesheets="@../style/style.css" text="Last Name">
+                                             <HBox.margin>
+                                                <Insets left="15.0" top="5.0" />
+                                             </HBox.margin>
+                                             <font>
+                                                <Font name="Book Antiqua" size="20.0" />
+                                             </font>
+                                          </Label>
+                                          <Text fx:id="lastName" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="user-info-text" text="name">
+                                             <HBox.margin>
+                                                <Insets left="40.0" top="5.0" />
+                                             </HBox.margin>
+                                             <font>
+                                                <Font name="Book Antiqua" size="20.0" />
+                                             </font>
+                                          </Text>
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets top="10.0" />
+                                       </VBox.margin>
+                                    </HBox>
+                                    <HBox fx:id="countryBox">
+                                       <children>
+                                          <Label prefHeight="23.0" prefWidth="137.0" styleClass="user-info-label" stylesheets="@../style/style.css" text="Country">
+                                             <HBox.margin>
+                                                <Insets left="15.0" top="5.0" />
+                                             </HBox.margin>
+                                             <font>
+                                                <Font name="Book Antiqua" size="20.0" />
+                                             </font>
+                                          </Label>
+                                          <Text fx:id="country" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="user-info-text" text="country">
+                                             <HBox.margin>
+                                                <Insets left="40.0" top="5.0" />
+                                             </HBox.margin>
+                                             <font>
+                                                <Font name="Book Antiqua" size="20.0" />
+                                             </font>
+                                          </Text>
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets top="10.0" />
+                                       </VBox.margin>
+                                    </HBox>
+                                    <HBox fx:id="birthdayBox">
+                                       <children>
+                                          <Label prefHeight="23.0" prefWidth="137.0" styleClass="user-info-label" stylesheets="@../style/style.css" text="Birthday">
+                                             <HBox.margin>
+                                                <Insets left="15.0" top="5.0" />
+                                             </HBox.margin>
+                                             <font>
+                                                <Font name="Book Antiqua" size="20.0" />
+                                             </font>
+                                          </Label>
+                                          <Text fx:id="birthday" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="user-info-text" text="day">
+                                             <HBox.margin>
+                                                <Insets left="40.0" top="5.0" />
+                                             </HBox.margin>
+                                             <font>
+                                                <Font name="Book Antiqua" size="20.0" />
+                                             </font>
+                                          </Text>
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets top="10.0" />
+                                       </VBox.margin>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </AnchorPane>
+                     </children>
+                  </HBox>
                </children>
-            </Pane>
+            </AnchorPane>
          </children>
-      </AnchorPane>
+      </VBox>
    </content>
 </ScrollPane>
