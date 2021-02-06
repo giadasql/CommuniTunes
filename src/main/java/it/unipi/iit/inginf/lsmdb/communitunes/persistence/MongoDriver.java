@@ -95,6 +95,7 @@ class MongoDriver implements Closeable {
         Document setData = new Document();
         setData.append("password", newUser.Password).append("email", newUser.Email)
                 .append("country", newUser.Country).append("birthday", newUser.Birthday)
+                .append("first_name", newUser.FirstName).append("last_name", newUser.LastName)
                 .append("image", newUser.Image);
         Document update = new Document();
         update.append("$set", setData);
@@ -134,7 +135,8 @@ class MongoDriver implements Closeable {
         setData.append("password", newArtist.Password).append("email", newArtist.Email)
                 .append("country", newArtist.Country).append("birthday", newArtist.Birthday)
                 .append("activity", newArtist.ActiveYears).append("image", newArtist.Image)
-                .append("biography", newArtist.Biography).append("stageName", newArtist.StageName);
+                .append("biography", newArtist.Biography).append("stageName", newArtist.StageName)
+                .append("first_name", newArtist.FirstName).append("last_name", newArtist.LastName);
         Document update = new Document();
         update.append("$set", setData);
 
@@ -313,7 +315,6 @@ class MongoDriver implements Closeable {
         return null;
     }
 
-    // TODO: try to add timestamp
     public String addReview(String user, int rating, String text, String songID){
         Bson filter = new BasicDBObject("_id", new ObjectId(songID));
 
@@ -414,6 +415,9 @@ class MongoDriver implements Closeable {
         userValues.put("password", user.get("password"));
         userValues.put("birthday", user.get("birthday"));
         userValues.put("country", user.get("country"));
+        userValues.put("firstName", user.get("first_name"));
+        userValues.put("lastName", user.get("last_name"));
+        userValues.put("image", user.get("image"));
         return userValues;
     }
 

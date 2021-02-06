@@ -20,8 +20,8 @@ public class Artist extends User {
         super(username, email, password);
     }
 
-    public Artist(Object email, Object username, Object password, Object country, Object birthday, Object loadedLikes, Object loadedFollowed, Object loadedArtistFollowed, Object loadedFollowers, Object loadedArtistFollowers, Object stageName, Object biography, Object image, Object activeYears, Object loadedSongs, Object id) {
-        super(email, username, password, country, image, birthday, loadedLikes, loadedFollowed, loadedArtistFollowed, loadedFollowers, loadedArtistFollowers, id);
+    public Artist(Object email, Object username, Object password, Object firstName, Object lastName, Object country, Object birthday, Object loadedLikes, Object loadedFollowed, Object loadedArtistFollowed, Object loadedFollowers, Object loadedArtistFollowers, Object stageName, Object biography, Object image, Object activeYears, Object loadedSongs, Object id) {
+        super(email, username, password, image, firstName, lastName, country, birthday, loadedLikes, loadedFollowed, loadedArtistFollowed, loadedFollowers, loadedArtistFollowers, id);
         if(stageName != null){
             try{
                 StageName = (String)stageName;

@@ -1,11 +1,13 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.entities;
+import it.unipi.iit.inginf.lsmdb.communitunes.utilities.tools.DateToLocalDateConverter;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.javatuples.Pair;
 
+import java.time.LocalDate;
 import java.util.*;
 
 public class User extends Entity {
-    public User(Object email, Object username, Object password, Object country, Object image, Object birthday, Object loadedLikes,Object loadedFollowed, Object loadedArtistFollowed, Object loadedFollowers, Object loadedArtistFollowers, Object id) {
+    public User(Object email, Object username, Object password, Object image, Object firstName, Object lastName, Object country, Object birthday, Object loadedLikes,Object loadedFollowed, Object loadedArtistFollowed, Object loadedFollowers, Object loadedArtistFollowers, Object id) {
         super(id);
         if(email != null){
             try{
@@ -31,14 +33,6 @@ public class User extends Entity {
                 // TODO: log the exception
             }
         }
-        if(country != null){
-            try{
-                Country = (String)country;
-            }
-            catch (ClassCastException exc){
-                // TODO: log the exception
-            }
-        }
         if(image != null){
             try{
                 Image = (String)image;
@@ -47,9 +41,33 @@ public class User extends Entity {
                 // TODO: log the exception
             }
         }
+        if(firstName != null){
+            try{
+                FirstName = (String)firstName;
+            }
+            catch (ClassCastException exc){
+                // TODO: log the exception
+            }
+        }
+        if(lastName != null){
+            try{
+                LastName = (String)lastName;
+            }
+            catch (ClassCastException exc){
+                // TODO: log the exception
+            }
+        }
+        if(country != null){
+            try{
+                Country = (String)country;
+            }
+            catch (ClassCastException exc){
+                // TODO: log the exception
+            }
+        }
         if(birthday != null){
             try{
-                Birthday = (Date)birthday;
+                Birthday = DateToLocalDateConverter.convertToLocalDateViaInstant((Date)birthday);
             }
             catch (ClassCastException exc){
                 // TODO: log the exception
@@ -107,7 +125,11 @@ public class User extends Entity {
 
     public String Image;
 
-    public Date Birthday;
+    public LocalDate Birthday;
+
+    public String FirstName;
+
+    public String LastName;
 
     public List<Pair<String, String>> LoadedLikes = new ArrayList<>();
 

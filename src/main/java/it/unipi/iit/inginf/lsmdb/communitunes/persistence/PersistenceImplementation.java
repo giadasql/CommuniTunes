@@ -354,8 +354,10 @@ class PersistenceImplementation implements Persistence {
                 artistFollowed = userData.get("followedArtists"),
                 likes = userData.get("likes"),
                 username = userData.get("username"),
+                firstName = userData.get("firstName"),
+                lastName = userData.get("lastName"),
                 id = userData.get("id");
-        return new User(email, username, password, country, image, birthday, likes, followed, artistFollowed, followers, artistFollowers, id);
+        return new User(email, username, password, image, firstName, lastName, country, birthday, likes, followed, artistFollowed, followers, artistFollowers, id);
     }
 
     private Artist buildArtistFromMap( Map<String, Object> artistData){
@@ -372,11 +374,13 @@ class PersistenceImplementation implements Persistence {
                 likes = artistData.get("likes"),
                 songs = artistData.get("songs"),
                 image = artistData.get("image"),
+                firstName = artistData.get("firstName"),
+                lastName = artistData.get("lastName"),
                 yearsActive = artistData.get("activity"),
                 username = artistData.get("username"),
                 id = artistData.get("id");
 
-        return new Artist(email, username, password, country, birthday, likes, followed, artistFollowed, followers, artistFollowers, stageName, biography, image, yearsActive, songs, id);
+        return new Artist(email, username, password, firstName, lastName, country, birthday, likes, followed, artistFollowed, followers, artistFollowers, stageName, biography, image, yearsActive, songs, id);
     }
 
     private Song buildSongFromMap( Map<String, Object> songData){
