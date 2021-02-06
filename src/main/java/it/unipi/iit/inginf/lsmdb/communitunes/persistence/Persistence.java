@@ -175,14 +175,14 @@ public interface Persistence {
 
     /**
      *
-     * Find the most and least appreciated album for each artist, based on the ratings
+     * Find the most and least appreciated album for an artist, based on the ratings
      * given to the songs contained in each album.
      *
      * @param artist
-     * @return List(album name, average rating of songs)
+     * @return a map with the two albums, with key "best" and "worst"
      *
      */
-    List<Pair<String, Integer>> getApprAlbum(Artist artist);
+    HashMap<String, String> getApprAlbum(Artist artist);
 
     /**
      *
@@ -193,7 +193,7 @@ public interface Persistence {
      * @return
      *
      */
-    List<ArtistPreview> getRepresentativeArtist(String genre);
+    List<Pair<String, ArtistPreview>> getRepresentativeArtist();
 
     /**
      *

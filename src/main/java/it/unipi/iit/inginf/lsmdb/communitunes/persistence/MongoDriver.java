@@ -11,11 +11,9 @@ import com.mongodb.client.result.UpdateResult;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
-import org.bson.BSONObject;
-import org.bson.BasicBSONObject;
-import org.bson.BsonDocument;
-import org.bson.Document;
+import org.bson.*;
 import org.bson.conversions.Bson;
 import org.bson.types.BasicBSONList;
 import org.bson.types.ObjectId;
@@ -31,6 +29,7 @@ import javax.print.Doc;
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.*;
+import static com.mongodb.client.model.Sorts.descending;
 import static com.mongodb.client.model.Updates.*;
 
 import java.io.Closeable;
@@ -74,11 +73,12 @@ class MongoDriver implements Closeable {
         return doc == null ? null : (String)doc.get("_id");
     }
 
-    public String addUser(String username, String email, String psw) {
+    public String addUser(String username, String email, String psw, String image) {
         Document user = new Document();
         user.append("username", username);
         user.append("email", email);
         user.append("password", psw);
+        user.append("image", image);
         InsertOneResult insertOneResult = usersCollection.insertOne(user);
         // TODO: probabilmente non serve ritornare l'ID
         return insertOneResult.getInsertedId() == null ? null : insertOneResult.getInsertedId().asObjectId().getValue().toString();
@@ -94,7 +94,8 @@ class MongoDriver implements Closeable {
         query.append("_id", new ObjectId(newUser.ID));
         Document setData = new Document();
         setData.append("password", newUser.Password).append("email", newUser.Email)
-                .append("country", newUser.Country).append("birthday", newUser.Birthday);
+                .append("country", newUser.Country).append("birthday", newUser.Birthday)
+                .append("image", newUser.Image);
         Document update = new Document();
         update.append("$set", setData);
 
@@ -142,11 +143,13 @@ class MongoDriver implements Closeable {
         return updateRes.getModifiedCount() != 0;
     }
 
-    public String addSong(String artist, String duration, String title, String album){
+    public String addSong(String artist, String duration, String title, String album, String image){
         Document song = new Document();
+        song.append("artist", artist);
         song.append("name", title);
         song.append("lenght", duration);
         song.append("album", album);
+        song.append("image", image);
         InsertOneResult insertOneResult = songsCollection.insertOne(song);
         return insertOneResult.getInsertedId() == null ? null : insertOneResult.getInsertedId().asObjectId().getValue().toString();
     }
@@ -205,7 +208,13 @@ class MongoDriver implements Closeable {
                 append("songs", new Document("$push", new Document("songId", "$songId").append("title", "$title")
                 .append("stageName", "$stageName").append("artistId", "$artistId").append("avgRev", new Document("$avg", "$reviews.rating")))));
 
-        songsCollection.aggregate(Arrays.asList(myMatch, myUnwind, myGroup)).forEach(doc ->{
+        songsCollection.aggregate(Arrays.asList(addFields(new Field("avg_rating",
+                new Document("$avg", "$reviews.rating"))), match(ne("avg_rating",
+                new BsonNull())), sort(descending("avg_rating")), unwind("$genres",
+                new UnwindOptions().preserveNullAndEmptyArrays(false)), group("$genres", Accumulators.push("songs", and(eq("name", "$name"), eq("avg_rating", "$avg_rating")))), addFields(new Field("songs",
+                new Document("$slice", Arrays.asList("$songs", 10L))))));
+
+        /*songsCollection.aggregate(Arrays.asList(myMatch, myUnwind, myGroup)).forEach(doc ->{
             String genre = doc.getString("genre");
             List<Document> list = doc.get("songs", new ArrayList<Document>().getClass());
             HashMap<SongPreview, Double> songs = new HashMap<SongPreview, Double>();
@@ -216,25 +225,42 @@ class MongoDriver implements Closeable {
                 songs.put(song, avg);
             }
 
-        });
+        });*/
 
         return res;
     }
 
-    /*public List<SongPreview> getSuggestedSongs(List<Pair<String,String>> songs){
-        if(songs == null)
-            return null;
-        List<SongPreview> res = new ArrayList<>();
+    public HashMap<String, String> getApprAlbum(String username){
+        HashMap<String, String> res = new HashMap<>();
 
-        for(Pair<String,String> iter : songs){
-            Bson myMatch = and(match(eq("title", iter.getValue0())), match(eq("artist", iter.getValue1())));
-            Bson myProject = project(fields(include("artistId")));
-            Document doc = songsCollection.aggregate(Arrays.asList(myMatch, myProject)).first();
-            res.add(new SongPreview(doc.getObjectId("_id").toString(), iter.getValue1(),
-                    doc.getObjectId("artistId").toString(), iter.getValue0()));
-        }
+        Document query = songsCollection.aggregate(Arrays.asList(match(eq("artist", username)), addFields(new Field("avg_song_rating",
+                new Document("$avg", "$reviews.rating"))), match(ne("avg_song_rating",
+                new BsonNull())), group("$album", avg("avg_album_rating", "$avg_song_rating")), sort(descending("avg_album_rating")), group("Album stats", first("best_album", "$_id"), last("worst_album", "$_id")))).first();
+
+        res.put("best", query.getString("best_album"));
+        res.put("worst", query.getString("worst_album"));
+
         return res;
-    }*/
+    }
+
+    public List<Pair<String, ArtistPreview>> getRepresentativeArtist(){
+        List<Pair<String, ArtistPreview>> res = new ArrayList<>();
+
+        usersCollection.aggregate(Arrays.asList(addFields(new Field("avg_song_rating",
+                new Document("$avg", "$reviews.rating"))), unwind("$genres",
+                new UnwindOptions().preserveNullAndEmptyArrays(false)), group(and(eq("genre", "$genres"), eq("artist", "$artist")), sum("songs_count", 1L), avg("songs_avg_rating", "$avg_song_rating")), match(ne("songs_avg_rating",
+                new BsonNull())), addFields(new Field("points",
+                new Document("$sum", Arrays.asList(new Document("$multiply", Arrays.asList("$songs_count", 0.3d)),
+                        new Document("$multiply", Arrays.asList("$songs_avg_rating", 0.7d)))))), sort(descending("points")),
+                        group("$_id.genre", first("best_artist", "$_id.artist"))))
+                .forEach(doc->{
+                    String genre = doc.getString("genre");
+                    String artistUsername = doc.getString("artist");
+                    res.add(new Pair(genre, getArtistPreview(artistUsername)));
+        });
+
+        return res;
+    }
 
     public boolean checkPassword(String username, String password){
         BasicDBObject criteria = new BasicDBObject();
@@ -256,6 +282,14 @@ class MongoDriver implements Closeable {
         Document artist = usersCollection.find(eq("username", username)).first();
         if(artist != null){
             return getArtistMap(artist);
+        }
+        return null;
+    }
+
+    private ArtistPreview getArtistPreview(String username){
+        Document artist = usersCollection.find(eq("username", username)).first();
+        if(artist != null){
+            return new ArtistPreview(username, artist.getString("stageName"), artist.getString("image"));
         }
         return null;
     }

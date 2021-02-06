@@ -8,11 +8,12 @@ import java.util.List;
 
 public class SongPreview {
 
-    public SongPreview(String ID, String artistName, String artistUsername, String title) {
+    public SongPreview(String ID, String artistName, String artistUsername, String title, String image) {
         this.ID = ID;
         ArtistName = artistName;
         ArtistUsername = artistUsername;
         Title = title;
+        Image = image;
     }
 
     public String ID;
@@ -22,5 +23,7 @@ public class SongPreview {
     public String ArtistUsername;
 
     public String Title;
+
+    public String Image;
 
 }
