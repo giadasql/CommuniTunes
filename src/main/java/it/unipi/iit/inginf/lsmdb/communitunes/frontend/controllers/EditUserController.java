@@ -52,10 +52,10 @@ public class EditUserController implements UIController {
             user.Country = country.getText();
         }
         if(image.getText() == null){
-            user.Avatar = null;
+            user.Image = null;
         }
         else{
-            user.Avatar = image.getText();
+            user.Image = image.getText();
         }
         if(firstName.getText() == null){
             user.FirstName = null;
@@ -108,7 +108,7 @@ public class EditUserController implements UIController {
         firstName.setText(user.FirstName);
         lastName.setText(user.LastName);
         birthday.setValue(user.Birthday);
-        image.setText(user.Avatar);
+        image.setText(user.Image);
         password.setText("");
     }
 }
