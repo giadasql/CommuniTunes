@@ -168,7 +168,6 @@ public interface Persistence {
      * For each genre, display the ten songs that obtained the highest average rating,
      * only considering the user ratings posted in the last month.
      *
-     * @param genre
      * @return
      */
     HashMap<String, List<SongPreview>> getSuggestedSongs();
@@ -272,6 +271,7 @@ public interface Persistence {
      *
      */
     List<SongPreview> getPopularSongs(Artist artist);
+
 
     /**
      *

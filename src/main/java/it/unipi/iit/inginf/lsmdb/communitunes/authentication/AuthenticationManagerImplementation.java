@@ -42,9 +42,15 @@ class AuthenticationManagerImplementation implements AuthenticationManager {
             return new AuthResult(null, false, UsernameTaken);
         }
         else{
-            User newUser = new User(username, email, DigestUtils.sha256Hex(psw));
+            User newUser = new User(username, email, securePassword(psw));
             persistenceManager.addNewUser(newUser);
             return new AuthResult(username, true, null);
         }
     }
+
+    @Override
+    public String securePassword(String password) {
+        return DigestUtils.sha256Hex(password);
+    }
+
 }

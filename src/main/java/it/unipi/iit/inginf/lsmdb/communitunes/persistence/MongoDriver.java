@@ -89,6 +89,7 @@ class MongoDriver implements Closeable {
         return deleteResult.wasAcknowledged() && deleteResult.getDeletedCount() >= 1;
     }
 
+    // TODO: check if a field is null. If it is, remove it from the document
     public boolean updateUser(User newUser){
         Document query = new Document();
         query.append("_id", new ObjectId(newUser.ID));
@@ -126,6 +127,7 @@ class MongoDriver implements Closeable {
         return deleteResult.wasAcknowledged() && songsDelete.wasAcknowledged() && deleteResult.getDeletedCount() >= 1;
     }
 
+    // TODO: check if a field is null. If it is, remove it from the document
     public boolean updateArtist(Artist newArtist){
         Document query = new Document();
         query.append("_id", new ObjectId(newArtist.ID));
@@ -166,6 +168,7 @@ class MongoDriver implements Closeable {
         return updateRes.wasAcknowledged();
     }
 
+    // TODO: check if a field is null. If it is, remove it from the document
     public boolean updateSong(Song newSong){
         Document query = new Document();
         query.append("_id", new ObjectId(newSong.ID));
