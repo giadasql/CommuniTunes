@@ -51,12 +51,12 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    public int addUser(String username, String image) {
+    public int addUser(String username) {
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
                 Result res = tx.run( "MERGE (u:User {username: $username, image: $image}) RETURN ID(u)",
-                        parameters( "username", username, "image", image));
+                        parameters( "username", username));
                 if (res.hasNext()) {
                     // TODO: probabilmente non serve ritornare l'ID
                     return res.single().get(0).asInt();

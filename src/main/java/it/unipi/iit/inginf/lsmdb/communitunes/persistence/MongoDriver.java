@@ -73,12 +73,11 @@ class MongoDriver implements Closeable {
         return doc == null ? null : (String)doc.get("_id");
     }
 
-    public String addUser(String username, String email, String psw, String image) {
+    public String addUser(String username, String email, String psw) {
         Document user = new Document();
         user.append("username", username);
         user.append("email", email);
         user.append("password", psw);
-        user.append("image", image);
         InsertOneResult insertOneResult = usersCollection.insertOne(user);
         // TODO: probabilmente non serve ritornare l'ID
         return insertOneResult.getInsertedId() == null ? null : insertOneResult.getInsertedId().asObjectId().getValue().toString();
