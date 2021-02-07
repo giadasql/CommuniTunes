@@ -22,7 +22,7 @@
                      <children>
                         <VBox prefHeight="200.0" prefWidth="100.0">
                            <children>
-                              <AnchorPane prefHeight="277.0" prefWidth="230.0">
+                              <AnchorPane prefHeight="203.0" prefWidth="230.0">
                                  <children>
                                     <Circle fx:id="avatarCircle" fill="#12ffe7dc" layoutX="115.0" layoutY="99.0" radius="63.0" stroke="BLACK" strokeType="INSIDE" />
                                     <Text fx:id="username" fill="WHITE" layoutY="180.0" strokeType="OUTSIDE" strokeWidth="0.0" text="username" textAlignment="CENTER" wrappingWidth="229.9830722808838">
@@ -34,12 +34,15 @@
                               </AnchorPane>
                               <AnchorPane prefHeight="63.0" prefWidth="190.0">
                                  <children>
-                                    <Button fx:id="editProfileUser" layoutX="78.0" layoutY="3.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="74.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Edit">
+                                    <Button fx:id="editProfile" layoutX="78.0" layoutY="3.0" mnemonicParsing="false" onMouseClicked="#goToEdit" prefHeight="34.0" prefWidth="74.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Edit">
                                        <font>
                                           <Font name="Book Antiqua" size="16.0" />
                                        </font>
+                                       <cursor>
+                                          <Cursor fx:constant="HAND" />
+                                       </cursor>
                                     </Button>
-                                    <Button fx:id="followUnfollowUser" layoutX="78.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="74.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Follow">
+                                    <Button fx:id="followUnfollow" layoutX="78.0" layoutY="3.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="74.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Follow">
                                        <cursor>
                                           <Cursor fx:constant="HAND" />
                                        </cursor>
@@ -65,7 +68,7 @@
                                                 <Font name="Book Antiqua" size="20.0" />
                                              </font>
                                           </Label>
-                                          <Text fx:id="firstName" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="user-info-text" text="name" wrappingWidth="400.0">
+                                          <Text fx:id="firstName" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="user-info-text" text="name">
                                              <HBox.margin>
                                                 <Insets left="40.0" />
                                              </HBox.margin>
@@ -88,7 +91,7 @@
                                                 <Font name="Book Antiqua" size="20.0" />
                                              </font>
                                           </Label>
-                                          <Text fx:id="lastName" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="user-info-text" text="name" wrappingWidth="400.0">
+                                          <Text fx:id="lastName" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="user-info-text" text="name">
                                              <HBox.margin>
                                                 <Insets left="40.0" top="5.0" />
                                              </HBox.margin>
@@ -111,7 +114,7 @@
                                                 <Font name="Book Antiqua" size="20.0" />
                                              </font>
                                           </Label>
-                                          <Text fx:id="country" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="user-info-text" text="country" wrappingWidth="400.0">
+                                          <Text fx:id="country" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="user-info-text" text="country">
                                              <HBox.margin>
                                                 <Insets left="40.0" top="5.0" />
                                              </HBox.margin>
@@ -134,7 +137,7 @@
                                                 <Font name="Book Antiqua" size="20.0" />
                                              </font>
                                           </Label>
-                                          <Text fx:id="birthday" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="user-info-text" text="day" wrappingWidth="400.0">
+                                          <Text fx:id="birthday" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="user-info-text" text="day">
                                              <HBox.margin>
                                                 <Insets left="40.0" top="5.0" />
                                              </HBox.margin>
@@ -159,6 +162,6 @@
       </VBox>
    </content>
    <cursor>
-      <Cursor fx:constant="HAND" />
+      <Cursor fx:constant="DEFAULT" />
    </cursor>
 </ScrollPane>
