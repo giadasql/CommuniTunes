@@ -100,7 +100,19 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean updateUser(User newUser) {
-        return mongo.updateUser(newUser);
+        /*User toUpdate = getUser(newUser.Username);
+        if(toUpdate == null || newUser.equals(toUpdate)){
+            return false;
+        }
+
+        toUpdate.Birthday = newUser.Birthday;
+        toUpdate.Country = newUser.Country;
+        toUpdate.Email = newUser.Email;
+        toUpdate.Password = newUser.Password;
+
+         */
+
+        return mongo.updateUser(newUser) && neo4j.updateUser(newUser.Username, newUser.Image);
     }
 
     @Override
@@ -159,15 +171,15 @@ class PersistenceImplementation implements Persistence {
 
          */
 
-        return mongo.updateArtist(newArtist) && neo4j.updateArtist(newArtist.Username, newArtist.StageName);
+        return mongo.updateArtist(newArtist) && neo4j.updateArtist(newArtist.Username, newArtist.StageName, newArtist.Image);
     }
 
         // TODO: Forse conviene passare l'artista insieme alla canzone?
     @Override
     public boolean addSong(Song newSong) throws PersistenceInconsistencyException {
-        String mongoID = mongo.addSong(newSong.Artist, newSong.Duration, newSong.Title, newSong.Album);
+        String mongoID = mongo.addSong(newSong.Artist, newSong.Duration, newSong.Title, newSong.Album, newSong.Image);
         if(mongoID != null){
-            int neoID = neo4j.addSong(newSong.Artist, newSong.Title, newSong.ID);
+            int neoID = neo4j.addSong(newSong.Artist, newSong.Title, newSong.ID, newSong.Image);
             if(neoID != -1){
                 return true;
             }
@@ -211,7 +223,7 @@ class PersistenceImplementation implements Persistence {
         toUpdate.Genres.addAll(newSong.Genres);
          */
 
-        return mongo.updateSong(newSong) && neo4j.updateSong(newSong.Title, newSong.Artist, newSong.Featurings);
+        return mongo.updateSong(newSong) && neo4j.updateSong(newSong.Title, newSong.Artist, newSong.Featurings, newSong.Image);
     }
 
     @Override
@@ -240,10 +252,12 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<Pair<String, Integer>> getApprAlbum(Artist artist){ return null; }
+    public HashMap<String, String> getApprAlbum(Artist artist){
+        return mongo.getApprAlbum(artist.Username);
+    }
 
     @Override
-    public List<ArtistPreview> getRepresentativeArtist(String genre){ return null; }
+    public List<Pair<String,ArtistPreview>> getRepresentativeArtist(){ return mongo.getRepresentativeArtist(); }
 
     @Override
     public HashMap<String, List<SongPreview>> getSuggestedSongs() {
@@ -252,7 +266,7 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<ArtistPreview> getSuggestedArtists(User user) {
-        return null;
+        return neo4j.getSuggestedArtists(user.Username);
     }
 
     @Override
@@ -331,6 +345,7 @@ class PersistenceImplementation implements Persistence {
         Object email = userData.get("email"),
                 password = userData.get("password"),
                 country = userData.get("country"),
+                image = userData.get("image"),
                 birthday = userData.get("birthday"),
                 followed = userData.get("followed"),
                 followers = userData.get("followers"),
@@ -340,9 +355,8 @@ class PersistenceImplementation implements Persistence {
                 username = userData.get("username"),
                 firstName = userData.get("firstName"),
                 lastName = userData.get("lastName"),
-                avatar = userData.get("avatar"),
                 id = userData.get("id");
-        return new User(email, username, password, avatar, firstName, lastName, country, birthday, likes, followed, artistFollowed, followers, artistFollowers, id);
+        return new User(email, username, password, image, firstName, lastName, country, birthday, likes, followed, artistFollowed, followers, artistFollowers, id);
     }
 
     private Artist buildArtistFromMap( Map<String, Object> artistData){
@@ -359,14 +373,13 @@ class PersistenceImplementation implements Persistence {
                 likes = artistData.get("likes"),
                 songs = artistData.get("songs"),
                 image = artistData.get("image"),
-                yearsActive = artistData.get("activity"),
-                username = artistData.get("username"),
                 firstName = artistData.get("firstName"),
                 lastName = artistData.get("lastName"),
-                avatar = artistData.get("avatar"),
+                yearsActive = artistData.get("activity"),
+                username = artistData.get("username"),
                 id = artistData.get("id");
 
-        return new Artist(email, username, password, avatar, firstName, lastName, country, birthday, likes, followed, artistFollowed, followers, artistFollowers, stageName, biography, image, yearsActive, songs, id);
+        return new Artist(email, username, password, firstName, lastName, country, birthday, likes, followed, artistFollowed, followers, artistFollowers, stageName, biography, image, yearsActive, songs, id);
     }
 
     private Song buildSongFromMap( Map<String, Object> songData){

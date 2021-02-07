@@ -1,9 +1,7 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.entities;
 
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
-import org.javatuples.Pair;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,8 +9,6 @@ import java.util.Map;
 public class Artist extends User {
 
     public String StageName;
-
-    public String Image;
 
     public String ActiveYears;
 
@@ -24,19 +20,11 @@ public class Artist extends User {
         super(username, email, password);
     }
 
-    public Artist(Object email, Object username, Object password, Object avatar, Object firstName, Object lastName, Object country, Object birthday, Object loadedLikes, Object loadedFollowed, Object loadedArtistFollowed, Object loadedFollowers, Object loadedArtistFollowers, Object stageName, Object biography, Object image, Object activeYears, Object loadedSongs, Object id) {
-        super(email, username, password, avatar, firstName, lastName, country, birthday, loadedLikes, loadedFollowed, loadedArtistFollowed, loadedFollowers, loadedArtistFollowers, id);
+    public Artist(Object email, Object username, Object password, Object firstName, Object lastName, Object country, Object birthday, Object loadedLikes, Object loadedFollowed, Object loadedArtistFollowed, Object loadedFollowers, Object loadedArtistFollowers, Object stageName, Object biography, Object image, Object activeYears, Object loadedSongs, Object id) {
+        super(email, username, password, image, firstName, lastName, country, birthday, loadedLikes, loadedFollowed, loadedArtistFollowed, loadedFollowers, loadedArtistFollowers, id);
         if(stageName != null){
             try{
                 StageName = (String)stageName;
-            }
-            catch (ClassCastException exc){
-                // TODO: log the exception
-            }
-        }
-        if(image != null){
-            try{
-                Image = (String)image;
             }
             catch (ClassCastException exc){
                 // TODO: log the exception
@@ -63,7 +51,7 @@ public class Artist extends User {
                 List<Map<String, String>> loadedSongsMaps = (List<Map<String, String>>) loadedSongs;
                 for (Map<String, String> songMap:
                      loadedSongsMaps) {
-                    LoadedSongs.add(new SongPreview(songMap.get("songID"), this.StageName, this.Username, songMap.get("title")));
+                    LoadedSongs.add(new SongPreview(songMap.get("songID"), this.StageName, this.Username, songMap.get("title"), songMap.get("image")));
                 }
             }
             catch (ClassCastException exc){

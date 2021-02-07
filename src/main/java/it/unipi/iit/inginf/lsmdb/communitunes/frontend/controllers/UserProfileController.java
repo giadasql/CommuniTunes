@@ -38,8 +38,8 @@ public class UserProfileController implements UIController {
     public void init(LayoutManager manager) {
         user = manager.context.focusedUser;
         username.setText(user.Username);
-        if(user.Avatar != null){
-            Image avatar = new Image(user.Avatar);
+        if(user.Image != null){
+            Image avatar = new Image(user.Image);
             avatarCircle.setFill(new ImagePattern(avatar));
             avatarCircle.setEffect(new DropShadow(+25d, 0d, +2d, Color.BLUEVIOLET));
         }

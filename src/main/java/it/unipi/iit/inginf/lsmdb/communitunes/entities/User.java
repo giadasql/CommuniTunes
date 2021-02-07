@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 public class User extends Entity {
-    public User(Object email, Object username, Object password, Object avatar, Object firstName, Object lastName, Object country, Object birthday, Object loadedLikes,Object loadedFollowed, Object loadedArtistFollowed, Object loadedFollowers, Object loadedArtistFollowers, Object id) {
+    public User(Object email, Object username, Object password, Object image, Object firstName, Object lastName, Object country, Object birthday, Object loadedLikes,Object loadedFollowed, Object loadedArtistFollowed, Object loadedFollowers, Object loadedArtistFollowers, Object id) {
         super(id);
         if(email != null){
             try{
@@ -33,9 +33,9 @@ public class User extends Entity {
                 // TODO: log the exception
             }
         }
-        if(avatar != null){
+        if(image != null){
             try{
-                Avatar = (String)avatar;
+                Image = (String)image;
             }
             catch (ClassCastException exc){
                 // TODO: log the exception
@@ -123,13 +123,13 @@ public class User extends Entity {
 
     public String Country;
 
+    public String Image;
+
     public LocalDate Birthday;
 
     public String FirstName;
 
     public String LastName;
-
-    public String Avatar;
 
     public List<Pair<String, String>> LoadedLikes = new ArrayList<>();
 
@@ -148,11 +148,13 @@ public class User extends Entity {
         Password =  password;
     }
 
+        // TODO: inserire l'immagine di default
     public User(String username, String email, String password){
         super(null);
         Email = email;
         Username = username;
         Password =  password;
+        Image = null;
     }
 
     @Override

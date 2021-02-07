@@ -51,12 +51,12 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    public int addUser(String username) {
+    public int addUser(String username, String image) {
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
-                Result res = tx.run( "MERGE (u:User {username: $username}) RETURN ID(u)",
-                        parameters( "username", username));
+                Result res = tx.run( "MERGE (u:User {username: $username, image: $image}) RETURN ID(u)",
+                        parameters( "username", username, "image", image));
                 if (res.hasNext()) {
                     // TODO: probabilmente non serve ritornare l'ID
                     return res.single().get(0).asInt();
@@ -76,11 +76,22 @@ class Neo4jDriver implements Closeable {
         }
     }
 
+    public boolean updateUser(String username, String image){
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (u:User { username: $username }) SET u.image = $image RETURN count(u)",
+                        parameters("username", username, "image", image));
+                return (res.single().get(0).asInt() >= 1);
+            });
+        }
+    }
+
     public int addArtist(String username, String stageName) {
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
-                HashMap<String, Object> parameters = new HashMap<String, Object>();
+                HashMap<String, Object> parameters = new HashMap<>();
                 parameters.put("username", username);
                 parameters.put("stageName", stageName);
                 Result res = tx.run( "MATCH (u:User {username: $username}) SET u:Artist, u.stageName = $stageName  RETURN ID(u)",
@@ -105,21 +116,22 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    public boolean updateArtist(String username, String stageName){
+    public boolean updateArtist(String username, String stageName, String image){
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
-                HashMap<String, Object> parameters = new HashMap<String, Object>();
+                HashMap<String, Object> parameters = new HashMap<>();
                 parameters.put("username", username);
                 parameters.put("stageName", stageName);
-                Result res = tx.run( "MATCH (a:Artist { username: $username}) SET a.stageName = $stageName RETURN count(a)",
+                parameters.put("image", image);
+                Result res = tx.run( "MATCH (a:Artist { username: $username}) SET a.stageName = $stageName, a.image = $image RETURN count(a)",
                         parameters);
                 return (res.single().get(0).asInt() >= 1);
             });
         }
     }
 
-    public int addSong(String artist, String title, String songID) {
+    public int addSong(String artist, String title, String songID, String image) {
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
@@ -127,8 +139,9 @@ class Neo4jDriver implements Closeable {
                 parameters.put("username", artist);
                 parameters.put("title", title);
                 parameters.put("songID", songID);
+                parameters.put("image", image);
                 Result res = tx.run( "MATCH (a:Artist) WHERE a.username = $username " +
-                                "CREATE (s:Song {title: $title, songID: $songID})," +
+                                "CREATE (s:Song {title: $title, songID: $songID, image = $image})," +
                                 "(a)-[:PERFORMS {isMainArtist: true}]->(s) RETURN ID(s)",
                       parameters);
                 if (res.hasNext()) {
@@ -154,17 +167,20 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    // TODO: Da finire qua!
-    public boolean updateSong(String title, String artist, List<Pair<String, String>> Featurings){
+    // TODO: Da ricontrollare qua!
+    public boolean updateSong(String title, String artist, List<Pair<String, String>> Featurings, String image){
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
-                HashMap<String, Object> parameters = new HashMap<String, Object>();
+                HashMap<String, Object> parameters = new HashMap<>();
                 parameters.put("username", artist);
                 parameters.put("title", title);
-                Result res = tx.run( "MATCH (a:Artist {username: $username})-[:PERFORMS {isMainArtist: true}]->(s:Song {title: $title})," +
+                parameters.put("artists", Featurings);
+                parameters.put("image", image);
+                Result res = tx.run( "MATCH (a:Artist {username: $username})-[:PERFORMS {isMainArtist: true}]->(s:Song {title: $title}) SET s.image = $image," +
                                 "FOREACH(ar IN {$artists} |" +
-                                "MERGE (s)<-[:PERFORMS {isMainArtist: false}]-(ar:Artist",
+                                "MERGE (s)<-[:PERFORMS {isMainArtist: false}]-(ar:Artist)" +
+                                "RETURN count(s)",
                         parameters);
                 return (res.single().get(0).asInt() >= 1);
             });
@@ -179,14 +195,32 @@ class Neo4jDriver implements Closeable {
                 Result res = tx.run( "MATCH (u:User {username: $username})-[:FOLLOWS]->(f:User) WHERE NOT f:Artist," +
                                 "(f)-[:LIKES]->(s:Song)<-[:PERFORMS {isMainArtist: true}]-(a:Artist)" +
                                 "WITH COLLECT(DISTINCT(s.title))[0..15] AS Songs, a " +
-                                "RETURN Songs.title AS title, a.username AS artistUsername, Songs.songID AS ID, a.stageName AS stageName",
+                                "RETURN Songs.title AS title, a.username AS artistUsername, Songs.songID AS ID, a.stageName AS stageName, Songs.image AS Image",
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();
                     songs.add(new SongPreview(r.get("songID").asString(), r.get("stageName").asString(),
-                            r.get("artistUsername").asString(), r.get("title").asString()));
+                            r.get("artistUsername").asString(), r.get("title").asString(), r.get("Image").asString()));
                 }
                 return songs;
+            });
+        }
+    }
+
+    public List<ArtistPreview> getSuggestedArtists(String username){
+        List<ArtistPreview> artists = new ArrayList<>();
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (u:User {username: $username})-[:FOLLOWS]->(a:Artist)," +
+                                "(a)-[:PERFORMS]->(:Song)<-[:PERFORMS]-(f:Artist) WHERE NOT a.username = f.username" +
+                                "RETURN f.username AS username, f.stageName AS stageName, f.image AS Image LIMIT 15",
+                        parameters("username", username));
+                while(res.hasNext()){
+                    Record r = res.next();
+                    artists.add(new ArtistPreview(r.get("username").toString(), r.get("stageName").toString(), r.get("Image").asString()));
+                }
+                return artists;
             });
         }
     }
@@ -198,12 +232,11 @@ class Neo4jDriver implements Closeable {
             return session.writeTransaction(tx -> {
                 Result res = tx.run( "MATCH (u:User {username: $username})-[:FOLLOWS]->(m:User) WHERE NOT m:Artist," +
                                 "(m)-[:FOLLOWS]->(f:User) WHERE NOT f:Artist AND NOT f.username = u.username" +
-                                "WITH COLLECT(DISTINCT(f.username))[0..15] AS User" +
-                                        "RETURN User",
+                                "RETURN f.username AS User, f.image AS Image LIMIT 15",
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();
-                    users.add(new UserPreview(r.get("User").asString()));
+                    users.add(new UserPreview(r.get("User").asString(), r.get("Image").asString()));
                 }
                 return users;
             });
@@ -223,11 +256,11 @@ class Neo4jDriver implements Closeable {
                                 "MATCH (u)-[:LIKES]->(s:Song)<-[:LIKES]-(f)" +
                                 "WITH f,s1Count, COUNT(DISTINCT s) AS commonSongsCount" +
                                 "WHERE commonSongsCount >= s1Count * 0.6" +
-                                "RETURN f.username LIMIT 15 ",
+                                "RETURN f.username AS User, f.image AS Image LIMIT 15 ",
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();
-                    users.add(new UserPreview(r.get("User").asString()));
+                    users.add(new UserPreview(r.get("User").asString(), r.get("Image").asString()));
                 }
                 return users;
             });
@@ -245,12 +278,12 @@ class Neo4jDriver implements Closeable {
                                 "MATCH (u)-[:LIKES]->(s:Song)<-[:LIKES]-(f)" +
                                 "WITH s1Count,s2, COUNT(DISTINCT s) AS commonSongsCount" +
                                 "WHERE commonSongsCount >= s1Count * 0.6" +
-                                "RETURN s2.title AS title, a.username AS artistUsername, s2.songID AS ID, a.stageName AS stageName LIMIT 15",
+                                "RETURN s2.title AS title, a.username AS artistUsername, s2.songID AS ID, a.stageName AS stageName, s2.image AS Image LIMIT 15",
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();
                     songs.add(new SongPreview(r.get("songID").asString(), r.get("stageName").asString(),
-                            r.get("artistUsername").asString(), r.get("title").asString()));
+                            r.get("artistUsername").asString(), r.get("title").asString(), r.get("Image").asString()));
                 }
                 return songs;
             });
@@ -268,18 +301,17 @@ class Neo4jDriver implements Closeable {
                                 "MATCH (s)<-[:LIKES]-(u)" +
                                 "WITH u, totalSongs, COUNT(DISTINCT s) AS likedSongs" +
                                 "WHERE likedSongs >= totalSongs * 0.6" +
-                                "RETURN u.username AS User LIMIT 15",
+                                "RETURN u.username AS User, u.image AS Image LIMIT 15",
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();
-                    users.add(new UserPreview(r.get("User").asString()));
+                    users.add(new UserPreview(r.get("User").asString(), r.get("Image").asString()));
                 }
                 return users;
             });
         }
     }
 
-    // TODO: aggiungere immagine agli artisti
     public List<ArtistPreview> getSimilarArtists(String username){
         List<ArtistPreview> artists = new ArrayList<>();
         try ( Session session = driver.session())
@@ -290,11 +322,11 @@ class Neo4jDriver implements Closeable {
                                 "MATCH (u)-[:FOLLOWS]->(a1:Artist) WHERE NOT a1.username = a.username" +
                                 "WITH u, a, totFollowers, a1, COUNT(DISTINCT u) AS followOthers" +
                                 "WHERE followOthers >= totFollowers * 0.3" +
-                                "RETURN a1.username AS username, a1.stageName AS stageName LIMIT 15",
+                                "RETURN a1.username AS username, a1.stageName AS stageName, a1.image AS Image LIMIT 15",
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();
-                    artists.add(new ArtistPreview(r.get("username").toString(), r.get("stageName").toString(), null));
+                    artists.add(new ArtistPreview(r.get("username").toString(), r.get("stageName").toString(), r.get("Image").asString()));
                 }
                 return artists;
             });
@@ -314,12 +346,12 @@ class Neo4jDriver implements Closeable {
                                 "WHERE NOT (u)-[:FOLLOWS]->(a) AND (u)-[:LIKES]->(s)" +
                                 "MATCH (s)" +
                                 "WHERE externalLikes >= totalLikes * 0.3" +
-                                "RETURN s.songID AS songID, a.stageName AS stageName, s.title AS title LIMIT 15",
+                                "RETURN s.songID AS songID, a.stageName AS stageName, s.title AS title, s.image AS Image LIMIT 15",
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();
                     songs.add(new SongPreview(r.get("songID").asString(), r.get("stageName").asString(),
-                            username, r.get("title").asString()));
+                            username, r.get("title").asString(), r.get("Image").asString()));
                 }
                 return songs;
             });
