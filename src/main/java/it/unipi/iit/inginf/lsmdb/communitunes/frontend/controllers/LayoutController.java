@@ -45,4 +45,8 @@ public class LayoutController implements UIController {
         manager.context.focusedUser = manager.context.authenticatedUser;
         manager.setContent(Path.USER_PROFILE);
     }
+
+    public void goToHomepage(MouseEvent mouseEvent) throws IOException {
+        manager.setContent(Path.HOMEPAGE);
+    }
 }

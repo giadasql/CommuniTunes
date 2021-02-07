@@ -16,7 +16,7 @@
    <top>
       <Pane prefHeight="66.0" prefWidth="898.0" style="-fx-background-color: #000033;" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="homeButton" layoutX="14.0" layoutY="8.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" prefWidth="50.0" style="-fx-background-color: transparent;">
+            <Button fx:id="homeButton" layoutX="14.0" layoutY="8.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="50.0" onMouseClicked="#goToHomepage" prefWidth="50.0" style="-fx-background-color: transparent;">
                <cursor>
                   <Cursor fx:constant="HAND" />
                </cursor>

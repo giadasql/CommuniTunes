@@ -39,7 +39,7 @@ public class AuthenticationController implements UIController {
             if(result.Success){
                 errorMsg.setText("");
                 manager.context.authenticatedUser = dbManager.getUser(result.AuthenticatedUser);
-                manager.setContent(Path.HOMEPAGE_EXAMPLE);
+                manager.setContent(Path.HOMEPAGE);
             }
             else{
                 errorMsg.setText(result.ErrorMsg);
@@ -63,7 +63,7 @@ public class AuthenticationController implements UIController {
             if (result.Success){
                 errorMsg.setText("");
                 manager.context.authenticatedUser = dbManager.getUser(result.AuthenticatedUser);
-                manager.setContent(Path.HOMEPAGE_EXAMPLE);
+                manager.setContent(Path.HOMEPAGE);
             }
             else{
                 errorMsg.setText(result.ErrorMsg);
