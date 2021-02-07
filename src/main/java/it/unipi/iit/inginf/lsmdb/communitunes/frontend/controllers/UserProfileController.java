@@ -2,10 +2,12 @@ package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -13,6 +15,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.Objects;
 
 public class UserProfileController implements UIController {
     @FXML
@@ -33,16 +39,29 @@ public class UserProfileController implements UIController {
     public HBox birthdayBox;
 
     private User user;
+    private LayoutManager manager;
 
     @Override
     public void init(LayoutManager manager) {
+        this.manager = manager;
         user = manager.context.focusedUser;
         username.setText(user.Username);
-        if(user.Image != null){
-            Image avatar = new Image(user.Image);
-            avatarCircle.setFill(new ImagePattern(avatar));
-            avatarCircle.setEffect(new DropShadow(+25d, 0d, +2d, Color.BLUEVIOLET));
+        Image avatar;
+        if(user.Image != null && !user.Image.equals("")){
+            try{
+                avatar = new Image(user.Image);
+                if (avatar.isError()) {
+                    avatar = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
+                }
+                avatarCircle.setFill(new ImagePattern(avatar));
+            }
+            catch(Exception exc) {
+                avatar = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
+                avatarCircle.setFill(new ImagePattern(avatar));
+            }
         }
+
+
         // check if the profile belongs to the user that is currently logged in
         if(manager.context.authenticatedUser.Username.equals(user.Username)){
             editProfile.setVisible(true);
@@ -93,5 +112,9 @@ public class UserProfileController implements UIController {
             birthdayBox.setVisible(false);
             birthdayBox.setManaged(false);
         }
+    }
+
+    public void goToEdit(MouseEvent mouseEvent) throws IOException {
+        manager.setContent(Path.USER_EDIT);
     }
 }
