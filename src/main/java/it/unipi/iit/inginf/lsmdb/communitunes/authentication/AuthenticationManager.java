@@ -1,5 +1,6 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.authentication;
 
+
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceInconsistencyException;
 
 /**
