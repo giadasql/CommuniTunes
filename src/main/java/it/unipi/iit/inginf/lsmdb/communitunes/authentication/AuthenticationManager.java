@@ -24,4 +24,6 @@ public interface AuthenticationManager {
      * @throws PersistenceInconsistencyException
      */
     AuthResult Register(String username, String email, String psw) throws PersistenceInconsistencyException;
+
+    String securePassword(String password);
 }

@@ -100,18 +100,6 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean updateUser(User newUser) {
-        /*User toUpdate = getUser(newUser.Username);
-        if(toUpdate == null || newUser.equals(toUpdate)){
-            return false;
-        }
-
-        toUpdate.Birthday = newUser.Birthday;
-        toUpdate.Country = newUser.Country;
-        toUpdate.Email = newUser.Email;
-        toUpdate.Password = newUser.Password;
-
-         */
-
         return mongo.updateUser(newUser);
     }
 
