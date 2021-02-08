@@ -32,12 +32,12 @@
                               </AnchorPane>
                               <AnchorPane prefHeight="50.0" prefWidth="231.0">
                                  <children>
-                                    <Button fx:id="likeSong" layoutX="75.0" layoutY="6.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="74.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Like">
+                                    <Button fx:id="likeSong" layoutX="64.0" layoutY="6.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="95.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Like">
                                        <font>
                                           <Font size="16.0" />
                                        </font>
                                     </Button>
-                                    <Button fx:id="modifySong" layoutX="75.0" layoutY="6.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="74.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Modify">
+                                    <Button fx:id="modifySong" layoutX="64.0" layoutY="6.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="95.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Modify">
                                        <font>
                                           <Font size="16.0" />
                                        </font>

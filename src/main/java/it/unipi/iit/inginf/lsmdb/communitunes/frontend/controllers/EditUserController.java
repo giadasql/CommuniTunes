@@ -81,7 +81,7 @@ public class EditUserController implements UIController {
         }
         else{
             msg.setFill(Color.RED);
-            msg.setText("An error occured while updating the informatio. Please try again later.");
+            msg.setText("An error occurred while updating the information. Please try again later.");
         }
     }
 

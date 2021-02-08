@@ -55,7 +55,7 @@ class Neo4jDriver implements Closeable {
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
-                Result res = tx.run( "MERGE (u:User {username: $username, image: $image}) RETURN ID(u)",
+                Result res = tx.run( "MERGE (u:User {username: $username}) RETURN ID(u)",
                         parameters( "username", username));
                 if (res.hasNext()) {
                     // TODO: probabilmente non serve ritornare l'ID
@@ -77,6 +77,9 @@ class Neo4jDriver implements Closeable {
     }
 
     public boolean updateUser(String username, String image){
+        if(image == null){
+            return true;
+        }
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
@@ -131,7 +134,7 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    public int addSong(String artist, String title, String songID, String image) {
+    public int addSong(String artist, String title, String songID) {
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
@@ -139,9 +142,8 @@ class Neo4jDriver implements Closeable {
                 parameters.put("username", artist);
                 parameters.put("title", title);
                 parameters.put("songID", songID);
-                parameters.put("image", image);
                 Result res = tx.run( "MATCH (a:Artist) WHERE a.username = $username " +
-                                "CREATE (s:Song {title: $title, songID: $songID, image = $image})," +
+                                "CREATE (s:Song {title: $title, songID: $songID})," +
                                 "(a)-[:PERFORMS {isMainArtist: true}]->(s) RETURN ID(s)",
                       parameters);
                 if (res.hasNext()) {

@@ -17,11 +17,11 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="534.0" prefWidth="900.0" styleClass="communitunes-bg" stylesheets="@../style/style.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.EditUserController">
    <children>
-      <VBox layoutX="109.0" layoutY="8.0" prefHeight="516.0" prefWidth="700.0">
+      <VBox layoutX="4.0" layoutY="8.0" prefHeight="564.0" prefWidth="650.0">
          <children>
-            <AnchorPane prefHeight="82.0" prefWidth="700.0">
+            <AnchorPane prefHeight="68.0" prefWidth="756.0">
                <children>
-                  <Text fill="WHITE" layoutX="99.0" layoutY="51.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Edit profile info" textAlignment="CENTER" wrappingWidth="501.13671875">
+                  <Text fill="WHITE" layoutX="333.0" layoutY="33.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Edit profile info" textAlignment="CENTER" wrappingWidth="269.13671875">
                      <font>
                         <Font name="Dubai Light" size="29.0" />
                      </font>
@@ -182,6 +182,72 @@
                   </AnchorPane>
                </children>
             </HBox>
+            <HBox prefHeight="36.0" prefWidth="700.0">
+               <children>
+                  <AnchorPane prefHeight="15.0" prefWidth="258.0">
+                     <children>
+                        <Label layoutX="96.0" layoutY="6.0" prefHeight="34.0" prefWidth="119.0" text="Biography" textAlignment="CENTER" textFill="WHITE">
+                           <font>
+                              <Font name="Book Antiqua Bold" size="26.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+                  <AnchorPane prefHeight="100.0" prefWidth="376.0">
+                     <children>
+                        <TextField fx:id="biography" layoutX="64.0" layoutY="14.0" prefHeight="25.0" prefWidth="230.0">
+                           <cursor>
+                              <Cursor fx:constant="TEXT" />
+                           </cursor>
+                        </TextField>
+                     </children>
+                  </AnchorPane>
+               </children>
+            </HBox>
+            <HBox prefHeight="44.0" prefWidth="709.0">
+               <children>
+                  <AnchorPane prefHeight="15.0" prefWidth="258.0">
+                     <children>
+                        <Label layoutX="96.0" layoutY="6.0" prefHeight="38.0" prefWidth="140.0" text="Active Years" textAlignment="CENTER" textFill="WHITE">
+                           <font>
+                              <Font name="Book Antiqua Bold" size="26.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+                  <AnchorPane prefHeight="100.0" prefWidth="376.0">
+                     <children>
+                        <TextField fx:id="activeYears" layoutX="64.0" layoutY="14.0" prefHeight="25.0" prefWidth="230.0">
+                           <cursor>
+                              <Cursor fx:constant="TEXT" />
+                           </cursor>
+                        </TextField>
+                     </children>
+                  </AnchorPane>
+               </children>
+            </HBox>
+            <HBox prefHeight="36.0" prefWidth="700.0">
+               <children>
+                  <AnchorPane prefHeight="15.0" prefWidth="258.0">
+                     <children>
+                        <Label layoutX="96.0" layoutY="6.0" prefHeight="38.0" prefWidth="140.0" text="Stage name" textAlignment="CENTER" textFill="WHITE">
+                           <font>
+                              <Font name="Book Antiqua Bold" size="26.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </AnchorPane>
+                  <AnchorPane prefHeight="100.0" prefWidth="376.0">
+                     <children>
+                        <TextField fx:id="stageName" layoutX="64.0" layoutY="14.0" prefHeight="25.0" prefWidth="230.0">
+                           <cursor>
+                              <Cursor fx:constant="TEXT" />
+                           </cursor>
+                        </TextField>
+                     </children>
+                  </AnchorPane>
+               </children>
+            </HBox>
             <HBox prefHeight="5.0" prefWidth="700.0">
                <children>
                   <AnchorPane prefHeight="200.0" prefWidth="703.0">
@@ -199,32 +265,8 @@
             <HBox prefHeight="56.0" prefWidth="700.0">
                <children>
                   <AnchorPane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                  <AnchorPane prefHeight="55.0" prefWidth="129.0">
-                     <children>
-                        <Button layoutX="28.0" layoutY="10.0" mnemonicParsing="false" onAction="#saveInfo" prefHeight="35.0" prefWidth="81.0" stylesheets="@../style/style.css" text="Save">
-                           <styleClass>
-                              <String fx:value="hover-btn" />
-                              <String fx:value="hover-btn-green" />
-                           </styleClass>
-                           <cursor>
-                              <Cursor fx:constant="HAND" />
-                           </cursor>
-                        </Button>
-                     </children>
-                  </AnchorPane>
-                  <AnchorPane prefHeight="55.0" prefWidth="148.0">
-                     <children>
-                        <Button layoutX="34.0" layoutY="10.0" mnemonicParsing="false" onAction="#cancelEdit" prefHeight="35.0" prefWidth="81.0" stylesheets="@../style/style.css" text="Cancel">
-                           <styleClass>
-                              <String fx:value="hover-btn" />
-                              <String fx:value="hover-btn-yellow" />
-                           </styleClass>
-                           <cursor>
-                              <Cursor fx:constant="HAND" />
-                           </cursor>
-                        </Button>
-                     </children>
-                  </AnchorPane>
+                  <AnchorPane prefHeight="55.0" prefWidth="129.0" />
+                  <AnchorPane prefHeight="55.0" prefWidth="148.0" />
                </children>
             </HBox>
          </children>
@@ -240,6 +282,33 @@
                </cursor>
             </ImageView>
          </graphic>
+      </Button>
+      <Button layoutX="796.0" layoutY="441.0" mnemonicParsing="false" onAction="#cancelEdit" prefHeight="35.0" prefWidth="81.0" stylesheets="@../style/style.css" text="Cancel">
+         <styleClass>
+            <String fx:value="hover-btn" />
+            <String fx:value="hover-btn-yellow" />
+         </styleClass>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button layoutX="674.0" layoutY="441.0" mnemonicParsing="false" onAction="#saveInfo" prefHeight="35.0" prefWidth="81.0" stylesheets="@../style/style.css" text="Save">
+         <styleClass>
+            <String fx:value="hover-btn" />
+            <String fx:value="hover-btn-green" />
+         </styleClass>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+      </Button>
+      <Button layoutX="674.0" layoutY="226.0" mnemonicParsing="false" onAction="#createSong" prefHeight="82.0" prefWidth="207.0" stylesheets="@../style/style.css" text="Add a new song!">
+         <styleClass>
+            <String fx:value="hover-btn" />
+            <String fx:value="hover-btn-green" />
+         </styleClass>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
       </Button>
    </children>
    <cursor>
