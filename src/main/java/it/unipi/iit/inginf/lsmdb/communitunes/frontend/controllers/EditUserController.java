@@ -91,7 +91,7 @@ public class EditUserController implements UIController {
 
     @Override
     public void init(LayoutManager manager) {
-        user = manager.context.authenticatedUser;
+        user = manager.context.getAuthenticatedUser();
         dbManager = PersistenceFactory.CreatePersistence();
         authManager = AuthenticationFactory.CreateAuthenticationManager();
         this.manager = manager;

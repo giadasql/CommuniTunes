@@ -12,14 +12,11 @@ import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigRea
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderType;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceInconsistencyException;
 import org.javatuples.Pair;
-import org.javatuples.Triplet;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InvalidClassException;
-import java.lang.reflect.Type;
 import java.util.*;
 
 class PersistenceImplementation implements Persistence {
@@ -289,8 +286,8 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean checkPassword(String username, String password) {
-        return mongo.checkPassword(username, password);
+    public int checkCredentials(String username, String password) {
+        return mongo.checkCredentials(username, password);
     }
 
     @Override

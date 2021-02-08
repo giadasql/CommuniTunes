@@ -4,6 +4,7 @@ package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthResult;
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.authentication.Role;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
@@ -38,7 +39,12 @@ public class AuthenticationController implements UIController {
             AuthResult result = authManager.Login(username.getText(), password.getText());
             if(result.Success){
                 errorMsg.setText("");
-                manager.context.authenticatedUser = dbManager.getUser(result.AuthenticatedUser);
+                if(result.role == Role.Artist){
+                    manager.context.setAuthenticatedArtist(dbManager.getArtist(result.Authenticated));
+                }
+                else if(result.role == Role.User){
+                    manager.context.setAuthenticatedUser(dbManager.getUser(result.Authenticated));
+                }
                 manager.setContent(Path.HOMEPAGE);
             }
             else{
@@ -62,7 +68,7 @@ public class AuthenticationController implements UIController {
             AuthResult result = authManager.Register(username.getText(), email.getText(), password.getText());
             if (result.Success){
                 errorMsg.setText("");
-                manager.context.authenticatedUser = dbManager.getUser(result.AuthenticatedUser);
+                manager.context.setAuthenticatedUser(dbManager.getUser(result.Authenticated));
                 manager.setContent(Path.HOMEPAGE);
             }
             else{

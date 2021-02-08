@@ -14,7 +14,7 @@ public class HomePageController implements UIController {
     @Override
     public void init(LayoutManager manager) {
         this.manager = manager;
-        user = manager.context.focusedUser;
+        user = manager.context.getFocusedUser();
         dbManager = PersistenceFactory.CreatePersistence();
     }
 }

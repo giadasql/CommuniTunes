@@ -5,20 +5,16 @@ import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.Objects;
 
 public class UserProfileController implements UIController {
     @FXML
@@ -44,7 +40,7 @@ public class UserProfileController implements UIController {
     @Override
     public void init(LayoutManager manager) {
         this.manager = manager;
-        user = manager.context.focusedUser;
+        user = manager.context.getFocusedUser();
         username.setText(user.Username);
         Image avatar;
         if(user.Image != null && !user.Image.equals("")){
@@ -63,7 +59,7 @@ public class UserProfileController implements UIController {
 
 
         // check if the profile belongs to the user that is currently logged in
-        if(manager.context.authenticatedUser.Username.equals(user.Username)){
+        if(manager.context.getAuthenticatedUser().Username.equals(user.Username)){
             editProfile.setVisible(true);
             editProfile.setManaged(true);
             followUnfollow.setVisible(false);

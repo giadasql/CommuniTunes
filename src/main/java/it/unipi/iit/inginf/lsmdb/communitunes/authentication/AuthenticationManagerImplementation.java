@@ -20,11 +20,15 @@ class AuthenticationManagerImplementation implements AuthenticationManager {
 
     @Override
     public AuthResult Login(String username, String psw) {
-        if(persistenceManager.checkPassword(username, DigestUtils.sha256Hex(psw))){
-            return new AuthResult(username, true, null);
+        int checkResult = persistenceManager.checkCredentials(username, securePassword(psw));
+        if(checkResult == 0){
+            return new AuthResult(username, true, Role.User, null);
         }
-        else{
-            return new AuthResult(null, false, WrongCredentials);
+        else if (checkResult == 1){
+            return new AuthResult(username, true, Role.Artist, null);
+        }
+        else {
+            return new AuthResult(null, false, null, WrongCredentials);
         }
     }
 
@@ -32,19 +36,19 @@ class AuthenticationManagerImplementation implements AuthenticationManager {
     public AuthResult Register(String username, String email, String psw) throws PersistenceInconsistencyException {
         String usernameRegex = "^[a-zA-Z0-9._-]{3,}$";
         if(!username.matches(usernameRegex)){
-            return new AuthResult(null, false, UsernameInvalidChars);
+            return new AuthResult(null, false, null, UsernameInvalidChars);
         }
         EmailValidator emailValidator = EmailValidator.getInstance();
         if(!emailValidator.isValid(email)){
-            return new AuthResult(null, false, InvalidEmail);
+            return new AuthResult(null, false, null, InvalidEmail);
         }
         if(persistenceManager.checkIfUsernameExists(username)){
-            return new AuthResult(null, false, UsernameTaken);
+            return new AuthResult(null, false, null, UsernameTaken);
         }
         else{
             User newUser = new User(username, email, securePassword(psw));
             persistenceManager.addNewUser(newUser);
-            return new AuthResult(username, true, null);
+            return new AuthResult(username, true, Role.User, null);
         }
     }
 

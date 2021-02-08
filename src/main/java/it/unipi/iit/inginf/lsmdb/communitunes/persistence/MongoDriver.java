@@ -262,12 +262,18 @@ class MongoDriver implements Closeable {
         return res;
     }
 
-    public boolean checkPassword(String username, String password){
-        BasicDBObject criteria = new BasicDBObject();
-        criteria.append("username", username);
-        criteria.append("password", password);
-
-        return usersCollection.find(criteria).first() != null;
+    public int checkCredentials(String username, String password){
+        Document user = usersCollection.aggregate(Arrays.asList(match(and(eq("username", username), eq("password", password))), addFields(new Field("isArtist",
+                new Document("$cond", Arrays.asList(new Document("$ifNull", Arrays.asList("$stage_name", false)), true, false)))))).first();
+        if(user == null){
+            return -1;
+        }
+        else if (user.getBoolean("isArtist")){
+            return 1;
+        }
+        else{
+            return 0;
+        }
     }
 
     public Map<String, Object> getUserData(String username){

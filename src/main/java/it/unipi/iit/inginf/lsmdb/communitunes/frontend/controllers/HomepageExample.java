@@ -11,8 +11,8 @@ public class HomepageExample implements UIController {
 
     @Override
     public void init(LayoutManager manager) {
-        if(manager.context.authenticatedUser != null){
-            message.setText("Welcome " + manager.context.authenticatedUser.Username + "!");
+        if(manager.context.getAuthenticatedUser() != null){
+            message.setText("Welcome " + manager.context.getAuthenticatedUser().Username + "!");
             message.setFill(Color.BLACK);
         }
     }

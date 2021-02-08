@@ -45,7 +45,7 @@ public interface Persistence {
      * @param password
      * @return
      */
-    boolean checkPassword(String username, String password);
+    int checkCredentials(String username, String password);
 
     /**
      *

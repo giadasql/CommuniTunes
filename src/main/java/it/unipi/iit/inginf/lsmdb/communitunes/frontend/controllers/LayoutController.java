@@ -1,14 +1,13 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
+import it.unipi.iit.inginf.lsmdb.communitunes.authentication.Role;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.ApplicationContext;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
-import org.apache.commons.digester.annotations.rules.SetRoot;
 
 import java.io.IOException;
 
@@ -37,13 +36,19 @@ public class LayoutController implements UIController {
     }
 
     public void logoutHandler( ) throws IOException {
-        manager.context.authenticatedUser = null;
+        manager.context.setAuthenticatedUser(null);
         manager.showAuthenticationPage(Path.LOGIN);
     }
 
     public void showUserProfile(MouseEvent mouseEvent) throws IOException {
-        manager.context.focusedUser = manager.context.authenticatedUser;
-        manager.setContent(Path.USER_PROFILE);
+        if(manager.context.getAuthenticatedRole() == Role.User){
+            manager.context.setFocusedUser(manager.context.getAuthenticatedUser());
+            manager.setContent(Path.USER_PROFILE);
+        }
+        else if(manager.context.getAuthenticatedRole() == Role.Artist){
+            manager.context.setFocusedArtist(manager.context.getAuthenticatedArtist());
+            manager.setContent(Path.ARTIST_PROFILE);
+        }
     }
 
     public void goToHomepage(MouseEvent mouseEvent) throws IOException {
