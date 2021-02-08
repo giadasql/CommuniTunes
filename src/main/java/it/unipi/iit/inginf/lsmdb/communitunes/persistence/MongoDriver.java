@@ -93,10 +93,24 @@ class MongoDriver implements Closeable {
         Document query = new Document();
         query.append("_id", new ObjectId(newUser.ID));
         Document setData = new Document();
-        setData.append("password", newUser.Password).append("email", newUser.Email)
+        java.lang.reflect.Field[] fields = User.class.getDeclaredFields();
+        for(java.lang.reflect.Field f : fields){
+            f.setAccessible(true);
+            try {
+                Object v = f.get(newUser);
+                if(v != null && f.getName() != "LoadedLikes" && f.getName() != "LoadedFollowed" && f.getName() != "LoadedArtistFollowed"
+                        && f.getName() != "LoadedFollowers" && f.getName() != "LoadedArtistFollowers" && f.getName() != "Username"){
+                    setData.append(f.getName(), v);
+                }
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+        /*setData.append("password", newUser.Password).append("email", newUser.Email)
                 .append("country", newUser.Country).append("birthday", newUser.Birthday)
                 .append("first_name", newUser.FirstName).append("last_name", newUser.LastName)
-                .append("image", newUser.Image);
+                .append("image", newUser.Image);*/
         Document update = new Document();
         update.append("$set", setData);
 
@@ -146,13 +160,12 @@ class MongoDriver implements Closeable {
         return updateRes.getModifiedCount() != 0;
     }
 
-    public String addSong(String artist, String duration, String title, String album, String image){
+    public String addSong(String artist, String duration, String title, String album){
         Document song = new Document();
         song.append("artist", artist);
         song.append("name", title);
         song.append("lenght", duration);
         song.append("album", album);
-        song.append("image", image);
         InsertOneResult insertOneResult = songsCollection.insertOne(song);
         return insertOneResult.getInsertedId() == null ? null : insertOneResult.getInsertedId().asObjectId().getValue().toString();
     }
