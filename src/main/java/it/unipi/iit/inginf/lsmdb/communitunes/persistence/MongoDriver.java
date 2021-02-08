@@ -40,7 +40,6 @@ class MongoDriver implements Closeable {
     private final MongoClient mongoClient;
     private final MongoCollection<Document> usersCollection;
     private final MongoCollection<Document> songsCollection;
-    private final MongoCollection<Document> oldReviewsCollection;
 
     MongoDriver(String connectionString){
         MongoDatabase database;
@@ -49,14 +48,12 @@ class MongoDriver implements Closeable {
             database = mongoClient.getDatabase("project");
             usersCollection = database.getCollection("users");
             songsCollection = database.getCollection("songs");
-            oldReviewsCollection = database.getCollection("old_reviews");
         }
         else{
             // TODO: raise exception
             mongoClient = null;
             usersCollection = null;
             songsCollection = null;
-            oldReviewsCollection = null;
         }
     }
 
@@ -93,24 +90,10 @@ class MongoDriver implements Closeable {
         Document query = new Document();
         query.append("_id", new ObjectId(newUser.ID));
         Document setData = new Document();
-        java.lang.reflect.Field[] fields = User.class.getDeclaredFields();
-        for(java.lang.reflect.Field f : fields){
-            f.setAccessible(true);
-            try {
-                Object v = f.get(newUser);
-                if(v != null && f.getName() != "LoadedLikes" && f.getName() != "LoadedFollowed" && f.getName() != "LoadedArtistFollowed"
-                        && f.getName() != "LoadedFollowers" && f.getName() != "LoadedArtistFollowers" && f.getName() != "Username"){
-                    setData.append(f.getName(), v);
-                }
-            }
-            catch(Exception e){
-                e.printStackTrace();
-            }
-        }
-        /*setData.append("password", newUser.Password).append("email", newUser.Email)
+        setData.append("password", newUser.Password).append("email", newUser.Email)
                 .append("country", newUser.Country).append("birthday", newUser.Birthday)
                 .append("first_name", newUser.FirstName).append("last_name", newUser.LastName)
-                .append("image", newUser.Image);*/
+                .append("image", newUser.Image);
         Document update = new Document();
         update.append("$set", setData);
 
