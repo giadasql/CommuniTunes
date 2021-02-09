@@ -1,11 +1,17 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.components;
 
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.ArtistPreviewClickedEvent;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.SongPreviewClickedEvent;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -13,36 +19,23 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
-public class SongPreviewVBox extends VBox {
+public class SongPreviewVBox extends PreviewVBox {
     public SongPreview preview;
 
-    public SongPreviewVBox(SongPreview preview) {
+    public SongPreviewVBox(SongPreview preview, EventHandler<SongPreviewClickedEvent> onMouseClickedEventHandler) {
+        super(preview.Image, preview.Title);
         this.preview = preview;
-        super.setWidth(130);
-        super.setHeight(150);
-        super.setAlignment(Pos.CENTER);
-        ImageView imageView = new ImageView();
-        imageView.setFitWidth(this.getWidth());
-        imageView.setFitHeight(this.getHeight() - 30);
-        if(preview.Image != null){
-            try{
-                Image image = new Image(preview.Image, true);
-                if (image.isError()) {
-                    image = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
-                }
-                imageView.setImage(image);
-            }
-            catch(Exception exc) {
-                Image image = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
-                imageView.setImage(image);
-            }
+        if(onMouseClickedEventHandler != null){
+            this.addEventHandler(SONG_PREVIEW_CLICKED, onMouseClickedEventHandler);
         }
-        super.getChildren().add(imageView);
-        Text text = new Text(preview.Title);
-        text.setFill(Color.WHITE);
-        text.setFont(new Font("Book Antiqua", 15));
-        text.setTextAlignment(TextAlignment.CENTER);
-        super.getChildren().add(text);
+    }
+
+    static final EventType<SongPreviewClickedEvent> SONG_PREVIEW_CLICKED = new EventType<>(PREVIEW_CLICKED, "SONG_PREVIEW_CLICKED");
+
+    @Override
+    protected void onMouseClicked(MouseEvent mouseEvent){
+        SongPreviewClickedEvent songPreviewClickedEvent = new SongPreviewClickedEvent(SONG_PREVIEW_CLICKED, this.preview);
+        this.fireEvent(songPreviewClickedEvent);
     }
 
 }

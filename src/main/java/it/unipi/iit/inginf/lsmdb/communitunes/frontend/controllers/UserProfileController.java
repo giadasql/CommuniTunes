@@ -1,6 +1,5 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
@@ -10,6 +9,9 @@ import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.SongPreviewVBo
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.UserPreviewVBox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.ArtistPreviewClickedEvent;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.SongPreviewClickedEvent;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.UserPreviewClickedEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
@@ -44,7 +46,7 @@ public class UserProfileController implements UIController {
     public HBox followedArtistsBox;
     public HBox followersBox;
     public HBox followedBox;
-    public HBox artistsFollowerBox;
+    public HBox followerArtistsBox;
 
     private User user;
     private LayoutManager manager;
@@ -122,7 +124,7 @@ public class UserProfileController implements UIController {
         }
 
         for(SongPreview preview : user.LoadedLikes){
-            likesHBox.getChildren().add(new SongPreviewVBox(preview));
+            likesHBox.getChildren().add(new SongPreviewVBox(preview, this::showSong));
         }
 
         if(likesHBox.getChildren().isEmpty()){
@@ -131,23 +133,71 @@ public class UserProfileController implements UIController {
         }
 
         for(UserPreview preview : user.LoadedFollowed){
-            followedBox.getChildren().add(new UserPreviewVBox(preview));
+            followedBox.getChildren().add(new UserPreviewVBox(preview, this::showUser));
+        }
+
+        if(followedBox.getChildren().isEmpty()){
+            followedBox.getParent().setVisible(false);
+            followedBox.getParent().setManaged(false);
         }
 
         for(UserPreview preview : user.LoadedFollowers){
-            followersBox.getChildren().add(new UserPreviewVBox(preview));
+            followersBox.getChildren().add(new UserPreviewVBox(preview, this::showUser));
+        }
+
+        if(followersBox.getChildren().isEmpty()){
+            followersBox.getParent().setVisible(false);
+            followersBox.getParent().setManaged(false);
         }
 
         for(ArtistPreview preview : user.LoadedArtistFollowed){
-            followedArtistsBox.getChildren().add(new ArtistPreviewVBox(preview));
+            followedArtistsBox.getChildren().add(new ArtistPreviewVBox(preview, this::showArtist));
+        }
+
+        if(followedArtistsBox.getChildren().isEmpty()){
+            followedArtistsBox.getParent().setVisible(false);
+            followedArtistsBox.getParent().setManaged(false);
         }
 
         for(ArtistPreview preview : user.LoadedArtistFollowers){
-            artistsFollowerBox.getChildren().add(new ArtistPreviewVBox(preview));
+            followerArtistsBox.getChildren().add(new ArtistPreviewVBox(preview, this::showArtist));
         }
+
+        if(followerArtistsBox.getChildren().isEmpty()){
+            followerArtistsBox.getParent().setVisible(false);
+            followerArtistsBox.getParent().setManaged(false);
+        }
+
     }
 
     public void goToEdit(MouseEvent mouseEvent) throws IOException {
         manager.setContent(Path.USER_EDIT);
+    }
+
+    public void showAllFollowedArtists(MouseEvent mouseEvent) {
+    }
+
+    public void showAllFollowers(MouseEvent mouseEvent) {
+    }
+
+    public void showAllFollowed(MouseEvent mouseEvent) {
+    }
+
+    public void showAllArtistFollowers(MouseEvent mouseEvent) {
+    }
+
+    public void showAllLikes(MouseEvent mouseEvent) {
+    }
+
+    public void showArtist(ArtistPreviewClickedEvent event) {
+        System.out.print(event.preview.username);
+    }
+
+    public void showSong(SongPreviewClickedEvent event) {
+        System.out.print(event.preview.Title);
+    }
+
+    public void showUser(UserPreviewClickedEvent event) {
+        System.out.print(event.preview.username);
     }
 }

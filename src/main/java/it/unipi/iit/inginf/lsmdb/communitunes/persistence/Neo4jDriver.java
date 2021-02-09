@@ -378,7 +378,7 @@ class Neo4jDriver implements Closeable {
                         "OPTIONAL MATCH (u)<-[:FOLLOWS]-(followerArtist:Artist)\n" +
                         "WITH COLLECT(DISTINCT(followerArtist {.username, .image, .stageName}))[0..6] AS FollowerArtists, FollowedArtists, Followers, Followed, u\n" +
                         "OPTIONAL MATCH (u)-[:LIKES]->(s:Song)<-[:PERFORMS {isMainArtist: true}]-(performer:Artist)\n" +
-                        "RETURN u AS User, Followers, Followed, FollowedArtists, FollowerArtists, COLLECT(DISTINCT({id: s.songID, title: s.title, image: s.image, artist: performer.username}))[0..6] AS LikedSongs", parameters("username", username));
+                        "RETURN u AS User, Followers, Followed, FollowedArtists, FollowerArtists, COLLECT(DISTINCT( s { .title, .image, id: s.songID, artist: performer.username}))[0..6] AS LikedSongs", parameters("username", username));
 
                 return res.single();
             });
@@ -411,7 +411,7 @@ class Neo4jDriver implements Closeable {
                         "OPTIONAL MATCH (a)-[:PERFORMS {isMainArtist: true}]->(s:Song)\n" +
                         "WITH COLLECT(DISTINCT({id: s.songID, title: s.title, image: s.image, artist: a.username}))[0..6] AS Songs, FollowerArtists, FollowedArtists, Follower, Followed, a\n" +
                         "OPTIONAL MATCH (a)-[:LIKES]->(s:Song)<-[:PERFORMS {isMainArtist: true}]-(performer:Artist)\n" +
-                        "RETURN Followed, Follower, FollowedArtists, FollowerArtists, Songs, COLLECT(DISTINCT({id: s.songID, title: s.title, image: s.image, artist: performer.username}))[0..6] AS LikedSongs", parameters("username", username));
+                        "RETURN Followed, Follower, FollowedArtists, FollowerArtists, Songs, COLLECT(DISTINCT( s { .title, .image, id: s.songID, artist: performer.username}))[0..6] AS LikedSongs", parameters("username", username));
                 if(res != null && res.hasNext()){
                     return res.single();
                 }

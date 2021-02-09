@@ -5,6 +5,8 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -162,56 +164,116 @@
             <AnchorPane maxHeight="-Infinity" maxWidth="0.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="188.0" prefWidth="885.0">
                <children>
                   <Line endX="876.0" endY="28.0" startX="22.0" startY="28.0" stroke="WHITE" />
-                  <HBox fx:id="likesHBox" layoutX="25.0" layoutY="36.0" prefHeight="151.0" prefWidth="849.0" spacing="10.0" />
+                  <HBox fx:id="likesHBox" layoutX="25.0" layoutY="36.0" prefHeight="151.0" prefWidth="817.0" spacing="10.0" />
                   <Text fill="WHITE" layoutX="22.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Likes">
                      <font>
                         <Font name="Book Antiqua" size="20.0" />
                      </font>
                   </Text>
+                  <Button layoutX="831.0" layoutY="91.0" maxWidth="-Infinity" minWidth="39.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="39.0" style="-fx-background-color: transparent;" textFill="TRANSPARENT">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <graphic>
+                        <ImageView fitHeight="32.0" fitWidth="32.0" onMouseClicked="#showAllLikes" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/arrow.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
                </children>
             </AnchorPane>
             <AnchorPane maxHeight="-Infinity" maxWidth="0.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="188.0" prefWidth="885.0">
                <children>
                   <Line endX="876.0" endY="28.0" startX="22.0" startY="28.0" stroke="WHITE" />
-                  <HBox fx:id="followedArtistsBox" layoutX="25.0" layoutY="36.0" prefHeight="151.0" prefWidth="849.0" spacing="10.0" />
+                  <HBox fx:id="followedArtistsBox" layoutX="25.0" layoutY="36.0" prefHeight="151.0" prefWidth="817.0" spacing="10.0" />
                   <Text fill="WHITE" layoutX="22.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Followed Artists">
                      <font>
                         <Font name="Book Antiqua" size="20.0" />
                      </font>
                   </Text>
+                  <Button layoutX="831.0" layoutY="91.0" maxWidth="-Infinity" minWidth="39.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="39.0" style="-fx-background-color: transparent;" textFill="TRANSPARENT">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <graphic>
+                        <ImageView fitHeight="32.0" fitWidth="32.0" onMouseClicked="#showAllFollowedArtists" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/arrow.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
                </children>
             </AnchorPane>
             <AnchorPane maxHeight="-Infinity" maxWidth="0.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="188.0" prefWidth="885.0">
                <children>
                   <Line endX="876.0" endY="28.0" startX="22.0" startY="28.0" stroke="WHITE" />
-                  <HBox fx:id="followersBox" layoutX="25.0" layoutY="36.0" prefHeight="151.0" prefWidth="849.0" spacing="10.0" />
+                  <HBox fx:id="followersBox" layoutX="25.0" layoutY="36.0" prefHeight="151.0" prefWidth="817.0" spacing="10.0" />
                   <Text fill="WHITE" layoutX="22.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Followers">
                      <font>
                         <Font name="Book Antiqua" size="20.0" />
                      </font>
                   </Text>
+                  <Button layoutX="831.0" layoutY="91.0" maxWidth="-Infinity" minWidth="39.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="39.0" style="-fx-background-color: transparent;" textFill="TRANSPARENT">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <graphic>
+                        <ImageView fitHeight="32.0" fitWidth="32.0" onMouseClicked="#showAllFollowers" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/arrow.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
                </children>
             </AnchorPane>
             <AnchorPane maxHeight="-Infinity" maxWidth="0.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="188.0" prefWidth="885.0">
                <children>
                   <Line endX="876.0" endY="28.0" startX="22.0" startY="28.0" stroke="WHITE" />
-                  <HBox fx:id="followedBox" layoutX="25.0" layoutY="36.0" prefHeight="151.0" prefWidth="849.0" spacing="10.0" />
+                  <HBox fx:id="followedBox" layoutX="25.0" layoutY="36.0" prefHeight="151.0" prefWidth="817.0" spacing="10.0" />
                   <Text fill="WHITE" layoutX="22.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Followed">
                      <font>
                         <Font name="Book Antiqua" size="20.0" />
                      </font>
                   </Text>
+                  <Button layoutX="831.0" layoutY="91.0" maxWidth="-Infinity" minWidth="39.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="39.0" style="-fx-background-color: transparent;" textFill="TRANSPARENT">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <graphic>
+                        <ImageView fitHeight="32.0" fitWidth="32.0" onMouseClicked="#showAllFollowed" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/arrow.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
                </children>
             </AnchorPane>
             <AnchorPane maxHeight="-Infinity" maxWidth="0.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="188.0" prefWidth="885.0">
                <children>
                   <Line endX="876.0" endY="28.0" startX="22.0" startY="28.0" stroke="WHITE" />
-                  <HBox fx:id="artistsFollowerBox" layoutX="25.0" layoutY="36.0" prefHeight="151.0" prefWidth="849.0" spacing="10.0" />
+                  <HBox fx:id="followerArtistsBox" layoutX="25.0" layoutY="36.0" prefHeight="151.0" prefWidth="817.0" spacing="10.0" />
                   <Text fill="WHITE" layoutX="22.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Artist followers">
                      <font>
                         <Font name="Book Antiqua" size="20.0" />
                      </font>
                   </Text>
+                  <Button layoutX="831.0" layoutY="91.0" maxWidth="-Infinity" minWidth="39.0" mnemonicParsing="false" prefHeight="41.0" prefWidth="39.0" style="-fx-background-color: transparent;" textFill="TRANSPARENT">
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                     <graphic>
+                        <ImageView fitHeight="32.0" fitWidth="32.0" onMouseClicked="#showAllArtistFollowers" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../img/arrow.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
                </children>
             </AnchorPane>
          </children>
