@@ -16,6 +16,13 @@ public class SongPreview {
         Image = image;
     }
 
+    public SongPreview(String ID, String artistUsername, String title, String image) {
+        this.ID = ID;
+        ArtistUsername = artistUsername;
+        Title = title;
+        Image = image;
+    }
+
     public String ID;
 
     public String ArtistName;

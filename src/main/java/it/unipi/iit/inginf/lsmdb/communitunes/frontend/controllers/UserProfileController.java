@@ -1,6 +1,13 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ArtistPreviewVBox;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.SongPreviewVBox;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.UserPreviewVBox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import javafx.fxml.FXML;
@@ -33,6 +40,11 @@ public class UserProfileController implements UIController {
     public HBox firstNameBox;
     public HBox countryBox;
     public HBox birthdayBox;
+    public HBox likesHBox;
+    public HBox followedArtistsBox;
+    public HBox followersBox;
+    public HBox followedBox;
+    public HBox artistsFollowerBox;
 
     private User user;
     private LayoutManager manager;
@@ -107,6 +119,26 @@ public class UserProfileController implements UIController {
         else{
             birthdayBox.setVisible(false);
             birthdayBox.setManaged(false);
+        }
+
+        SongPreview songp = new SongPreview("aaa", "artist", "asd", "A nice song", "https://www.officialcharts.com/media/648111/michael-jackson-rex.jpg?width=462.7906976744186&height=500");
+        for(int i = 0; i < 6; i++){
+            likesHBox.getChildren().add(new SongPreviewVBox(songp));
+        }
+
+        UserPreview userp = new UserPreview("this user", "https://images.vanityfair.it/wp-content/uploads/2020/09/28145100/donald-trump-portrait-850x1360.jpg");
+        for(int i = 0; i < 6; i++){
+            followedBox.getChildren().add(new UserPreviewVBox(userp));
+        }
+
+        for(int i = 0; i < 6; i++){
+            followersBox.getChildren().add(new UserPreviewVBox(userp));
+        }
+
+        ArtistPreview artistp = new ArtistPreview("this artist", "Queen", "https://dvfnvgxhycwzf.cloudfront.net/media/SharedImage/imageFull/.f3noMS6U/SharedImage-53612.jpg?t=1a8ff15292f3d96da274");
+        for(int i = 0; i < 6; i++){
+            artistsFollowerBox.getChildren().add(new ArtistPreviewVBox(artistp));
+            followedArtistsBox.getChildren().add(new ArtistPreviewVBox(artistp));
         }
     }
 
