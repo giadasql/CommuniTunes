@@ -125,6 +125,11 @@ public class UserProfileController implements UIController {
             likesHBox.getChildren().add(new SongPreviewVBox(preview));
         }
 
+        if(likesHBox.getChildren().isEmpty()){
+            likesHBox.getParent().setVisible(false);
+            likesHBox.getParent().setManaged(false);
+        }
+
         for(UserPreview preview : user.LoadedFollowed){
             followedBox.getChildren().add(new UserPreviewVBox(preview));
         }

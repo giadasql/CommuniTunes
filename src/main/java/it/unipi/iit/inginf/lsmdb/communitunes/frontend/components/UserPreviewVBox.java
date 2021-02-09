@@ -28,8 +28,8 @@ public class UserPreviewVBox extends VBox {
                 Image image = new Image(preview.image, true);
                 if (image.isError()) {
                     image = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
-                    imageView.setImage(image);
                 }
+                imageView.setImage(image);
             }
             catch(Exception exc) {
                 Image image = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
