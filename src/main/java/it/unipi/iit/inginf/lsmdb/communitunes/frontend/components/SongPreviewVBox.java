@@ -24,9 +24,18 @@ public class SongPreviewVBox extends VBox {
         ImageView imageView = new ImageView();
         imageView.setFitWidth(this.getWidth());
         imageView.setFitHeight(this.getHeight() - 30);
-        if (preview.Image != null) {
-            Image image = new Image(preview.Image, true);
-            imageView.setImage(image);
+        if(preview.Image != null){
+            try{
+                Image image = new Image(preview.Image, true);
+                if (image.isError()) {
+                    image = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
+                    imageView.setImage(image);
+                }
+            }
+            catch(Exception exc) {
+                Image image = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
+                imageView.setImage(image);
+            }
         }
         super.getChildren().add(imageView);
         Text text = new Text(preview.Title);

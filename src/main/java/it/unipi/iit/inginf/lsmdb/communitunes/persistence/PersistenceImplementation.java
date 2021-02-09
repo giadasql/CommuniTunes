@@ -351,7 +351,7 @@ class PersistenceImplementation implements Persistence {
             String artistUsername = (artistMap.get("username") instanceof String ? (String)artistMap.get("username") : null);
             String artistImage = (artistMap.get("image") instanceof String ? (String)artistMap.get("image") : null);
             String artistStageName = (artistMap.get("stageName") instanceof String ? (String)artistMap.get("stageName") : null);
-            artistFollowed.add(new ArtistPreview(artistUsername, artistImage, artistStageName));
+            artistFollowed.add(new ArtistPreview(artistUsername, artistStageName, artistImage));
         }
 
         Iterable<Map<String,Object>> followerArtistsList = (Iterable<Map<String,Object>>)userData.get("followerArtists");
@@ -359,7 +359,7 @@ class PersistenceImplementation implements Persistence {
             String artistUsername = (artistMap.get("username") instanceof String ? (String)artistMap.get("username") : null);
             String artistImage = (artistMap.get("image") instanceof String ? (String)artistMap.get("image") : null);
             String artistStageName = (artistMap.get("stageName") instanceof String ? (String)artistMap.get("stageName") : null);
-            artistFollowers.add(new ArtistPreview(artistUsername, artistImage, artistStageName));
+            artistFollowers.add(new ArtistPreview(artistUsername, artistStageName, artistImage));
         }
 
         Iterable<Map<String,Object>> likesList = (Iterable<Map<String,Object>>)userData.get("likes");
@@ -416,7 +416,7 @@ class PersistenceImplementation implements Persistence {
             String artistUsername = (artistMap.get("username") instanceof String ? (String)artistMap.get("username") : null);
             String artistImage = (artistMap.get("image") instanceof String ? (String)artistMap.get("image") : null);
             String artistStageName = (artistMap.get("stageName") instanceof String ? (String)artistMap.get("stageName") : null);
-            artistFollowed.add(new ArtistPreview(artistUsername, artistImage, artistStageName));
+            artistFollowed.add(new ArtistPreview(artistUsername, artistStageName, artistImage));
         }
 
         Iterable<Map<String,Object>> followerArtistsList = (Iterable<Map<String,Object>>)artistData.get("followerArtists");
@@ -424,7 +424,7 @@ class PersistenceImplementation implements Persistence {
             String artistUsername = (artistMap.get("username") instanceof String ? (String)artistMap.get("username") : null);
             String artistImage = (artistMap.get("image") instanceof String ? (String)artistMap.get("image") : null);
             String artistStageName = (artistMap.get("stageName") instanceof String ? (String)artistMap.get("stageName") : null);
-            artistFollowers.add(new ArtistPreview(artistUsername, artistImage, artistStageName));
+            artistFollowers.add(new ArtistPreview(artistUsername, artistStageName, artistImage));
         }
 
         Iterable<Map<String,Object>> likesList = (Iterable<Map<String,Object>>)artistData.get("likes");
@@ -497,7 +497,7 @@ class PersistenceImplementation implements Persistence {
                 String featUsername = (featArtistMap.get("username") instanceof String ? (String) featArtistMap.get("username") : null);
                 String featImage = (featArtistMap.get("image") instanceof String ? (String) featArtistMap.get("image") : null);
                 String featStageName = (featArtistMap.get("stageName") instanceof String ? (String) featArtistMap.get("stageName") : null);
-                featurings.add(new ArtistPreview(featUsername, featImage, featStageName));
+                featurings.add(new ArtistPreview(featUsername, featStageName, featImage));
             }
         }
 

@@ -23,9 +23,18 @@ public class UserPreviewVBox extends VBox {
         ImageView imageView = new ImageView();
         imageView.setFitWidth(this.getWidth());
         imageView.setFitHeight(this.getHeight() - 30);
-        if (preview.image != null) {
-            Image image = new Image(preview.image, true);
-            imageView.setImage(image);
+        if(preview.image != null){
+            try{
+                Image image = new Image(preview.image, true);
+                if (image.isError()) {
+                    image = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
+                    imageView.setImage(image);
+                }
+            }
+            catch(Exception exc) {
+                Image image = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
+                imageView.setImage(image);
+            }
         }
         super.getChildren().add(imageView);
         Text text = new Text(preview.username);

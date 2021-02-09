@@ -55,7 +55,7 @@ public class UserProfileController implements UIController {
         user = manager.context.getFocusedUser();
         username.setText(user.Username);
         Image avatar;
-        if(user.Image != null && !user.Image.equals("")){
+        if(user.Image != null){
             try{
                 avatar = new Image(user.Image);
                 if (avatar.isError()) {
@@ -121,24 +121,24 @@ public class UserProfileController implements UIController {
             birthdayBox.setManaged(false);
         }
 
-        SongPreview songp = new SongPreview("aaa", "artist", "asd", "A nice song", "https://www.officialcharts.com/media/648111/michael-jackson-rex.jpg?width=462.7906976744186&height=500");
-        for(int i = 0; i < 6; i++){
-            likesHBox.getChildren().add(new SongPreviewVBox(songp));
+        for(SongPreview preview : user.LoadedLikes){
+            likesHBox.getChildren().add(new SongPreviewVBox(preview));
         }
 
-        UserPreview userp = new UserPreview("this user", "https://images.vanityfair.it/wp-content/uploads/2020/09/28145100/donald-trump-portrait-850x1360.jpg");
-        for(int i = 0; i < 6; i++){
-            followedBox.getChildren().add(new UserPreviewVBox(userp));
+        for(UserPreview preview : user.LoadedFollowed){
+            followedBox.getChildren().add(new UserPreviewVBox(preview));
         }
 
-        for(int i = 0; i < 6; i++){
-            followersBox.getChildren().add(new UserPreviewVBox(userp));
+        for(UserPreview preview : user.LoadedFollowers){
+            followersBox.getChildren().add(new UserPreviewVBox(preview));
         }
 
-        ArtistPreview artistp = new ArtistPreview("this artist", "Queen", "https://dvfnvgxhycwzf.cloudfront.net/media/SharedImage/imageFull/.f3noMS6U/SharedImage-53612.jpg?t=1a8ff15292f3d96da274");
-        for(int i = 0; i < 6; i++){
-            artistsFollowerBox.getChildren().add(new ArtistPreviewVBox(artistp));
-            followedArtistsBox.getChildren().add(new ArtistPreviewVBox(artistp));
+        for(ArtistPreview preview : user.LoadedArtistFollowed){
+            followedArtistsBox.getChildren().add(new ArtistPreviewVBox(preview));
+        }
+
+        for(ArtistPreview preview : user.LoadedArtistFollowers){
+            artistsFollowerBox.getChildren().add(new ArtistPreviewVBox(preview));
         }
     }
 
