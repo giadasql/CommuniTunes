@@ -173,7 +173,9 @@ class MongoDriver implements Closeable {
         Document query = new Document();
         query.append("_id", new ObjectId(newSong.ID));
         Document setData = new Document();
-        setData.append("songLink", newSong.Link).append("image", newSong.Image).append("genres", newSong.Genres);
+        setData.append("links", newSong.Links)
+                .append("image", newSong.Image)
+                .append("genres", newSong.Genres);
         Document update = new Document();
         update.append("$set", setData);
 
@@ -308,7 +310,7 @@ class MongoDriver implements Closeable {
         list.add("$reviews");
         list.add(15);
         Bson slice = new BasicDBObject("reviews", new BasicDBObject("$slice", list));
-        Bson project = Aggregates.project(Projections.fields(include("_id", "name", "length", "songLink", "album", "reviews", "genres", "image"), slice));
+        Bson project = Aggregates.project(Projections.fields(include("_id", "title", "length", "links", "album", "reviews", "genres", "image"), slice));
 
         Bson limit = limit(1);
 
@@ -392,18 +394,20 @@ class MongoDriver implements Closeable {
             return null;
         }
         HashMap<String, Object> songValues = new HashMap<>();
-        songValues.put("title", song.get("name"));
+        songValues.put("title", song.get("title"));
         songValues.put("id", song.getObjectId("_id").toString());
         songValues.put("duration", song.get("length"));
         songValues.put("image", song.get("image"));
-        songValues.put("link", song.get("songLink"));
+        songValues.put("links", song.getList("links", Document.class));
         songValues.put("album", song.get("album"));
         List<Map<String, Object>> reviews = new ArrayList<>();
-        for (Document reviewDoc: song.getList("reviews", Document.class)) {
-            Map<String, Object> reviewMap = getReviewMap(reviewDoc, song.getObjectId("_id").toString());
-            reviews.add(reviewMap);
+        if(song.getList("reviews", Document.class) != null){
+            for (Document reviewDoc: song.getList("reviews", Document.class)) {
+                Map<String, Object> reviewMap = getReviewMap(reviewDoc, song.getObjectId("_id").toString());
+                reviews.add(reviewMap);
+            }
+            songValues.put("reviews", reviews);
         }
-        songValues.put("reviews", reviews);
         songValues.put("genres", song.get("genres"));
         return songValues;
     }
@@ -435,9 +439,14 @@ class MongoDriver implements Closeable {
         artistValues.put("id", artist.getObjectId("_id").toString());
         artistValues.put("password", artist.get("password"));
         artistValues.put("birthday", artist.get("birthday"));
-        artistValues.put("stageName", artist.get("stageName"));
+        artistValues.put("stageName", artist.get("stage_name"));
         artistValues.put("biography", artist.get("biography"));
         artistValues.put("activity", artist.get("activity"));
+        artistValues.put("country", artist.get("country"));
+        artistValues.put("firstName", artist.get("first_name"));
+        artistValues.put("lastName", artist.get("last_name"));
+        artistValues.put("image", artist.get("image"));
+        artistValues.put("links", artist.get("sites"));
         return artistValues;
     }
 

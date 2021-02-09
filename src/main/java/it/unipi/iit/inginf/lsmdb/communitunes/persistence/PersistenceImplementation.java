@@ -1,9 +1,6 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.persistence;
 
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.Review;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.*;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
@@ -14,9 +11,11 @@ import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceIn
 import org.javatuples.Pair;
 import org.xml.sax.SAXException;
 
+import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.*;
 
 class PersistenceImplementation implements Persistence {
@@ -162,9 +161,9 @@ class PersistenceImplementation implements Persistence {
         // TODO: Forse conviene passare l'artista insieme alla canzone?
     @Override
     public boolean addSong(Song newSong) throws PersistenceInconsistencyException {
-        String mongoID = mongo.addSong(newSong.Artist, newSong.Duration, newSong.Title, newSong.Album);
+        String mongoID = mongo.addSong(newSong.Artist.username, newSong.Duration, newSong.Title, newSong.Album);
         if(mongoID != null){
-            int neoID = neo4j.addSong(newSong.Artist, newSong.Title, newSong.ID);
+            int neoID = neo4j.addSong(newSong.Artist.username, newSong.Title, newSong.ID);
             if(neoID != -1){
                 return true;
             }
@@ -184,7 +183,7 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean deleteSong(Song song) {
-        boolean neo4jDelete = neo4j.deleteSong(song.Artist, song.Title);
+        boolean neo4jDelete = neo4j.deleteSong(song.Artist.username, song.Title);
         boolean mongoDelete = mongo.deleteSong(song.ID);
         return (mongoDelete && neo4jDelete);
     }
@@ -208,7 +207,7 @@ class PersistenceImplementation implements Persistence {
         toUpdate.Genres.addAll(newSong.Genres);
          */
 
-        return mongo.updateSong(newSong) && neo4j.updateSong(newSong.Title, newSong.Artist, newSong.Featurings, newSong.Image);
+        return mongo.updateSong(newSong) && neo4j.updateSong(newSong.Title, newSong.Artist.username, newSong.Featurings, newSong.Image);
     }
 
     @Override
@@ -308,10 +307,13 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public Song getSong(String songID) {
-        Map<String, Object> songData = new HashMap<>(mongo.getSongData(songID));
-        songData.putAll(neo4j.getSongData(songID));
-        songData.put("id", songID);
-        return buildSongFromMap(songData);
+        Map<String, Object> songData = mongo.getSongData(songID);
+        if(songData != null){
+            songData.putAll(neo4j.getSongData(songID));
+            songData.put("id", songID);
+            return buildSongFromMap(songData);
+        }
+        return null;
     }
 
     @Override
@@ -327,72 +329,198 @@ class PersistenceImplementation implements Persistence {
     }
 
     private User buildUserFromMap(Map<String, Object> userData){
-        Object email = userData.get("email"),
-                password = userData.get("password"),
-                country = userData.get("country"),
-                image = userData.get("image"),
-                birthday = userData.get("birthday"),
-                followed = userData.get("followed"),
-                followers = userData.get("followers"),
-                artistFollowers = userData.get("followerArtists"),
-                artistFollowed = userData.get("followedArtists"),
-                likes = userData.get("likes"),
-                username = userData.get("username"),
-                firstName = userData.get("firstName"),
-                lastName = userData.get("lastName"),
-                id = userData.get("id");
-        return new User(email, username, password, image, firstName, lastName, country, birthday, likes, followed, artistFollowed, followers, artistFollowers, id);
+        String email, password, country, image, firstName, lastName, username, id;
+        LocalDate birthday;
+        ArrayList<ArtistPreview> artistFollowers = new ArrayList<>();
+        ArrayList<ArtistPreview> artistFollowed = new ArrayList<>();
+        ArrayList<SongPreview> likes = new ArrayList<>();
+        ArrayList<UserPreview> followed = new ArrayList<>();
+        ArrayList<UserPreview> followers = new ArrayList<>();
+
+        email = (userData.get("email") instanceof String ? (String)userData.get("email") : null);
+        password = (userData.get("password") instanceof String ? (String)userData.get("password") : null);
+        country = (userData.get("country") instanceof String ? (String)userData.get("country") : null);
+        image = (userData.get("image") instanceof String ? (String)userData.get("image") : null);
+        firstName = (userData.get("firstName") instanceof String ? (String)userData.get("firstName") : null);
+        lastName = (userData.get("lastName") instanceof String ? (String)userData.get("lastName") : null);
+        username = (userData.get("username") instanceof String ? (String)userData.get("username") : null);
+        birthday = (userData.get("birthday") instanceof LocalDate ? (LocalDate) userData.get("birthday") : null);
+        id = (userData.get("id") instanceof String ? (String) userData.get("id") : null);
+        Iterable<Map<String,Object>> followedArtistsList = (Iterable<Map<String,Object>>)userData.get("followedArtists");
+        for (Map<String,Object> artistMap : followedArtistsList){
+            String artistUsername = (artistMap.get("username") instanceof String ? (String)artistMap.get("username") : null);
+            String artistImage = (artistMap.get("image") instanceof String ? (String)artistMap.get("image") : null);
+            String artistStageName = (artistMap.get("stageName") instanceof String ? (String)artistMap.get("stageName") : null);
+            artistFollowed.add(new ArtistPreview(artistUsername, artistStageName, artistImage));
+        }
+
+        Iterable<Map<String,Object>> followerArtistsList = (Iterable<Map<String,Object>>)userData.get("followerArtists");
+        for (Map<String,Object> artistMap : followerArtistsList){
+            String artistUsername = (artistMap.get("username") instanceof String ? (String)artistMap.get("username") : null);
+            String artistImage = (artistMap.get("image") instanceof String ? (String)artistMap.get("image") : null);
+            String artistStageName = (artistMap.get("stageName") instanceof String ? (String)artistMap.get("stageName") : null);
+            artistFollowers.add(new ArtistPreview(artistUsername, artistStageName, artistImage));
+        }
+
+        Iterable<Map<String,Object>> likesList = (Iterable<Map<String,Object>>)userData.get("likes");
+        for (Map<String,Object> likeMap : likesList){
+            String songID = (likeMap.get("id") instanceof String ? (String)likeMap.get("id") : null);
+            String title = (likeMap.get("title") instanceof String ? (String)likeMap.get("title") : null);
+            String artistUsername = (likeMap.get("artist") instanceof String ? (String)likeMap.get("artist") : null);
+            String songImage = (likeMap.get("image") instanceof String ? (String)likeMap.get("image") : null);
+            likes.add(new SongPreview(songID, artistUsername, title, songImage));
+        }
+
+        Iterable<Map<String,Object>> followedList = (Iterable<Map<String,Object>>)userData.get("followed");
+        for (Map<String,Object> userMap : followedList){
+            String userUsername = (userMap.get("username") instanceof String ? (String)userMap.get("username") : null);
+            String userImage = (userMap.get("image") instanceof String ? (String)userMap.get("image") : null);
+            followed.add(new UserPreview(userUsername, userImage));
+        }
+
+        Iterable<Map<String,Object>> followersList = (Iterable<Map<String,Object>>)userData.get("followers");
+        for (Map<String,Object> userMap : followersList){
+            String userUsername = (userMap.get("username") instanceof String ? (String)userMap.get("username") : null);
+            String userImage = (userMap.get("image") instanceof String ? (String)userMap.get("image") : null);
+            followers.add(new UserPreview(userUsername, userImage));
+        }
+        return new User(id, email, username, password, country, image, birthday, firstName, lastName, likes, followed, artistFollowed, followers, artistFollowers);
     }
 
     private Artist buildArtistFromMap( Map<String, Object> artistData){
-        Object email = artistData.get("email"),
-                password = artistData.get("password"),
-                country = artistData.get("country"),
-                stageName = artistData.get("stageName"),
-                biography = artistData.get("biography"),
-                birthday = artistData.get("birthday"),
-                followed = artistData.get("followed"),
-                followers = artistData.get("followers"),
-                artistFollowers = artistData.get("followerArtists"),
-                artistFollowed = artistData.get("followedArtists"),
-                likes = artistData.get("likes"),
-                songs = artistData.get("songs"),
-                image = artistData.get("image"),
-                firstName = artistData.get("firstName"),
-                lastName = artistData.get("lastName"),
-                yearsActive = artistData.get("activity"),
-                username = artistData.get("username"),
-                id = artistData.get("id");
+        String email, password, country, image, firstName, lastName, username, id, stageName, biography, yearsActive;
+        LocalDate birthday;
+        ArrayList<ArtistPreview> artistFollowers = new ArrayList<>();
+        ArrayList<ArtistPreview> artistFollowed = new ArrayList<>();
+        ArrayList<SongPreview> likes = new ArrayList<>();
+        ArrayList<SongPreview> songs = new ArrayList<>();
+        ArrayList<UserPreview> followed = new ArrayList<>();
+        ArrayList<UserPreview> followers = new ArrayList<>();
+        ArrayList<Link> links = new ArrayList<>();
 
-        return new Artist(email, username, password, firstName, lastName, country, birthday, likes, followed, artistFollowed, followers, artistFollowers, stageName, biography, image, yearsActive, songs, id);
+        email = (artistData.get("email") instanceof String ? (String)artistData.get("email") : null);
+        password = (artistData.get("password") instanceof String ? (String)artistData.get("password") : null);
+        country = (artistData.get("country") instanceof String ? (String)artistData.get("country") : null);
+        image = (artistData.get("image") instanceof String ? (String)artistData.get("image") : null);
+        firstName = (artistData.get("firstName") instanceof String ? (String)artistData.get("firstName") : null);
+        lastName = (artistData.get("lastName") instanceof String ? (String)artistData.get("lastName") : null);
+        username = (artistData.get("username") instanceof String ? (String)artistData.get("username") : null);
+        birthday = (artistData.get("birthday") instanceof LocalDate ? (LocalDate) artistData.get("birthday") : null);
+        id = (artistData.get("id") instanceof String ? (String) artistData.get("id") : null);
+        stageName = (artistData.get("stageName") instanceof String ? (String) artistData.get("stageName") : null);
+        biography = (artistData.get("biography") instanceof String ? (String) artistData.get("biography") : null);
+        yearsActive = (artistData.get("activity") instanceof String ? (String) artistData.get("activity") : null);
+
+        Iterable<Map<String,Object>> followedArtistsList = (Iterable<Map<String,Object>>)artistData.get("followedArtists");
+        for (Map<String,Object> artistMap : followedArtistsList){
+            String artistUsername = (artistMap.get("username") instanceof String ? (String)artistMap.get("username") : null);
+            String artistImage = (artistMap.get("image") instanceof String ? (String)artistMap.get("image") : null);
+            String artistStageName = (artistMap.get("stageName") instanceof String ? (String)artistMap.get("stageName") : null);
+            artistFollowed.add(new ArtistPreview(artistUsername, artistStageName, artistImage));
+        }
+
+        Iterable<Map<String,Object>> followerArtistsList = (Iterable<Map<String,Object>>)artistData.get("followerArtists");
+        for (Map<String,Object> artistMap : followerArtistsList){
+            String artistUsername = (artistMap.get("username") instanceof String ? (String)artistMap.get("username") : null);
+            String artistImage = (artistMap.get("image") instanceof String ? (String)artistMap.get("image") : null);
+            String artistStageName = (artistMap.get("stageName") instanceof String ? (String)artistMap.get("stageName") : null);
+            artistFollowers.add(new ArtistPreview(artistUsername, artistStageName, artistImage));
+        }
+
+        Iterable<Map<String,Object>> likesList = (Iterable<Map<String,Object>>)artistData.get("likes");
+        for (Map<String,Object> likeMap : likesList){
+            String songID = (likeMap.get("id") instanceof String ? (String)likeMap.get("id") : null);
+            String title = (likeMap.get("title") instanceof String ? (String)likeMap.get("title") : null);
+            String artistUsername = (likeMap.get("artist") instanceof String ? (String)likeMap.get("artist") : null);
+            String songImage = (likeMap.get("image") instanceof String ? (String)likeMap.get("image") : null);
+            likes.add(new SongPreview(songID, artistUsername, title, songImage));
+        }
+
+        Iterable<Map<String,Object>> songsList = (Iterable<Map<String,Object>>)artistData.get("songs");
+        for (Map<String,Object> songMap : songsList){
+            String songID = (songMap.get("id") instanceof String ? (String)songMap.get("id") : null);
+            String title = (songMap.get("title") instanceof String ? (String)songMap.get("title") : null);
+            String artistUsername = (songMap.get("artist") instanceof String ? (String)songMap.get("artist") : null);
+            String songImage = (songMap.get("image") instanceof String ? (String)songMap.get("image") : null);
+            songs.add(new SongPreview(songID, artistUsername, title, songImage));
+        }
+
+        Iterable<Map<String,Object>> followedList = (Iterable<Map<String,Object>>)artistData.get("followed");
+        for (Map<String,Object> userMap : followedList){
+            String userUsername = (userMap.get("username") instanceof String ? (String)userMap.get("username") : null);
+            String userImage = (userMap.get("image") instanceof String ? (String)userMap.get("image") : null);
+            followed.add(new UserPreview(userUsername, userImage));
+        }
+
+        Iterable<Map<String,Object>> linksList = (Iterable<Map<String,Object>>)artistData.get("links");
+        for (Map<String,Object> linkMap : linksList){
+            String linkName = (linkMap.get("name") instanceof String ? (String)linkMap.get("name") : null);
+            String linkUrl = (linkMap.get("url") instanceof String ? (String)linkMap.get("url") : null);
+            links.add(new Link(linkName, linkUrl));
+        }
+
+        Iterable<Map<String,Object>> followersList = (Iterable<Map<String,Object>>)artistData.get("followers");
+        for (Map<String,Object> userMap : followersList){
+            String userUsername = (userMap.get("username") instanceof String ? (String)userMap.get("username") : null);
+            String userImage = (userMap.get("image") instanceof String ? (String)userMap.get("image") : null);
+            followers.add(new UserPreview(userUsername, userImage));
+        }
+        return new Artist(id, email, username, password, country, image, birthday, firstName, lastName, likes, followed, artistFollowed, followers, artistFollowers, stageName, yearsActive, biography, links, songs);
     }
 
     private Song buildSongFromMap( Map<String, Object> songData){
-        Object artist = songData.get("mainArtist"),
-                title = songData.get("title"),
-                image = songData.get("image"),
-                album = songData.get("album"),
-                duration = songData.get("duration"),
-                link = songData.get("link"),
-                genres = songData.get("genres"),
-                featurings = songData.get("featurings"),
-                loadedLikes = songData.get("likers"),
-                songID = songData.get("id");
+        String title, image, album, duration, id;
+        int likes;
+        List<String> genres = new ArrayList<>();
+        List<Link> links = new ArrayList<>();
+        List<ArtistPreview> featurings = new ArrayList<>();
+        ArtistPreview artist = null;
 
-        // TODO: find a way to not do this high level operation at Persistence level
+        title = (songData.get("title") instanceof String ? (String)songData.get("title") : null);
+        image = (songData.get("image") instanceof String ? (String)songData.get("image") : null);
+        album = (songData.get("album") instanceof String ? (String)songData.get("album") : null);
+        duration = (songData.get("duration") instanceof String ? (String)songData.get("duration") : null);
+        id = (songData.get("id") instanceof String ? (String)songData.get("id") : null);
+        likes = (songData.get("likes") instanceof Integer ? (Integer) songData.get("likes") : 0);
+
+        if(songData.get("mainArtist") != null){
+            Map<String, Object> artistMap = (Map<String, Object>)songData.get("mainArtist");
+            String artistUsername = (artistMap.get("username") instanceof String ? (String)artistMap.get("username") : null);
+            String stageName = (artistMap.get("stageName") instanceof String ? (String)artistMap.get("stageName") : null);
+            String artistImage = (artistMap.get("image") instanceof String ? (String)artistMap.get("image") : null);
+            artist = new ArtistPreview(artistUsername, stageName, artistImage);
+        }
+
+        if(songData.get("featurings") != null) {
+            Iterable<Map<String, Object>> featuringsList = (Iterable<Map<String, Object>>) songData.get("featurings");
+            for (Map<String, Object> featArtistMap : featuringsList) {
+                String featUsername = (featArtistMap.get("username") instanceof String ? (String) featArtistMap.get("username") : null);
+                String featImage = (featArtistMap.get("image") instanceof String ? (String) featArtistMap.get("image") : null);
+                String featStageName = (featArtistMap.get("stageName") instanceof String ? (String) featArtistMap.get("stageName") : null);
+                featurings.add(new ArtistPreview(featUsername, featStageName, featImage));
+            }
+        }
+
+        if(songData.get("links") != null) {
+            Iterable<Map<String, Object>> linksList = (Iterable<Map<String, Object>>) songData.get("links");
+            for (Map<String, Object> linkMap : linksList) {
+                String linkName = (linkMap.get("name") instanceof String ? (String) linkMap.get("name") : null);
+                String linkUrl = (linkMap.get("url") instanceof String ? (String) linkMap.get("url") : null);
+                links.add(new Link(linkName, linkUrl));
+            }
+        }
+
         List<Review> loadedReviews = new ArrayList<>();
-        try{
-            List<Map<String, Object>> reviewsData = (List<Map<String, Object>>)songData.get("reviews");
-            for(Map<String, Object> review:
-                    reviewsData){
+
+        if(songData.get("reviews") != null) {
+            List<Map<String, Object>> reviewsData = (List<Map<String, Object>>) songData.get("reviews");
+            for (Map<String, Object> review :
+                    reviewsData) {
                 loadedReviews.add(buildReviewFromMap(review));
             }
         }
-        catch(ClassCastException exc){
-            // TODO: log
-        }
 
-        return new Song(artist, duration, title, image, album, loadedReviews, link, loadedLikes, genres, featurings, songID);
+        return new Song(id, artist, duration, title, image, album, loadedReviews, links, genres, featurings, likes);
     }
 
     private Review buildReviewFromMap( Map<String, Object> reviewData){

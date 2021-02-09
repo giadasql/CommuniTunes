@@ -1,6 +1,13 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ArtistPreviewVBox;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.SongPreviewVBox;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.UserPreviewVBox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import javafx.fxml.FXML;
@@ -33,6 +40,11 @@ public class UserProfileController implements UIController {
     public HBox firstNameBox;
     public HBox countryBox;
     public HBox birthdayBox;
+    public HBox likesHBox;
+    public HBox followedArtistsBox;
+    public HBox followersBox;
+    public HBox followedBox;
+    public HBox artistsFollowerBox;
 
     private User user;
     private LayoutManager manager;
@@ -43,7 +55,7 @@ public class UserProfileController implements UIController {
         user = manager.context.getFocusedUser();
         username.setText(user.Username);
         Image avatar;
-        if(user.Image != null && !user.Image.equals("")){
+        if(user.Image != null){
             try{
                 avatar = new Image(user.Image);
                 if (avatar.isError()) {
@@ -107,6 +119,26 @@ public class UserProfileController implements UIController {
         else{
             birthdayBox.setVisible(false);
             birthdayBox.setManaged(false);
+        }
+
+        for(SongPreview preview : user.LoadedLikes){
+            likesHBox.getChildren().add(new SongPreviewVBox(preview));
+        }
+
+        for(UserPreview preview : user.LoadedFollowed){
+            followedBox.getChildren().add(new UserPreviewVBox(preview));
+        }
+
+        for(UserPreview preview : user.LoadedFollowers){
+            followersBox.getChildren().add(new UserPreviewVBox(preview));
+        }
+
+        for(ArtistPreview preview : user.LoadedArtistFollowed){
+            followedArtistsBox.getChildren().add(new ArtistPreviewVBox(preview));
+        }
+
+        for(ArtistPreview preview : user.LoadedArtistFollowers){
+            artistsFollowerBox.getChildren().add(new ArtistPreviewVBox(preview));
         }
     }
 

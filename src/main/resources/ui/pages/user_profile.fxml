@@ -9,16 +9,17 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<ScrollPane minHeight="534.0" minWidth="-Infinity" prefWidth="900.0" style="-fx-background-color: #001a4d;" stylesheets="@../style/style.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.UserProfileController">
+<ScrollPane maxHeight="-Infinity" minHeight="534.0" minWidth="-Infinity" prefHeight="534.0" prefWidth="900.0" style="-fx-background-color: #001a4d;" stylesheets="@../style/style.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.UserProfileController">
    <content>
-      <VBox>
+      <VBox maxWidth="-Infinity" prefWidth="880.0">
          <children>
-            <AnchorPane prefHeight="200.0" prefWidth="200.0">
+            <AnchorPane maxWidth="0.0" prefHeight="200.0" prefWidth="200.0">
                <children>
-                  <HBox prefHeight="255.0" prefWidth="893.0">
+                  <HBox prefHeight="255.0" prefWidth="885.0">
                      <children>
                         <VBox prefHeight="200.0" prefWidth="100.0">
                            <children>
@@ -156,6 +157,61 @@
                         </AnchorPane>
                      </children>
                   </HBox>
+               </children>
+            </AnchorPane>
+            <AnchorPane maxHeight="-Infinity" maxWidth="0.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="188.0" prefWidth="885.0">
+               <children>
+                  <Line endX="876.0" endY="28.0" startX="22.0" startY="28.0" stroke="WHITE" />
+                  <HBox fx:id="likesHBox" layoutX="25.0" layoutY="36.0" prefHeight="151.0" prefWidth="849.0" spacing="10.0" />
+                  <Text fill="WHITE" layoutX="22.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Likes">
+                     <font>
+                        <Font name="Book Antiqua" size="20.0" />
+                     </font>
+                  </Text>
+               </children>
+            </AnchorPane>
+            <AnchorPane maxHeight="-Infinity" maxWidth="0.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="188.0" prefWidth="885.0">
+               <children>
+                  <Line endX="876.0" endY="28.0" startX="22.0" startY="28.0" stroke="WHITE" />
+                  <HBox fx:id="followedArtistsBox" layoutX="25.0" layoutY="36.0" prefHeight="151.0" prefWidth="849.0" spacing="10.0" />
+                  <Text fill="WHITE" layoutX="22.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Followed Artists">
+                     <font>
+                        <Font name="Book Antiqua" size="20.0" />
+                     </font>
+                  </Text>
+               </children>
+            </AnchorPane>
+            <AnchorPane maxHeight="-Infinity" maxWidth="0.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="188.0" prefWidth="885.0">
+               <children>
+                  <Line endX="876.0" endY="28.0" startX="22.0" startY="28.0" stroke="WHITE" />
+                  <HBox fx:id="followersBox" layoutX="25.0" layoutY="36.0" prefHeight="151.0" prefWidth="849.0" spacing="10.0" />
+                  <Text fill="WHITE" layoutX="22.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Followers">
+                     <font>
+                        <Font name="Book Antiqua" size="20.0" />
+                     </font>
+                  </Text>
+               </children>
+            </AnchorPane>
+            <AnchorPane maxHeight="-Infinity" maxWidth="0.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="188.0" prefWidth="885.0">
+               <children>
+                  <Line endX="876.0" endY="28.0" startX="22.0" startY="28.0" stroke="WHITE" />
+                  <HBox fx:id="followedBox" layoutX="25.0" layoutY="36.0" prefHeight="151.0" prefWidth="849.0" spacing="10.0" />
+                  <Text fill="WHITE" layoutX="22.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Followed">
+                     <font>
+                        <Font name="Book Antiqua" size="20.0" />
+                     </font>
+                  </Text>
+               </children>
+            </AnchorPane>
+            <AnchorPane maxHeight="-Infinity" maxWidth="0.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="188.0" prefWidth="885.0">
+               <children>
+                  <Line endX="876.0" endY="28.0" startX="22.0" startY="28.0" stroke="WHITE" />
+                  <HBox fx:id="artistsFollowerBox" layoutX="25.0" layoutY="36.0" prefHeight="151.0" prefWidth="849.0" spacing="10.0" />
+                  <Text fill="WHITE" layoutX="22.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Artist followers">
+                     <font>
+                        <Font name="Book Antiqua" size="20.0" />
+                     </font>
+                  </Text>
                </children>
             </AnchorPane>
          </children>

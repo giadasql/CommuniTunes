@@ -1,11 +1,13 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.persistence;
 
 import com.mongodb.client.result.InsertOneResult;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
 import org.bson.Document;
 import org.javatuples.Pair;
+import org.javatuples.Tuple;
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.summary.ResultSummary;
@@ -16,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.neo4j.driver.Values.parameters;
@@ -169,19 +172,19 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    // TODO: Da ricontrollare qua!
-    public boolean updateSong(String title, String artist, List<Pair<String, String>> Featurings, String image){
+    // TODO: Non fa l'update del titolo
+    public boolean updateSong(String title, String artist, List<ArtistPreview> Featurings, String image){
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
                 HashMap<String, Object> parameters = new HashMap<>();
                 parameters.put("username", artist);
                 parameters.put("title", title);
-                parameters.put("artists", Featurings);
+                parameters.put("artists", Featurings.stream().map(x->x.username).collect(Collectors.toList()));
                 parameters.put("image", image);
                 Result res = tx.run( "MATCH (a:Artist {username: $username})-[:PERFORMS {isMainArtist: true}]->(s:Song {title: $title}) SET s.image = $image," +
-                                "FOREACH(ar IN {$artists} |" +
-                                "MERGE (s)<-[:PERFORMS {isMainArtist: false}]-(ar:Artist)" +
+                                "MATCH (a2:Artist) WHERE ar.username in $artists\n" +
+                                "MERGE (a2)-[:PERFORMS {isMainArtist: false]->(s)\n" +
                                 "RETURN count(s)",
                         parameters);
                 return (res.single().get(0).asInt() >= 1);
@@ -367,15 +370,15 @@ class Neo4jDriver implements Closeable {
             Record result = session.readTransaction(tx -> {
                 Result res = tx.run( "MATCH (u:User { username: $username }) \n" +
                         "OPTIONAL MATCH (u)-[:FOLLOWS]->(followed:User) WHERE NOT followed:Artist\n" +
-                        "WITH COLLECT(DISTINCT(followed.username))[0..15] AS Followed, u\n" +
+                        "WITH COLLECT(DISTINCT(followed { .username, .image }))[0..6] AS Followed, u\n" +
                         "OPTIONAL MATCH (u)<-[:FOLLOWS]-(follower:User) WHERE NOT follower:Artist\n" +
-                        "WITH COLLECT(DISTINCT(follower.username))[0..15] AS Followers, Followed, u\n" +
+                        "WITH COLLECT(DISTINCT(follower { .username, .image }))[0..6] AS Followers, Followed, u\n" +
                         "OPTIONAL MATCH (u)-[:FOLLOWS]->(followedArtist:Artist)\n" +
-                        "WITH COLLECT(DISTINCT(followedArtist.username))[0..15] AS FollowedArtists, Followers, Followed, u\n" +
+                        "WITH COLLECT(DISTINCT(followedArtist {.username, .image, .stageName}))[0..6] AS FollowedArtists, Followers, Followed, u\n" +
                         "OPTIONAL MATCH (u)<-[:FOLLOWS]-(followerArtist:Artist)\n" +
-                        "WITH COLLECT(DISTINCT(followerArtist.username))[0..15] AS FollowerArtists, FollowedArtists, Followers, Followed, u\n" +
-                        "OPTIONAL MATCH (u)-[:LIKES]->(likedSong:Song)\n" +
-                        "RETURN u AS User, Followers, Followed, FollowedArtists, FollowerArtists, COLLECT(DISTINCT(likedSong { .songID, .title }))[0..15] AS LikedSongs", parameters("username", username));
+                        "WITH COLLECT(DISTINCT(followerArtist {.username, .image, .stageName}))[0..6] AS FollowerArtists, FollowedArtists, Followers, Followed, u\n" +
+                        "OPTIONAL MATCH (u)-[:LIKES]->(s:Song)<-[:PERFORMS {isMainArtist: true}]-(performer:Artist)\n" +
+                        "RETURN u AS User, Followers, Followed, FollowedArtists, FollowerArtists, COLLECT(DISTINCT({id: s.songID, title: s.title, image: s.image, artist: performer.username}))[0..6] AS LikedSongs", parameters("username", username));
 
                 return res.single();
             });
@@ -398,17 +401,17 @@ class Neo4jDriver implements Closeable {
             Record result = session.readTransaction(tx -> {
                 Result res = tx.run( "MATCH (a:Artist { username: $username })\n" +
                         "OPTIONAL MATCH (a)-[:FOLLOWS]->(followed:User) WHERE NOT followed:Artist\n" +
-                        "WITH COLLECT(DISTINCT followed.username)[0..15] AS Followed, a\n" +
+                        "WITH COLLECT(DISTINCT(followed { .username, .image }))[0..6] AS Followed, a\n" +
                         "OPTIONAL MATCH (a)<-[:FOLLOWS]-(follower:User) WHERE NOT follower:Artist\n" +
-                        "WITH COLLECT(DISTINCT follower.username)[0..15] AS Follower, Followed, a\n" +
+                        "WITH COLLECT(DISTINCT (follower { .username, .image }))[0..6] AS Follower, Followed, a\n" +
                         "OPTIONAL MATCH (a)-[:FOLLOWS]->(followedArtist:Artist)\n" +
-                        "WITH COLLECT(DISTINCT followedArtist.stageName)[0..15] AS FollowedArtists, Follower, Followed, a\n" +
+                        "WITH COLLECT(DISTINCT (followedArtist {.username, .image, .stageName}))[0..6] AS FollowedArtists, Follower, Followed, a\n" +
                         "OPTIONAL MATCH (followerArtist:Artist)-[:FOLLOWS]->(a)\n" +
-                        "WITH COLLECT(DISTINCT followerArtist.stageName)[0..15] AS FollowerArtists, FollowedArtists, Follower, Followed, a\n" +
-                        "OPTIONAL MATCH (a)-[:PERFORMS]->(s:Song)\n" +
-                        "WITH COLLECT(DISTINCT(s { .songID, .title }))[0..15] AS Songs, FollowerArtists, FollowedArtists, Follower, Followed, a\n" +
-                        "OPTIONAL MATCH (a)-[:LIKES]->(likedSong:Song)\n" +
-                        "RETURN Followed, Follower, FollowedArtists, FollowerArtists, Songs, COLLECT(DISTINCT(likedSong { .songID, .title }))[0..15] AS LikedSongs", parameters("username", username));
+                        "WITH COLLECT(DISTINCT (followerArtist {.username, .image, .stageName}))[0..6] AS FollowerArtists, FollowedArtists, Follower, Followed, a\n" +
+                        "OPTIONAL MATCH (a)-[:PERFORMS {isMainArtist: true}]->(s:Song)\n" +
+                        "WITH COLLECT(DISTINCT({id: s.songID, title: s.title, image: s.image, artist: a.username}))[0..6] AS Songs, FollowerArtists, FollowedArtists, Follower, Followed, a\n" +
+                        "OPTIONAL MATCH (a)-[:LIKES]->(s:Song)<-[:PERFORMS {isMainArtist: true}]-(performer:Artist)\n" +
+                        "RETURN Followed, Follower, FollowedArtists, FollowerArtists, Songs, COLLECT(DISTINCT({id: s.songID, title: s.title, image: s.image, artist: performer.username}))[0..6] AS LikedSongs", parameters("username", username));
                 if(res != null && res.hasNext()){
                     return res.single();
                 }
@@ -439,12 +442,12 @@ class Neo4jDriver implements Closeable {
             Record result = session.readTransaction(tx -> {
                 Result res = tx.run( "MATCH (s:Song { songID: $songID  } )\n" +
                         "OPTIONAL MATCH (s)<-[r:PERFORMS {isMainArtist: true} ]-(mainArtist:Artist)\n" +
-                        "WITH mainArtist.username AS MainArtist, s\n" +
+                        "WITH mainArtist {.username, .image, .stageName} AS MainArtist, s\n" +
                         "LIMIT 1\n" +
                         "OPTIONAL MATCH (s)<-[r2:PERFORMS {isMainArtist: false}]-(featuring:Artist)\n" +
-                        "WITH COLLECT(DISTINCT featuring.username)[0..15] AS Featurings, MainArtist, s\n" +
+                        "WITH COLLECT(DISTINCT featuring {.username, .image, .stageName})[0..15] AS Featurings, MainArtist, s\n" +
                         "OPTIONAL MATCH (s)<-[:LIKES]-(u:User)\n" +
-                        "RETURN s AS Song, MainArtist, Featurings, COLLECT(DISTINCT u.username)[0..15] AS Likers", parameters("songID", songID));
+                        "RETURN s AS Song, MainArtist, Featurings, COUNT(DISTINCT(u)) AS Likers", parameters("songID", songID));
                 if(res != null && res.hasNext()){
                     return res.single();
                 }
@@ -453,9 +456,9 @@ class Neo4jDriver implements Closeable {
                 }
             });
             if(result != null){
-                songValues.put(("mainArtist"), result.get("MainArtist").asString());
+                songValues.put(("mainArtist"), result.get("MainArtist").asMap());
                 songValues.put(("featurings"), result.get("Featurings").asList());
-                songValues.put(("likers"), result.get("Likers").asList());
+                songValues.put(("likes"), result.get("Likers").asInt());
                 return songValues;
             }
         }
