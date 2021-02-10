@@ -53,3 +53,8 @@
 	-fx-font-family: "Book Antiqua";
 	-fx-cursor: HAND;
 }
+
+.delete-btn {
+	-fx-background-color: transparent;
+	
+}

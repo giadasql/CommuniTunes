@@ -34,6 +34,7 @@ import static com.mongodb.client.model.Updates.*;
 
 import java.io.Closeable;
 import java.lang.reflect.Array;
+import java.time.LocalDate;
 import java.util.*;
 
 class MongoDriver implements Closeable {
@@ -204,21 +205,37 @@ class MongoDriver implements Closeable {
         cal.setTime(new Date());
         cal.add(Calendar.DAY_OF_MONTH, -30);
 
-        songsCollection.aggregate(Arrays.asList(addFields(new Field("reviews",
+        Document toProject = new Document("title", "$title")
+                .append("avg_rating", "$avg_rating")
+                .append("artist", "$artist")
+                .append("id", "$_id")
+                .append("image", "$image");
+
+        AggregateIterable<Document> result = songsCollection.aggregate(Arrays.asList(addFields(new Field("reviews",
                 new Document("$filter",
                         new Document("input", "$reviews")
                                 .append("as", "review")
                                 .append("cond",
                                         new Document("$and", Arrays.asList(new Document("$gt", Arrays.asList(new java.util.Date(), "$$review.posted")),
-                                                new Document("$lte", Arrays.asList(new java.util.Date(), "$$review.posted")))))))), addFields(new Field("avg_rating",
+                                                new Document("$lte", Arrays.asList(LocalDate.now().minusDays(30), "$$review.posted")))))))), addFields(new Field("avg_rating",
                 new Document("$avg", "$reviews.rating"))), match(ne("avg_rating",
                 new BsonNull())), sort(descending("avg_rating")), unwind("$genres",
-                new UnwindOptions().preserveNullAndEmptyArrays(false)), group("$genres", Accumulators.push("songs", and(eq("name", "$title"), eq("avg_rating", "$avg_rating"), eq("artist", "$artist"), eq("id", "$_id"), eq("image", "$image")))), addFields(new Field("songs",
-                new Document("$slice", Arrays.asList("$songs", 6L))))))
-                .forEach(doc->{
-                    System.out.println(doc);
-                    String genre = doc.getString("genres");
-                });
+                new UnwindOptions().preserveNullAndEmptyArrays(false)), group("$genres", Accumulators.push("songs", toProject)), addFields(new Field("songs",
+                new Document("$slice", Arrays.asList("$songs", 6L)))))).allowDiskUse(true);
+        for (Document resultDoc :
+        result){
+            String genre = resultDoc.getString("_id");
+            List<SongPreview> previews = new ArrayList<>();
+            List<Document> songs = (ArrayList<Document>)resultDoc.get("songs");
+            for (Document song : songs){
+                String title = song.getString("title");
+                String artist = song.getString("artist");
+                String songID = song.getObjectId("id").toString();
+                String image = song.getString("image");
+                previews.add(new SongPreview(songID, artist, title, image));
+            }
+            res.put(genre, previews);
+        }
         return res;
     }
 
@@ -277,7 +294,7 @@ class MongoDriver implements Closeable {
     }
 
     public Map<String, Object> getArtistData(String username){
-        Document artist = usersCollection.find(eq("username", username)).first();
+        Document artist = usersCollection.find(and(eq("username", username), ne("stage_name", null))).first();
         if(artist != null){
             return getArtistMap(artist);
         }
@@ -298,9 +315,9 @@ class MongoDriver implements Closeable {
 
         BasicDBList list = new BasicDBList();
         list.add("$reviews");
-        list.add(15);
+        list.add(-15);
         Bson slice = new BasicDBObject("reviews", new BasicDBObject("$slice", list));
-        Bson addField = Aggregates.addFields(new Field<>("avgRating", new BasicDBObject("$avg", "reviews.rating")));
+        Bson addField = Aggregates.addFields(new Field<>("avgRating", new BasicDBObject("$avg", "$reviews.rating")));
         Bson project = Aggregates.project(Projections.fields(include("_id", "title", "length", "links", "album", "reviews", "genres", "image", "avgRating"), slice));
 
         Bson limit = limit(1);
@@ -324,9 +341,12 @@ class MongoDriver implements Closeable {
         if(current != null){
             Document reviewDoc = new Document("user", user)
                     .append("rating", rating)
-                    .append("text", text)
                     .append("_id", reviewId)
                     .append("posted", current);
+
+            if(text != null){
+                reviewDoc.append("text", text);
+            }
 
             Bson update = Updates.addToSet("reviews", reviewDoc);
 
@@ -393,8 +413,10 @@ class MongoDriver implements Closeable {
         songValues.put("album", song.get("album"));
         songValues.put("avgRating", song.get("avgRating"));
         List<Map<String, Object>> reviews = new ArrayList<>();
-        if(song.getList("reviews", Document.class) != null){
-            for (Document reviewDoc: song.getList("reviews", Document.class)) {
+        List<Document> songList = song.getList("reviews", Document.class);
+        if(songList != null){
+            Collections.reverse(songList);
+            for (Document reviewDoc: songList) {
                 Map<String, Object> reviewMap = getReviewMap(reviewDoc, song.getObjectId("_id").toString());
                 reviews.add(reviewMap);
             }
@@ -440,6 +462,13 @@ class MongoDriver implements Closeable {
         artistValues.put("image", artist.get("image"));
         artistValues.put("links", artist.get("sites"));
         return artistValues;
+    }
+
+    public boolean checkIfUserReviewedSong(String username, String songID){
+        BasicDBObject criteria = new BasicDBObject();
+        criteria.append("_id", new ObjectId(songID));
+        criteria.append("reviews", new BasicDBObject("$elemMatch", new BasicDBObject("user", username)));
+        return songsCollection.countDocuments(criteria) > 0;
     }
 
     @Override

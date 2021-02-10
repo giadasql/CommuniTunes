@@ -17,9 +17,9 @@
 
 <ScrollPane maxWidth="-Infinity" minHeight="534.0" minWidth="-Infinity" prefHeight="534.0" prefWidth="900.0" style="-fx-background-color: #001a4d;" stylesheets="@../../style/style.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.SongController">
    <content>
-      <VBox maxWidth="-Infinity" prefHeight="404.0" prefWidth="885.0">
+      <VBox maxWidth="-Infinity" prefWidth="885.0">
          <children>
-            <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="714.0" prefWidth="883.0">
+            <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefWidth="883.0">
                <children>
                   <HBox layoutX="-4.0" layoutY="18.0" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="240.0" prefWidth="885.0">
                      <children>
@@ -154,9 +154,9 @@
                   </HBox>
                   <VBox layoutX="-1.0" layoutY="270.0" prefHeight="444.0" prefWidth="883.0">
                      <children>
-                        <AnchorPane prefHeight="452.0" prefWidth="883.0">
+                        <AnchorPane prefHeight="292.0" prefWidth="883.0">
                            <children>
-                              <VBox layoutX="1.0" prefHeight="450.0" prefWidth="880.0">
+                              <VBox layoutX="1.0" prefWidth="880.0">
                                  <children>
                                     <AnchorPane fx:id="writeReview" prefHeight="142.0" prefWidth="881.0">
                                        <children>
@@ -174,7 +174,7 @@
                                                 <Font size="20.0" />
                                              </font>
                                           </Text>
-                                          <TextArea layoutX="34.0" layoutY="26.0" prefHeight="67.0" prefWidth="843.0">
+                                          <TextArea fx:id="reviewComment" layoutX="34.0" layoutY="26.0" prefHeight="67.0" prefWidth="843.0">
                                              <cursor>
                                                 <Cursor fx:constant="TEXT" />
                                              </cursor></TextArea>
@@ -193,7 +193,7 @@
                                           </Text>
                                        </children>
                                     </AnchorPane>
-                                    <AnchorPane prefHeight="61.0" prefWidth="881.0">
+                                    <AnchorPane maxWidth="-Infinity" prefHeight="200.0" prefWidth="841.0">
                                        <children>
                                           <Label layoutX="26.0" layoutY="19.0" prefHeight="23.0" prefWidth="137.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="Reviews">
                                              <font>
@@ -209,7 +209,11 @@
                                                 <Cursor fx:constant="HAND" />
                                              </cursor>
                                           </Button>
+                                          <VBox fx:id="reviews" layoutX="27.0" layoutY="70.0" prefHeight="130.0" prefWidth="828.0" spacing="35.0" />
                                        </children>
+                                       <VBox.margin>
+                                          <Insets />
+                                       </VBox.margin>
                                     </AnchorPane>
                                  </children>
                               </VBox>

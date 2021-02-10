@@ -332,6 +332,11 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
+    public boolean checkIfUserReviewedSong(User user, Song song) {
+        return mongo.checkIfUserReviewedSong(user.Username, song.ID);
+    }
+
+    @Override
     public boolean deleteReviews(String username) {
         return mongo.deleteReviews(username);
     }
@@ -343,18 +348,24 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public User getUser(String username) {
-        Map<String, Object> userData = new HashMap<>(mongo.getUserData(username));
-        userData.putAll(neo4j.getUserData(username));
-        userData.put("username", username);
-        return buildUserFromMap(userData);
+        Map<String, Object> userData = mongo.getUserData(username);
+        if(userData != null){
+            userData.putAll(neo4j.getUserData(username));
+            userData.put("username", username);
+            return buildUserFromMap(userData);
+        }
+        return null;
     }
 
     @Override
     public Artist getArtist(String username) {
-        Map<String, Object> artistData = new HashMap<>(mongo.getArtistData(username));
-        artistData.putAll(neo4j.getArtistData(username));
-        artistData.put("username", username);
-        return buildArtistFromMap(artistData);
+        Map<String, Object> artistData = mongo.getArtistData(username);
+        if(artistData != null){
+            artistData.putAll(neo4j.getArtistData(username));
+            artistData.put("username", username);
+            return buildArtistFromMap(artistData);
+        }
+        return null;
     }
 
     @Override

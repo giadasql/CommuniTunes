@@ -314,6 +314,8 @@ public interface Persistence {
     boolean checkLike(User user, Song song);
     boolean deleteLike(User user, Song song);
 
+    boolean checkIfUserReviewedSong(User user, Song song);
+
     /**
      *
      */
