@@ -465,6 +465,47 @@ class Neo4jDriver implements Closeable {
         return songValues;
     }
 
+    public boolean addFollow(String followed, String follower){
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (u1:User {username: $follower})\n" +
+                        "MATCH (u2:User {username: $followed})\n" +
+                        "MERGE (u1)-[:FOLLOWS]->(u2)",
+                        parameters("followed", followed, "follower", follower));
+                return true;
+            });
+        }
+    }
+
+    public boolean checkFollow(String followed, String follower){
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (u1:User {username: $follower})\n" +
+                                "MATCH (u2:User {username: $followed})\n" +
+                                "MATCH (u1)-[r:FOLLOWS]->(u2)\n" +
+                                "RETURN COUNT(r)",
+                        parameters("followed", followed, "follower", follower));
+                return (res.single().get(0).asInt() >= 1);
+            });
+        }
+    }
+
+    public boolean deleteFollow(String followed, String follower){
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (u1:User {username: $follower})\n" +
+                                "MATCH (u2:User {username: $followed})\n" +
+                                "MATCH (u1)-[r:FOLLOWS]->(u2)\n" +
+                                "DELETE r",
+                        parameters("followed", followed, "follower", follower));
+                return true;
+            });
+        }
+    }
+
     @Override
     public void close() {
         driver.close();

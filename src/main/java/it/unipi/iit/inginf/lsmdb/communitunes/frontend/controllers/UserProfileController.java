@@ -1,5 +1,6 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
+import it.unipi.iit.inginf.lsmdb.communitunes.authentication.Role;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
@@ -9,6 +10,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ArtistPreviewV
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.SongPreviewVBox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.UserPreviewVBox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.ArtistPreviewClickedEvent;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.SongPreviewClickedEvent;
@@ -55,9 +57,11 @@ public class UserProfileController implements UIController {
     private LayoutManager manager;
     private Persistence dbManager;
 
+    private boolean followingFocusedUser;
+
     @Override
-    public void init(LayoutManager manager) {
-        this.manager = manager;
+    public void init() {
+        this.manager = LayoutManagerFactory.getManager();
         user = manager.context.getFocusedUser();
         dbManager = PersistenceFactory.CreatePersistence();
         username.setText(user.Username);
@@ -76,9 +80,10 @@ public class UserProfileController implements UIController {
             }
         }
 
-
         // check if the profile belongs to the user that is currently logged in
-        if(manager.context.getAuthenticatedUser().Username.equals(user.Username)){
+        if(manager.context.getAuthenticatedUser() != null &&
+                manager.context.getAuthenticatedUser().Username != null &&
+                manager.context.getAuthenticatedUser().Username.equals(manager.context.getFocusedUser().Username)){
             editProfile.setVisible(true);
             editProfile.setManaged(true);
             followUnfollow.setVisible(false);
@@ -89,6 +94,14 @@ public class UserProfileController implements UIController {
             editProfile.setManaged(false);
             followUnfollow.setVisible(true);
             followUnfollow.setManaged(true);
+            if(dbManager.checkFollow(user, manager.context.getAuthenticatedUser())){
+                followUnfollow.setText("Unfollow");
+                followingFocusedUser = true;
+            }
+            else{
+                followUnfollow.setText("Follow");
+                followingFocusedUser = false;
+            }
         }
         // write info in the infoContainer
         if(user.FirstName != null){
@@ -129,7 +142,7 @@ public class UserProfileController implements UIController {
         }
 
         for(SongPreview preview : user.LoadedLikes){
-            likesHBox.getChildren().add(new SongPreviewVBox(preview, this::showSong));
+            likesHBox.getChildren().add(new SongPreviewVBox(preview, null));
         }
 
         if(likesHBox.getChildren().isEmpty()){
@@ -210,6 +223,31 @@ public class UserProfileController implements UIController {
     }
 
     public void showUser(UserPreviewClickedEvent event) {
-        System.out.print(event.preview.username);
+        User focused = dbManager.getUser(event.preview.username);
+        manager.context.setFocusedUser(focused);
+        try {
+            manager.setContent(Path.USER_PROFILE);
+        } catch (IOException e) {
+            // TODO: log
+            e.printStackTrace();
+        }
+    }
+
+    public void followUser(MouseEvent mouseEvent) {
+        User current = manager.context.getAuthenticatedUser();
+        User toFollow = manager.context.getFocusedUser();
+        if(!followingFocusedUser){
+            if(dbManager.addFollow(toFollow, current)){
+                followUnfollow.setText("Unfollow");
+                followingFocusedUser = true;
+            }
+        }
+        else{
+            if(dbManager.deleteFollow(toFollow, current)){
+                followUnfollow.setText("Follow");
+                followingFocusedUser = false;
+            }
+        }
+
     }
 }

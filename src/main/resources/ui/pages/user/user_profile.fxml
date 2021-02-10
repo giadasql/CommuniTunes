@@ -15,7 +15,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<ScrollPane maxHeight="-Infinity" minHeight="534.0" minWidth="-Infinity" prefHeight="534.0" prefWidth="900.0" style="-fx-background-color: #001a4d;" stylesheets="@../style/style.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.UserProfileController">
+<ScrollPane maxHeight="-Infinity" minHeight="534.0" minWidth="-Infinity" prefHeight="534.0" prefWidth="900.0" style="-fx-background-color: #001a4d;" stylesheets="@../../style/style.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.UserProfileController">
    <content>
       <VBox maxWidth="-Infinity" prefWidth="880.0">
          <children>
@@ -45,7 +45,7 @@
                                           <Cursor fx:constant="HAND" />
                                        </cursor>
                                     </Button>
-                                    <Button fx:id="followUnfollow" layoutX="78.0" layoutY="3.0" mnemonicParsing="false" prefHeight="34.0" prefWidth="74.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Follow">
+                                    <Button fx:id="followUnfollow" layoutX="68.0" layoutY="3.0" mnemonicParsing="false" onMouseClicked="#followUser" prefHeight="35.0" prefWidth="95.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Follow">
                                        <cursor>
                                           <Cursor fx:constant="HAND" />
                                        </cursor>
@@ -63,7 +63,7 @@
                                  <children>
                                     <HBox fx:id="firstNameBox">
                                        <children>
-                                          <Label prefHeight="23.0" prefWidth="137.0" styleClass="user-info-label" stylesheets="@../style/style.css" text="First Name">
+                                          <Label prefHeight="23.0" prefWidth="137.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="First Name">
                                              <HBox.margin>
                                                 <Insets left="15.0" />
                                              </HBox.margin>
@@ -86,7 +86,7 @@
                                     </HBox>
                                     <HBox fx:id="lastNameBox">
                                        <children>
-                                          <Label prefHeight="23.0" prefWidth="137.0" styleClass="user-info-label" stylesheets="@../style/style.css" text="Last Name">
+                                          <Label prefHeight="23.0" prefWidth="137.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="Last Name">
                                              <HBox.margin>
                                                 <Insets left="15.0" top="5.0" />
                                              </HBox.margin>
@@ -109,7 +109,7 @@
                                     </HBox>
                                     <HBox fx:id="countryBox">
                                        <children>
-                                          <Label prefHeight="23.0" prefWidth="137.0" styleClass="user-info-label" stylesheets="@../style/style.css" text="Country">
+                                          <Label prefHeight="23.0" prefWidth="137.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="Country">
                                              <HBox.margin>
                                                 <Insets left="15.0" top="5.0" />
                                              </HBox.margin>
@@ -132,7 +132,7 @@
                                     </HBox>
                                     <HBox fx:id="birthdayBox">
                                        <children>
-                                          <Label prefHeight="23.0" prefWidth="137.0" styleClass="user-info-label" stylesheets="@../style/style.css" text="Birthday">
+                                          <Label prefHeight="23.0" prefWidth="137.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="Birthday">
                                              <HBox.margin>
                                                 <Insets left="15.0" top="5.0" />
                                              </HBox.margin>
@@ -177,7 +177,7 @@
                      <graphic>
                         <ImageView fitHeight="32.0" fitWidth="32.0" onMouseClicked="#showAllLikes" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../img/arrow.png" />
+                              <Image url="@../../img/arrow.png" />
                            </image>
                         </ImageView>
                      </graphic>
@@ -200,7 +200,7 @@
                      <graphic>
                         <ImageView fitHeight="32.0" fitWidth="32.0" onMouseClicked="#showAllFollowedArtists" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../img/arrow.png" />
+                              <Image url="@../../img/arrow.png" />
                            </image>
                         </ImageView>
                      </graphic>
@@ -223,7 +223,7 @@
                      <graphic>
                         <ImageView fitHeight="32.0" fitWidth="32.0" onMouseClicked="#showAllFollowers" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../img/arrow.png" />
+                              <Image url="@../../img/arrow.png" />
                            </image>
                         </ImageView>
                      </graphic>
@@ -246,7 +246,7 @@
                      <graphic>
                         <ImageView fitHeight="32.0" fitWidth="32.0" onMouseClicked="#showAllFollowed" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../img/arrow.png" />
+                              <Image url="@../../img/arrow.png" />
                            </image>
                         </ImageView>
                      </graphic>
@@ -269,7 +269,7 @@
                      <graphic>
                         <ImageView fitHeight="32.0" fitWidth="32.0" onMouseClicked="#showAllArtistFollowers" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../img/arrow.png" />
+                              <Image url="@../../img/arrow.png" />
                            </image>
                         </ImageView>
                      </graphic>

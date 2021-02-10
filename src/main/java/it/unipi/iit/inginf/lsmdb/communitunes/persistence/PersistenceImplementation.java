@@ -280,6 +280,21 @@ class PersistenceImplementation implements Persistence {
     public List<SongPreview> getPopularSongs(Artist artist) { return neo4j.getPopularSongs(artist.Username); }
 
     @Override
+    public boolean addFollow(User followed, User follower) {
+        return neo4j.addFollow(followed.Username, follower.Username);
+    }
+
+    @Override
+    public boolean checkFollow(User followed, User follower) {
+        return neo4j.checkFollow(followed.Username, follower.Username);
+    }
+
+    @Override
+    public boolean deleteFollow(User followed, User follower) {
+        return neo4j.deleteFollow(followed.Username, follower.Username);
+    }
+
+    @Override
     public boolean deleteReviews(String username) {
         return mongo.deleteReviews(username);
     }

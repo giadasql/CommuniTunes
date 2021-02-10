@@ -7,6 +7,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.SongPreviewVBox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.SongPreviewClickedEvent;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
@@ -62,8 +63,8 @@ public class ArtistController implements UIController {
     private boolean biographyExpanded = false;
 
     @Override
-    public void init(LayoutManager manager) {
-        this.manager = manager;
+    public void init() {
+        this.manager = LayoutManagerFactory.getManager();
         artist = manager.context.getFocusedArtist();
         dbManager = PersistenceFactory.CreatePersistence();
         username.setText(artist.Username);
@@ -84,7 +85,7 @@ public class ArtistController implements UIController {
 
 
         // check if the profile belongs to the user that is currently logged in
-        if(manager.context.getAuthenticatedArtist() == null){
+        if(manager.context.getAuthenticatedArtist() == null || !artist.Username.equals(manager.context.getAuthenticatedArtist().Username)){
             editProfile.setVisible(false);
             editProfile.setManaged(false);
             followUnfollow.setVisible(true);
@@ -217,5 +218,8 @@ public class ArtistController implements UIController {
 
     public void editProfile(MouseEvent mouseEvent) throws IOException {
         manager.setContent(Path.ARTIST_EDIT);
+    }
+
+    public void followArtist(MouseEvent mouseEvent) {
     }
 }
