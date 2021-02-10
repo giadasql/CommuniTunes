@@ -30,7 +30,9 @@ public class Song extends Entity {
 
     public int Likes;
 
-    public Song(String ID, ArtistPreview artist, String duration, String title, String image, String album, List<Review> loadedReviews, List<Link> links, List<String> genres, List<ArtistPreview> featurings, int likes) {
+    public double AvgRating;
+
+    public Song(String ID, ArtistPreview artist, String duration, String title, String image, String album, List<Review> loadedReviews, List<Link> links, List<String> genres, List<ArtistPreview> featurings, int likes, double avgRating) {
         super(ID);
         Artist = artist;
         Duration = duration;
@@ -42,6 +44,7 @@ public class Song extends Entity {
         Genres = genres;
         Featurings = featurings;
         Likes = likes;
+        AvgRating = avgRating;
     }
 
 //    @Override

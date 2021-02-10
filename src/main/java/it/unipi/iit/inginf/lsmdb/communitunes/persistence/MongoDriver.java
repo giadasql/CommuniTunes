@@ -300,11 +300,12 @@ class MongoDriver implements Closeable {
         list.add("$reviews");
         list.add(15);
         Bson slice = new BasicDBObject("reviews", new BasicDBObject("$slice", list));
-        Bson project = Aggregates.project(Projections.fields(include("_id", "title", "length", "links", "album", "reviews", "genres", "image"), slice));
+        Bson addField = Aggregates.addFields(new Field<>("avgRating", new BasicDBObject("$avg", "reviews.rating")));
+        Bson project = Aggregates.project(Projections.fields(include("_id", "title", "length", "links", "album", "reviews", "genres", "image", "avgRating"), slice));
 
         Bson limit = limit(1);
 
-        Document song = songsCollection.aggregate(Arrays.asList(match, limit, project)).first();
+        Document song = songsCollection.aggregate(Arrays.asList(match, limit, addField, project)).first();
         if(song != null){
             return getSongMap(song);
         }
@@ -390,6 +391,7 @@ class MongoDriver implements Closeable {
         songValues.put("image", song.get("image"));
         songValues.put("links", song.getList("sites", Document.class));
         songValues.put("album", song.get("album"));
+        songValues.put("avgRating", song.get("avgRating"));
         List<Map<String, Object>> reviews = new ArrayList<>();
         if(song.getList("reviews", Document.class) != null){
             for (Document reviewDoc: song.getList("reviews", Document.class)) {

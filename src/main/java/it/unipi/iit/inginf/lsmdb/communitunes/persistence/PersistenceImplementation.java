@@ -317,6 +317,21 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
+    public boolean addLike(User user, Song song) {
+        return neo4j.addLike(user.Username, song.ID);
+    }
+
+    @Override
+    public boolean checkLike(User user, Song song) {
+        return neo4j.checkLike(user.Username, song.ID);
+    }
+
+    @Override
+    public boolean deleteLike(User user, Song song) {
+        return neo4j.deleteLike(user.Username, song.ID);
+    }
+
+    @Override
     public boolean deleteReviews(String username) {
         return mongo.deleteReviews(username);
     }
@@ -389,6 +404,7 @@ class PersistenceImplementation implements Persistence {
         username = (userData.get("username") instanceof String ? (String)userData.get("username") : null);
         birthday = (userData.get("birthday") instanceof LocalDate ? (LocalDate) userData.get("birthday") : null);
         id = (userData.get("id") instanceof String ? (String) userData.get("id") : null);
+        
         Iterable<Map<String,Object>> followedArtistsList = (Iterable<Map<String,Object>>)userData.get("followedArtists");
         for (Map<String,Object> artistMap : followedArtistsList){
             String artistUsername = (artistMap.get("username") instanceof String ? (String)artistMap.get("username") : null);
@@ -525,6 +541,7 @@ class PersistenceImplementation implements Persistence {
         duration = (songData.get("duration") instanceof String ? (String)songData.get("duration") : null);
         id = (songData.get("id") instanceof String ? (String)songData.get("id") : null);
         likes = (songData.get("likes") instanceof Integer ? (Integer) songData.get("likes") : 0);
+        double avgRating = (songData.get("avgRating") instanceof Double ? (Double) songData.get("avgRating") : -1);
 
         if(songData.get("mainArtist") != null){
             Map<String, Object> artistMap = (Map<String, Object>)songData.get("mainArtist");
@@ -563,7 +580,7 @@ class PersistenceImplementation implements Persistence {
             }
         }
 
-        return new Song(id, artist, duration, title, image, album, loadedReviews, links, genres, featurings, likes);
+        return new Song(id, artist, duration, title, image, album, loadedReviews, links, genres, featurings, likes, avgRating);
     }
 
     private Review buildReviewFromMap( Map<String, Object> reviewData){

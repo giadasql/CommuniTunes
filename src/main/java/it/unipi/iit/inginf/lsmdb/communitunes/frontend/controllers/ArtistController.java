@@ -61,11 +61,15 @@ public class ArtistController implements UIController {
     private Persistence dbManager;
 
     private boolean biographyExpanded = false;
+    private boolean followingFocusedUser = false;
 
     @Override
     public void init() {
         this.manager = LayoutManagerFactory.getManager();
         artist = manager.context.getFocusedArtist();
+        if(artist == null){
+            return;
+        }
         dbManager = PersistenceFactory.CreatePersistence();
         username.setText(artist.Username);
         Image avatar;
@@ -85,17 +89,27 @@ public class ArtistController implements UIController {
 
 
         // check if the profile belongs to the user that is currently logged in
-        if(manager.context.getAuthenticatedArtist() == null || !artist.Username.equals(manager.context.getAuthenticatedArtist().Username)){
-            editProfile.setVisible(false);
-            editProfile.setManaged(false);
-            followUnfollow.setVisible(true);
-            followUnfollow.setManaged(true);
+        if(manager.context.getAuthenticatedUser() != null &&
+                manager.context.getAuthenticatedUser().Username != null &&
+                manager.context.getAuthenticatedUser().Username.equals(artist.Username)){
+            editProfile.setVisible(true);
+            editProfile.setManaged(true);
+            followUnfollow.setVisible(false);
+            followUnfollow.setManaged(false);
         }
-        else if(manager.context.getAuthenticatedArtist().Username.equals(artist.Username)){
-                editProfile.setVisible(true);
-                editProfile.setManaged(true);
-                followUnfollow.setVisible(false);
-                followUnfollow.setManaged(false);
+        else {
+                editProfile.setVisible(false);
+                editProfile.setManaged(false);
+                followUnfollow.setVisible(true);
+                followUnfollow.setManaged(true);
+            if(dbManager.checkFollow(artist, manager.context.getAuthenticatedUser())){
+                followUnfollow.setText("Unfollow");
+                followingFocusedUser = true;
+            }
+            else{
+                followUnfollow.setText("Follow");
+                followingFocusedUser = false;
+            }
         }
 
         // write info in the infoContainer
@@ -185,14 +199,11 @@ public class ArtistController implements UIController {
 
         if(artist.LoadedSongs != null){
             for(SongPreview songPreview : artist.LoadedSongs){
-                    songsHbox.getChildren().add(new SongPreviewVBox(songPreview, this::showSong));
+                    songsHbox.getChildren().add(new SongPreviewVBox(songPreview, null));
             }
         }
     }
 
-    private void showSong(SongPreviewClickedEvent songPreviewClickedEvent) {
-        System.out.print(songPreviewClickedEvent.preview.Title);
-    }
 
     private void toggleBiography(ActionEvent actionEvent) {
         if(biographyExpanded){
@@ -221,5 +232,19 @@ public class ArtistController implements UIController {
     }
 
     public void followArtist(MouseEvent mouseEvent) {
+        User current = manager.context.getAuthenticatedUser();
+        User toFollow = manager.context.getFocusedUser();
+        if(!followingFocusedUser){
+            if(dbManager.addFollow(toFollow, current)){
+                followUnfollow.setText("Unfollow");
+                followingFocusedUser = true;
+            }
+        }
+        else{
+            if(dbManager.deleteFollow(toFollow, current)){
+                followUnfollow.setText("Follow");
+                followingFocusedUser = false;
+            }
+        }
     }
 }

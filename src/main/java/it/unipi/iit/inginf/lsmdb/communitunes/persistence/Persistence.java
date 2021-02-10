@@ -310,6 +310,10 @@ public interface Persistence {
     boolean checkFollow(User followed, User follower);
     boolean deleteFollow(User followed, User follower);
 
+    boolean addLike(User user, Song song);
+    boolean checkLike(User user, Song song);
+    boolean deleteLike(User user, Song song);
+
     /**
      *
      */
