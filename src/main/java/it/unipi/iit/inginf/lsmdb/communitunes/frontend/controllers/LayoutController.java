@@ -2,6 +2,7 @@ package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.Role;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -26,8 +27,8 @@ public class LayoutController implements UIController {
     }
 
     @Override
-    public void init(LayoutManager manager) {
-        this.manager = manager;
+    public void init() {
+        this.manager = LayoutManagerFactory.getManager();
     }
 
     public void setContent(Node node){

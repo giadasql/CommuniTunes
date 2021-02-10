@@ -4,6 +4,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationFacto
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
@@ -36,8 +37,8 @@ public class EditArtistController implements UIController {
     private Artist artist;
 
     @Override
-    public void init(LayoutManager manager) {
-        this.manager = manager;
+    public void init() {
+        this.manager = LayoutManagerFactory.getManager();
         this.authManager = AuthenticationFactory.CreateAuthenticationManager();
         this.dbManager = PersistenceFactory.CreatePersistence();
         this.artist = manager.context.getAuthenticatedArtist();

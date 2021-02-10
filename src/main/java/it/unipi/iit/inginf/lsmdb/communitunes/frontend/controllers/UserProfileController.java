@@ -10,6 +10,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ArtistPreviewV
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.SongPreviewVBox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.UserPreviewVBox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.ArtistPreviewClickedEvent;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.SongPreviewClickedEvent;
@@ -59,8 +60,8 @@ public class UserProfileController implements UIController {
     private boolean followingFocusedUser;
 
     @Override
-    public void init(LayoutManager manager) {
-        this.manager = manager;
+    public void init() {
+        this.manager = LayoutManagerFactory.getManager();
         user = manager.context.getFocusedUser();
         dbManager = PersistenceFactory.CreatePersistence();
         username.setText(user.Username);
@@ -141,7 +142,7 @@ public class UserProfileController implements UIController {
         }
 
         for(SongPreview preview : user.LoadedLikes){
-            likesHBox.getChildren().add(new SongPreviewVBox(preview, this::showSong));
+            likesHBox.getChildren().add(new SongPreviewVBox(preview, null));
         }
 
         if(likesHBox.getChildren().isEmpty()){

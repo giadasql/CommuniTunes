@@ -3,6 +3,8 @@ package it.unipi.iit.inginf.lsmdb.communitunes.frontend.components;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.ArtistPreviewClickedEvent;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.UserPreviewClickedEvent;
 import javafx.event.Event;
@@ -28,6 +30,14 @@ public class UserPreviewVBox extends PreviewVBox {
         if(onMouseClickedEventHandler != null){
             this.addEventHandler(USER_PREVIEW_CLICKED, onMouseClickedEventHandler);
         }
+        else{
+            this.addEventHandler(USER_PREVIEW_CLICKED, this::defaultAction);
+        }
+    }
+
+    public void defaultAction(UserPreviewClickedEvent event) {
+        LayoutManager manager = LayoutManagerFactory.getManager();
+        manager.goToUserPage(preview.username);
     }
 
     static final EventType<UserPreviewClickedEvent> USER_PREVIEW_CLICKED = new EventType<>(PREVIEW_CLICKED, "USER_PREVIEW_CLICKED");

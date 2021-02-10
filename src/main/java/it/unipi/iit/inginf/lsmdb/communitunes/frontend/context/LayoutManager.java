@@ -1,5 +1,8 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.context;
 
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.LayoutController;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.UIController;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
@@ -21,13 +24,20 @@ public class LayoutManager {
     private Stage primary;
     private final LayoutController layoutController;
     private boolean layoutVisible = false;
-    private final Scene layoutScene;
+    private Scene layoutScene = null;
     public final ApplicationContext context = new ApplicationContext();
+    public final Persistence dbManager;
 
-    public LayoutManager() throws IOException {
+    LayoutManager() {
         FXMLLoader layoutLoader = getLoader(Path.GENERAL_LAYOUT);
-        layoutScene = new Scene(layoutLoader.load(), 900, 600);
+        try {
+            layoutScene = new Scene(layoutLoader.load(), 900, 600);
+        } catch (IOException e) {
+            // TODO: log
+            e.printStackTrace();
+        }
         layoutController = layoutLoader.getController();
+        dbManager = PersistenceFactory.CreatePersistence();
     }
 
     public void startApp(Stage primaryStage, HostServices hostServices) throws IOException {
@@ -47,13 +57,13 @@ public class LayoutManager {
         );
 
         UIController controller = authLoader.getController();
-        controller.init(this);
+        controller.init();
     }
 
     public void setContent(String resource) throws IOException {
         if(!layoutVisible){
             primary.setScene( layoutScene);
-            layoutController.init(this);
+            layoutController.init();
             layoutVisible = true;
         }
 
@@ -61,7 +71,7 @@ public class LayoutManager {
         layoutController.setContent(loader.load());
 
         UIController controller = loader.getController();
-        controller.init(this);
+        controller.init();
         primary.show();
     }
 
@@ -71,5 +81,38 @@ public class LayoutManager {
                         resourcePath
                 )
         );
+    }
+
+    public void goToUserPage(String username){
+        User focused = dbManager.getUser(username);
+        context.setFocusedUser(focused);
+        try {
+            setContent(Path.USER_PROFILE);
+        } catch (IOException e) {
+            // TODO: log
+            e.printStackTrace();
+        }
+    }
+
+    public void goToArtistPage(String username){
+        Artist focused = dbManager.getArtist(username);
+        context.setFocusedArtist(focused);
+        try {
+            setContent(Path.ARTIST_PROFILE);
+        } catch (IOException e) {
+            // TODO: log
+            e.printStackTrace();
+        }
+    }
+
+    public void goToSongPage(String id){
+        Song focused = dbManager.getSong(id);
+        context.setFocusedSong(focused);
+        try {
+            setContent(Path.SONG_PAGE);
+        } catch (IOException e) {
+            // TODO: log
+            e.printStackTrace();
+        }
     }
 }

@@ -2,7 +2,9 @@ package it.unipi.iit.inginf.lsmdb.communitunes.frontend.context;
 
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.Role;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
+import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import javafx.application.HostServices;
 
 public class ApplicationContext {
@@ -12,7 +14,9 @@ public class ApplicationContext {
     private Artist authenticatedArtist;
     private Role authenticatedRole;
     private Role focusedRole;
+    private Song focusedSong;
     public HostServices hostServices;
+    public Persistence dbManager;
 
     ApplicationContext(){};
 
@@ -63,5 +67,13 @@ public class ApplicationContext {
 
     public Role getFocusedRole() {
         return focusedRole;
+    }
+
+    public Song getFocusedSong() {
+        return focusedSong;
+    }
+
+    public void setFocusedSong(Song song) {
+        focusedSong = song;
     }
 }

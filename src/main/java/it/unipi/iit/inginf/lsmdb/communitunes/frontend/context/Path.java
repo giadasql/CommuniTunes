@@ -9,4 +9,5 @@ public class Path {
     public static final String ARTIST_PROFILE = "ui/pages/artist/artist_page.fxml";
     public static final String USER_EDIT = "ui/pages/user/user_edit.fxml";
     public static final String ARTIST_EDIT = "ui/pages/artist/artist_edit.fxml";
+    public static final String SONG_PAGE = "ui/pages/song/song_page.fxml";
 }

@@ -6,6 +6,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationFacto
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.Role;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
@@ -55,10 +56,10 @@ public class AuthenticationController implements UIController {
 
 
     @Override
-    public void init(LayoutManager manager) {
+    public void init() {
         authManager = AuthenticationFactory.CreateAuthenticationManager();
         dbManager = PersistenceFactory.CreatePersistence();
-        this.manager = manager;
+        this.manager = LayoutManagerFactory.getManager();
         errorMsg.setText("");
     }
 

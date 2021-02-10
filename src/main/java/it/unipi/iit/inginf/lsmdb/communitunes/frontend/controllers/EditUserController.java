@@ -4,6 +4,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationFacto
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
@@ -90,11 +91,11 @@ public class EditUserController implements UIController {
     }
 
     @Override
-    public void init(LayoutManager manager) {
+    public void init() {
+        manager = LayoutManagerFactory.getManager();
         user = manager.context.getAuthenticatedUser();
         dbManager = PersistenceFactory.CreatePersistence();
         authManager = AuthenticationFactory.CreateAuthenticationManager();
-        this.manager = manager;
         setDefaultValues();
     }
 
