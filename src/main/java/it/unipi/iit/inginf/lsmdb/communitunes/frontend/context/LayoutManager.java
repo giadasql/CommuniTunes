@@ -5,6 +5,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.UIController;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
+import javafx.application.HostServices;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -29,10 +30,10 @@ public class LayoutManager {
         layoutController = layoutLoader.getController();
     }
 
-    public void startApp(Stage primaryStage) throws IOException {
+    public void startApp(Stage primaryStage, HostServices hostServices) throws IOException {
         primary = primaryStage;
         primaryStage.setTitle("Communitunes");
-
+        context.hostServices = hostServices;
         showAuthenticationPage(Path.LOGIN);
         primaryStage.show();
     }

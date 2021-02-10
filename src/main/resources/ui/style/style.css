@@ -46,3 +46,10 @@
 	-fx-text-fill: white;
 	-fx-font-size: 18px;
 }
+
+.artist-site{
+	-fx-text-fill: white;
+	-fx-font-size: 15px;
+	-fx-font-family: "Book Antiqua";
+	-fx-cursor: HAND;
+}

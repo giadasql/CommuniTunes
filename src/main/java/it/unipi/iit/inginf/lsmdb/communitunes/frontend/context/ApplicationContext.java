@@ -3,6 +3,7 @@ package it.unipi.iit.inginf.lsmdb.communitunes.frontend.context;
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.Role;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
+import javafx.application.HostServices;
 
 public class ApplicationContext {
     private User authenticatedUser;
@@ -11,6 +12,7 @@ public class ApplicationContext {
     private Artist authenticatedArtist;
     private Role authenticatedRole;
     private Role focusedRole;
+    public HostServices hostServices;
 
     ApplicationContext(){};
 
