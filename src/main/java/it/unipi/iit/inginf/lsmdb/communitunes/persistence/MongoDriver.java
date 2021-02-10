@@ -216,9 +216,9 @@ class MongoDriver implements Closeable {
                 new UnwindOptions().preserveNullAndEmptyArrays(false)), group("$genres", Accumulators.push("songs", and(eq("name", "$title"), eq("avg_rating", "$avg_rating"), eq("artist", "$artist"), eq("id", "$_id"), eq("image", "$image")))), addFields(new Field("songs",
                 new Document("$slice", Arrays.asList("$songs", 6L))))))
                 .forEach(doc->{
+                    System.out.println(doc);
                     String genre = doc.getString("genres");
                 });
-
         return res;
     }
 
@@ -238,7 +238,7 @@ class MongoDriver implements Closeable {
     public List<Pair<String, ArtistPreview>> getRepresentativeArtist(){
         List<Pair<String, ArtistPreview>> res = new ArrayList<>();
 
-        usersCollection.aggregate(Arrays.asList(addFields(new Field("avg_song_rating",
+        songsCollection.aggregate(Arrays.asList(addFields(new Field("avg_song_rating",
                 new Document("$avg", "$reviews.rating"))), unwind("$genres",
                 new UnwindOptions().preserveNullAndEmptyArrays(false)), group(and(eq("genre", "$genres"), eq("artist", "$artist")), sum("songs_count", 1L), avg("songs_avg_rating", "$avg_song_rating")), match(ne("songs_avg_rating",
                 new BsonNull())), addFields(new Field("points",
@@ -246,10 +246,8 @@ class MongoDriver implements Closeable {
                         new Document("$multiply", Arrays.asList("$songs_avg_rating", 0.7d)))))), sort(descending("points")),
                         group("$_id.genre", first("best_artist", "$_id.artist"))))
                 .forEach(doc->{
-                    String genre = doc.getString("_id.genre");
-                    System.out.println(genre);
+                    String genre = doc.getString("genre");
                     String artistUsername = doc.getString("best_artist");
-                    System.out.println(artistUsername);
                     res.add(new Pair(genre, getArtistPreview(artistUsername)));
         });
 

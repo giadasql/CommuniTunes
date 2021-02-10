@@ -70,11 +70,46 @@ public interface Persistence {
 
     /**
      *
+     * @param useranem
+     * @return
+     */
+    ArtistPreview getArtistPreview(String usenrname);
+
+    /**
+     *
      * @param songID
      * @param nMax
      * @return
      */
     List<Review> getReviews(String songID, int nMax);
+
+    /**
+     *
+     * @param username
+     * @return
+     */
+    List<UserPreview> getFollowedUsers(String username);
+
+    /**
+     *
+     * @param username
+     * @return
+     */
+    List<UserPreview> getFollowers(String username);
+
+    /**
+     *
+     * @param username
+     * @return
+     */
+    List<SongPreview> getLikedSongs(String username);
+
+    /**
+     *
+     * @param username
+     * @return
+     */
+    List<SongPreview> getArtistSongs(String username);
 
     /**
      *

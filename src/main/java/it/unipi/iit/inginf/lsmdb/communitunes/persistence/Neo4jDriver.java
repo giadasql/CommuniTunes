@@ -192,6 +192,76 @@ class Neo4jDriver implements Closeable {
         }
     }
 
+    public List<UserPreview> getFollowedUsers(String username){
+        List<UserPreview> users = new ArrayList<>();
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (u:User {username: $username})-[:FOLLOWS]->(m:User)" +
+                                "RETURN m.username AS User, m.image AS Image",
+                        parameters("username", username));
+                while(res.hasNext()){
+                    Record r = res.next();
+                    users.add(new UserPreview(r.get("User").asString(), r.get("Image").asString()));
+                }
+                return users;
+            });
+        }
+    }
+
+    public List<UserPreview> getFollowers(String username){
+        List<UserPreview> users = new ArrayList<>();
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (u:User {username: $username})<-[:FOLLOWS]-(m:User)" +
+                                "RETURN m.username AS User, m.image AS Image",
+                        parameters("username", username));
+                while(res.hasNext()){
+                    Record r = res.next();
+                    users.add(new UserPreview(r.get("User").asString(), r.get("Image").asString()));
+                }
+                return users;
+            });
+        }
+    }
+
+    public List<SongPreview> getLikedSongs(String username){
+        List<SongPreview> songs = new ArrayList<>();
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (u:User {username: $username})-[:LIKES]->(s:Song)<-[:PERFORMS {isMainArtist: true}]-(a:Artist)" +
+                                "RETURN s.title AS title, a.username AS artistUsername, s.songID AS ID, a.stageName AS stageName, s.image AS Image",
+                        parameters("username", username));
+                while(res.hasNext()){
+                    Record r = res.next();
+                    songs.add(new SongPreview(r.get("songID").asString(), r.get("stageName").asString(),
+                            r.get("artistUsername").asString(), r.get("title").asString(), r.get("Image").asString()));
+                }
+                return songs;
+            });
+        }
+    }
+
+    public List<SongPreview> getArtistSongs(String username){
+        List<SongPreview> songs = new ArrayList<>();
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (s:Song)<-[:PERFORMS {isMainArtist: true}]-(a:Artist {username: $username})" +
+                                "RETURN s.title AS title, a.username AS artistUsername, s.songID AS ID, a.stageName AS stageName, s.image AS Image",
+                        parameters("username", username));
+                while(res.hasNext()){
+                    Record r = res.next();
+                    songs.add(new SongPreview(r.get("songID").asString(), r.get("stageName").asString(),
+                            r.get("artistUsername").asString(), r.get("title").asString(), r.get("Image").asString()));
+                }
+                return songs;
+            });
+        }
+    }
+
     public List<SongPreview> getSuggestedSongs(String username){
         List<SongPreview> songs = new ArrayList<>();
         try ( Session session = driver.session())

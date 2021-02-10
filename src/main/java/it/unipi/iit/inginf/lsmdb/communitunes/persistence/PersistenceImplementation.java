@@ -231,6 +231,26 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
+    public List<UserPreview> getFollowedUsers(String username){
+        return neo4j.getFollowedUsers(username);
+    }
+
+    @Override
+    public List<UserPreview> getFollowers(String username){
+        return neo4j.getFollowers(username);
+    }
+
+    @Override
+    public List<SongPreview> getLikedSongs(String username){
+        return neo4j.getLikedSongs(username);
+    }
+
+    @Override
+    public List<SongPreview> getArtistSongs(String username){
+        return neo4j.getArtistSongs(username);
+    }
+
+    @Override
     public List<SongPreview> getSuggestedSongs(User user) {
         return neo4j.getSuggestedSongs(user.Username);
     }
@@ -369,6 +389,12 @@ class PersistenceImplementation implements Persistence {
         }
 
         return toReturn;
+    }
+
+    @Override
+    public ArtistPreview getArtistPreview(String username){
+        Artist artist = getArtist(username);
+        return new ArtistPreview(artist.Username, artist.StageName, artist.Image);
     }
 
     private User buildUserFromMap(Map<String, Object> userData){
