@@ -84,7 +84,7 @@ public class ArtistController implements UIController {
 
 
         // check if the profile belongs to the user that is currently logged in
-        if(manager.context.getAuthenticatedArtist() == null){
+        if(manager.context.getAuthenticatedArtist() == null || !artist.Username.equals(manager.context.getAuthenticatedArtist().Username)){
             editProfile.setVisible(false);
             editProfile.setManaged(false);
             followUnfollow.setVisible(true);
@@ -217,5 +217,8 @@ public class ArtistController implements UIController {
 
     public void editProfile(MouseEvent mouseEvent) throws IOException {
         manager.setContent(Path.ARTIST_EDIT);
+    }
+
+    public void followArtist(MouseEvent mouseEvent) {
     }
 }

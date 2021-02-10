@@ -23,7 +23,6 @@ public class LayoutController implements UIController {
     @FXML
     public void searchEventHandler(MouseEvent event) throws IOException {
         System.out.println(searchBarText.getText());
-        manager.setContent("ui/pages/homepage_example.fxml");
     }
 
     @Override

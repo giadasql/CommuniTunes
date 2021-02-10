@@ -17,11 +17,11 @@ public class ApplicationContext {
     ApplicationContext(){};
 
     public User getAuthenticatedUser() {
-        return authenticatedUser;
+        return authenticatedUser == null ? authenticatedArtist : authenticatedUser;
     }
 
     public User getFocusedUser() {
-        return focusedUser;
+        return focusedUser == null ? focusedArtist : focusedUser;
     }
 
     public void setAuthenticatedUser(User authenticatedUser) {

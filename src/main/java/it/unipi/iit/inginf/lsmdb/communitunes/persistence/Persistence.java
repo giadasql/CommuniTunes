@@ -188,7 +188,6 @@ public interface Persistence {
      * For each genre, find the most representative artist, combining the number of
      * the artist's songs belonging to that genre and their reviews.
      *
-     * @param genre
      * @return
      *
      */
@@ -272,6 +271,9 @@ public interface Persistence {
      */
     List<SongPreview> getPopularSongs(Artist artist);
 
+    boolean addFollow(User followed, User follower);
+    boolean checkFollow(User followed, User follower);
+    boolean deleteFollow(User followed, User follower);
 
     /**
      *
