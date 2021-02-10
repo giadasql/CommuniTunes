@@ -11,7 +11,7 @@
 
 <ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="534.0" minWidth="-Infinity" prefHeight="534.0" prefWidth="900.0" style="-fx-background-color: #001a4d;" stylesheets="@../style/style.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.HomePageController">
    <content>
-      <VBox maxWidth="-Infinity" minWidth="-Infinity" prefHeight="714.0" prefWidth="885.0">
+      <VBox fx:id="mainVbox" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="714.0" prefWidth="885.0">
          <children>
             <AnchorPane prefHeight="207.0" prefWidth="885.0">
                <children>
