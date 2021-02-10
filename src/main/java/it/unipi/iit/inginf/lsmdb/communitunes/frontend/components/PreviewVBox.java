@@ -47,7 +47,7 @@ public abstract class PreviewVBox extends VBox {
             text = new Text(name);
         }
         text.setFill(Color.WHITE);
-        text.setWrappingWidth(100);
+        text.setWrappingWidth(115);
 
         text.setFont(new Font("Book Antiqua", 15));
         text.setTextAlignment(TextAlignment.CENTER);

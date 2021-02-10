@@ -455,7 +455,7 @@ class PersistenceImplementation implements Persistence {
         Iterable<Map<String,Object>> linksList = (Iterable<Map<String,Object>>)artistData.get("links");
         for (Map<String,Object> linkMap : linksList){
             String linkName = (linkMap.get("name") instanceof String ? (String)linkMap.get("name") : null);
-            String linkUrl = (linkMap.get("url") instanceof String ? (String)linkMap.get("url") : null);
+            String linkUrl = (linkMap.get("link") instanceof String ? (String)linkMap.get("link") : null);
             links.add(new Link(linkName, linkUrl));
         }
 

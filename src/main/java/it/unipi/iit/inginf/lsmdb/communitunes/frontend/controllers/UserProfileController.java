@@ -1,5 +1,6 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
@@ -12,6 +13,8 @@ import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.ArtistPreviewClickedEvent;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.SongPreviewClickedEvent;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.UserPreviewClickedEvent;
+import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
+import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
@@ -50,11 +53,13 @@ public class UserProfileController implements UIController {
 
     private User user;
     private LayoutManager manager;
+    private Persistence dbManager;
 
     @Override
     public void init(LayoutManager manager) {
         this.manager = manager;
         user = manager.context.getFocusedUser();
+        dbManager = PersistenceFactory.CreatePersistence();
         username.setText(user.Username);
         Image avatar;
         if(user.Image != null){
@@ -190,7 +195,14 @@ public class UserProfileController implements UIController {
     }
 
     public void showArtist(ArtistPreviewClickedEvent event) {
-        System.out.print(event.preview.username);
+        Artist focusedArtist = dbManager.getArtist(event.preview.username);
+        manager.context.setFocusedArtist(focusedArtist);
+        try {
+            manager.setContent(Path.ARTIST_PROFILE);
+        } catch (IOException e) {
+            // TODO: log
+            e.printStackTrace();
+        }
     }
 
     public void showSong(SongPreviewClickedEvent event) {

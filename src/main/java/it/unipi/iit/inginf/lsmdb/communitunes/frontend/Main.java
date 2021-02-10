@@ -5,6 +5,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
 import javafx.application.Application;
+import javafx.application.HostServices;
 import javafx.stage.Stage;
 
 import java.sql.Timestamp;
@@ -18,8 +19,8 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception{
         LayoutManager manager = new LayoutManager();
-        manager.startApp(primaryStage);
-
+        HostServices hostServices = this.getHostServices();
+        manager.startApp(primaryStage, hostServices);
     }
 
     public static void main(String args[]) {launch(args);}
