@@ -42,5 +42,14 @@ public class HomepageAnchorPane extends AnchorPane {
         AnchorPane.setLeftAnchor(genreHbox, 8.0);
         AnchorPane.setTopAnchor(genreHbox, 38.0);
         getChildren().addAll(this.genre, line, genreHbox);
+
+        genreHbox.setVisible(true);
+        genreHbox.setManaged(true);
+
+        genreHbox.getChildren().add(new ArtistPreviewVBox(artist, null));
+
+        for(SongPreview song : songs){
+            genreHbox.getChildren().add(new SongPreviewVBox(song, null));
+        }
     }
 }

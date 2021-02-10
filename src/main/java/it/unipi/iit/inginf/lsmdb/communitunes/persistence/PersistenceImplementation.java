@@ -241,7 +241,9 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<Pair<String,ArtistPreview>> getRepresentativeArtist(){ return mongo.getRepresentativeArtist(); }
+    public List<Pair<String,ArtistPreview>> getRepresentativeArtist(){
+        return mongo.getRepresentativeArtist();
+    }
 
     @Override
     public HashMap<String, List<SongPreview>> getSuggestedSongs() {

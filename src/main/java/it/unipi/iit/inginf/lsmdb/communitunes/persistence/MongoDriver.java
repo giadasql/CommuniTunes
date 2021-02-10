@@ -204,30 +204,11 @@ class MongoDriver implements Closeable {
         cal.setTime(new Date());
         cal.add(Calendar.DAY_OF_MONTH, -30);
 
-        Bson myMatch = match(gte("review.timestamp", cal.getTimeInMillis()));
-        Bson myUnwind = unwind("genre");
-        Bson myGroup = new Document("$group", new Document("_id", new Document("genre", "$genre")).
-                append("songs", new Document("$push", new Document("songId", "$songId").append("title", "$title")
-                .append("stageName", "$stageName").append("artistId", "$artistId").append("avgRev", new Document("$avg", "$reviews.rating")))));
-
         songsCollection.aggregate(Arrays.asList(addFields(new Field("avg_rating",
                 new Document("$avg", "$reviews.rating"))), match(ne("avg_rating",
                 new BsonNull())), sort(descending("avg_rating")), unwind("$genres",
                 new UnwindOptions().preserveNullAndEmptyArrays(false)), group("$genres", Accumulators.push("songs", and(eq("name", "$name"), eq("avg_rating", "$avg_rating")))), addFields(new Field("songs",
-                new Document("$slice", Arrays.asList("$songs", 10L))))));
-
-        /*songsCollection.aggregate(Arrays.asList(myMatch, myUnwind, myGroup)).forEach(doc ->{
-            String genre = doc.getString("genre");
-            List<Document> list = doc.get("songs", new ArrayList<Document>().getClass());
-            HashMap<SongPreview, Double> songs = new HashMap<SongPreview, Double>();
-            for(Document embDoc : list){
-                SongPreview song = new SongPreview(embDoc.getObjectId("songId").toString(), embDoc.getString("stageName"),
-                        embDoc.getObjectId("artistId").toString(), embDoc.getString("title"));
-                Double avg = embDoc.getDouble("avg");
-                songs.put(song, avg);
-            }
-
-        });*/
+                new Document("$slice", Arrays.asList("$songs", 6L))))));
 
         return res;
     }
