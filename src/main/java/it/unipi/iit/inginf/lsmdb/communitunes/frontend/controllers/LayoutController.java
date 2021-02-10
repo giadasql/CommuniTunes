@@ -1,9 +1,13 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.Role;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
+import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
+import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.TextField;
@@ -20,6 +24,7 @@ public class LayoutController implements UIController {
     private Pane content;
 
     private LayoutManager manager;
+    private Persistence dbManager;
 
     @FXML
     public void searchEventHandler(MouseEvent event) throws IOException {
@@ -28,6 +33,7 @@ public class LayoutController implements UIController {
 
     @Override
     public void init() {
+        dbManager = PersistenceFactory.CreatePersistence();
         this.manager = LayoutManagerFactory.getManager();
     }
 
@@ -41,13 +47,26 @@ public class LayoutController implements UIController {
     }
 
     public void showUserProfile(MouseEvent mouseEvent) throws IOException {
-        if(manager.context.getAuthenticatedRole() == Role.User){
+        Role authRole = manager.context.getAuthenticatedRole();
+        refreshAuthenticated(authRole);
+        if(authRole == Role.User){
             manager.context.setFocusedUser(manager.context.getAuthenticatedUser());
             manager.setContent(Path.USER_PROFILE);
         }
-        else if(manager.context.getAuthenticatedRole() == Role.Artist){
+        else if(authRole == Role.Artist){
             manager.context.setFocusedArtist(manager.context.getAuthenticatedArtist());
             manager.setContent(Path.ARTIST_PROFILE);
+        }
+    }
+
+    private void refreshAuthenticated(Role role){
+        if(role == Role.Artist){
+            Artist authArtist = dbManager.getArtist(manager.context.getAuthenticatedArtist().Username);
+            manager.context.setAuthenticatedArtist(authArtist);
+        }
+        else if(role == Role.User){
+            User authUser = dbManager.getUser(manager.context.getAuthenticatedUser().Username);
+            manager.context.setAuthenticatedUser(authUser);
         }
     }
 

@@ -38,6 +38,10 @@ public abstract class PreviewVBox extends VBox {
                 imageView.setImage(image);
             }
         }
+        else{
+            Image image = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
+            imageView.setImage(image);
+        }
         super.getChildren().add(imageView);
         Text text;
         if(name.length() >= 25){

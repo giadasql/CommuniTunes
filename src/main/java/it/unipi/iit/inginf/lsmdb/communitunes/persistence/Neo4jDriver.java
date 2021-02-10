@@ -506,6 +506,47 @@ class Neo4jDriver implements Closeable {
         }
     }
 
+    public boolean addLike(String user, String song){
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (u1:User {username: $user})\n" +
+                                "MATCH (s:Song {songID: $song})\n" +
+                                "MERGE (u1)-[r:LIKES]->(s)",
+                        parameters("song", song, "user", user));
+                return true;
+            });
+        }
+    }
+
+    public boolean checkLike(String user, String song){
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (u1:User {username: $user})\n" +
+                                "MATCH (s:Song {songID: $song})\n" +
+                                "MATCH (u1)-[r:LIKES]->(s)\n" +
+                                "RETURN COUNT(r)",
+                        parameters("song", song, "user", user));
+                return (res.single().get(0).asInt() >= 1);
+            });
+        }
+    }
+
+    public boolean deleteLike(String user, String song){
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (u1:User {username: $user})\n" +
+                                "MATCH (s:Song {songID: $song})\n" +
+                                "MATCH (u1)-[r:LIKES]->(s)\n" +
+                                "DELETE r",
+                        parameters("song", song, "user", user));
+                return true;
+            });
+        }
+    }
+
     @Override
     public void close() {
         driver.close();
