@@ -204,11 +204,20 @@ class MongoDriver implements Closeable {
         cal.setTime(new Date());
         cal.add(Calendar.DAY_OF_MONTH, -30);
 
-        songsCollection.aggregate(Arrays.asList(addFields(new Field("avg_rating",
+        songsCollection.aggregate(Arrays.asList(addFields(new Field("reviews",
+                new Document("$filter",
+                        new Document("input", "$reviews")
+                                .append("as", "review")
+                                .append("cond",
+                                        new Document("$and", Arrays.asList(new Document("$gt", Arrays.asList(new java.util.Date(), "$$review.posted")),
+                                                new Document("$lte", Arrays.asList(new java.util.Date(), "$$review.posted")))))))), addFields(new Field("avg_rating",
                 new Document("$avg", "$reviews.rating"))), match(ne("avg_rating",
                 new BsonNull())), sort(descending("avg_rating")), unwind("$genres",
-                new UnwindOptions().preserveNullAndEmptyArrays(false)), group("$genres", Accumulators.push("songs", and(eq("name", "$name"), eq("avg_rating", "$avg_rating")))), addFields(new Field("songs",
-                new Document("$slice", Arrays.asList("$songs", 6L))))));
+                new UnwindOptions().preserveNullAndEmptyArrays(false)), group("$genres", Accumulators.push("songs", and(eq("name", "$title"), eq("avg_rating", "$avg_rating"), eq("artist", "$artist"), eq("id", "$_id"), eq("image", "$image")))), addFields(new Field("songs",
+                new Document("$slice", Arrays.asList("$songs", 6L))))))
+                .forEach(doc->{
+                    String genre = doc.getString("genres");
+                });
 
         return res;
     }
@@ -237,8 +246,10 @@ class MongoDriver implements Closeable {
                         new Document("$multiply", Arrays.asList("$songs_avg_rating", 0.7d)))))), sort(descending("points")),
                         group("$_id.genre", first("best_artist", "$_id.artist"))))
                 .forEach(doc->{
-                    String genre = doc.getString("genre");
-                    String artistUsername = doc.getString("artist");
+                    String genre = doc.getString("_id.genre");
+                    System.out.println(genre);
+                    String artistUsername = doc.getString("best_artist");
+                    System.out.println(artistUsername);
                     res.add(new Pair(genre, getArtistPreview(artistUsername)));
         });
 
