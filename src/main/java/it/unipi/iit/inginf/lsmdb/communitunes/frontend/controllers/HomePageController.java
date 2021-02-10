@@ -37,8 +37,7 @@ public class HomePageController implements UIController {
             for(SongPreview song : songs){
                 System.out.println(song.Title);
             }
-            HomepageAnchorPane nextPane = new HomepageAnchorPane(element.getValue0(), songs, element.getValue1());
-            mainVbox.getChildren().add(nextPane);
+            mainVbox.getChildren().add(new HomepageAnchorPane(element.getValue0(), songs, element.getValue1()));
         }
     }
 }

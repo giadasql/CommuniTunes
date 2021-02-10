@@ -1,15 +1,122 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.Link;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
+import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
+import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
+import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceInconsistencyException;
 import javafx.event.ActionEvent;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 
-public class AddSongController {
-    public void addSong(ActionEvent actionEvent) {
+import java.io.IOException;
+import java.util.Arrays;
+
+public class AddSongController implements UIController {
+
+    public Text msg;
+    public TextField title;
+    public TextField album;
+    public TextField duration;
+    public TextField genres;
+    public TextField link;
+    public TextField image;
+    public TextField feat;
+
+    private Song song;
+    private Persistence dbManager;
+    private LayoutManager manager;
+
+    public void addSong(ActionEvent actionEvent) throws PersistenceInconsistencyException {
+        if(title.getText() == null || "".equals(title.getText())){
+            msg.setFill(Color.RED);
+            msg.setText("The title is mandatory to add a new song.");
+            return;
+        }
+        else{
+            song.Title = title.getText();
+        }
+        if(album.getText() == null || "".equals(album.getText())){
+            song.Album = null;
+        }
+        else{
+            song.Album = album.getText();
+        }
+        if(duration.getText() == null || "".equals(duration.getText())){
+            song.Duration = null;
+        }
+        else{
+            song.Duration = duration.getText();
+        }
+        if(genres.getText() == null || "".equals(genres.getText())){
+            song.Genres = null;
+        }
+        else{
+            String[] arrayGenres = genres.getText().split(" ");
+            song.Genres = Arrays.asList(arrayGenres);
+        }
+        if(link.getText() == null || "".equals(link.getText())){
+            song.Links = null;
+        }
+        else{
+            String[] arrayLinks = link.getText().split(" ");
+            for(String s : arrayLinks){
+                String[] nameUrl = s.split(",");
+                song.Links.add(new Link(nameUrl[0], nameUrl[1]));
+            }
+        }
+        if(image.getText() == null || "".equals(image.getText())){
+            song.Image = null;
+        }
+        else{
+            song.Image = image.getText();
+        }
+        if(feat.getText() == null || "".equals(feat.getText())){
+            song.Featurings = null;
+        }
+        else{
+            String[] arrayFeat = feat.getText().split(" ");
+            for(String s : arrayFeat){
+                song.Featurings.add(dbManager.getArtistPreview(s));
+            }
+        }
+        if(dbManager.addSong(song)){
+            msg.setFill(Color.GREEN);
+            msg.setText("The information was successfully updated.");
+        }
+        else{
+            msg.setFill(Color.RED);
+            msg.setText("An error occurred while updating the information. Please try again later.");
+        }
     }
 
-    public void cancelAdd(ActionEvent actionEvent) {
+    public void cancelAdd(ActionEvent actionEvent)  {
+        setDefaultValues();
     }
 
-    public void closeEditWindow(MouseEvent mouseEvent) {
+    @Override
+    public void init(){
+        manager = LayoutManagerFactory.getManager();
+        song = manager.context.getFocusedSong();
+        dbManager = PersistenceFactory.CreatePersistence();
+    }
+
+    public void closeAddWindow(MouseEvent mouseEvent) throws IOException {
+        manager.setContent(Path.ARTIST_EDIT);
+    }
+
+    public void setDefaultValues(){
+        title.setText("");
+        album.setText("");
+        duration.setText("");
+        genres.setText("");
+        link.setText("");
+        image.setText("");
+        feat.setText("");
     }
 }
