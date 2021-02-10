@@ -45,25 +45,25 @@ public class EditUserController implements UIController {
         }
         msg.setText("");
         user.Email = email.getText();
-        if(country.getText() == null){
+        if(country.getText() == null || "".equals(country.getText())){
             user.Country = null;
         }
         else{
             user.Country = country.getText();
         }
-        if(image.getText() == null){
+        if(image.getText() == null || "".equals(image.getText())){
             user.Image = null;
         }
         else{
             user.Image = image.getText();
         }
-        if(firstName.getText() == null){
+        if(firstName.getText() == null || "".equals(firstName.getText())){
             user.FirstName = null;
         }
         else{
             user.FirstName = firstName.getText();
         }
-        if(lastName.getText() == null){
+        if(lastName.getText() == null || "".equals(lastName.getText())){
             user.LastName = null;
         }
         else{

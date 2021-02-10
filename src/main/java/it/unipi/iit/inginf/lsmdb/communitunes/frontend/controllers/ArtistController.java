@@ -7,6 +7,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.SongPreviewVBox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.SongPreviewClickedEvent;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
@@ -49,6 +50,10 @@ public class ArtistController implements UIController {
     public Text firstName;
     public VBox links;
     public Hyperlink readMoreOrLess;
+    public HBox countryBox;
+    public Text country;
+    public HBox birthdayBox;
+    public Text birthday;
     private Artist artist;
     private LayoutManager manager;
 
@@ -137,6 +142,25 @@ public class ArtistController implements UIController {
             }
         }
 
+        if(artist.Country != null){
+            country.setText(artist.Country);
+            countryBox.setVisible(true);
+            countryBox.setManaged(true);
+        }
+        else{
+            countryBox.setVisible(false);
+            countryBox.setManaged(false);
+        }
+        if(artist.Birthday != null){
+            birthday.setText(artist.Birthday.toString());
+            birthdayBox.setVisible(true);
+            birthdayBox.setManaged(true);
+        }
+        else{
+            birthdayBox.setVisible(false);
+            birthdayBox.setManaged(false);
+        }
+        
         if(artist.ActiveYears != null){
             activity.setText(artist.ActiveYears);
             activityBox.setVisible(true);
@@ -186,5 +210,12 @@ public class ArtistController implements UIController {
     }
 
     public void showAllSongs(MouseEvent mouseEvent) {
+    }
+
+    public void addSong(MouseEvent mouseEvent) {
+    }
+
+    public void editProfile(MouseEvent mouseEvent) throws IOException {
+        manager.setContent(Path.ARTIST_EDIT);
     }
 }

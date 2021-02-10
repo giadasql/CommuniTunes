@@ -8,4 +8,5 @@ public class Path {
     public static final String USER_PROFILE = "./ui/pages/user_profile.fxml";
     public static final String ARTIST_PROFILE = "./ui/pages/artist_page.fxml";
     public static final String USER_EDIT = "./ui/pages/user_edit.fxml";
+    public static final String ARTIST_EDIT = "./ui/pages/artist_edit.fxml";
 }
