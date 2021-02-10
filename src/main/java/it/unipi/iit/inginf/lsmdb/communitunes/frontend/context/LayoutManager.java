@@ -83,6 +83,16 @@ public class LayoutManager {
         );
     }
 
+    public void goToUserOrArtistPage(String username){
+        Artist artist = dbManager.getArtist(username);
+        if(artist == null){
+            goToUserPage(username);
+        }
+        else{
+            goToArtistPage(artist);
+        }
+    }
+
     public void goToUserPage(String username){
         User focused = dbManager.getUser(username);
         context.setFocusedUser(focused);
@@ -97,6 +107,16 @@ public class LayoutManager {
     public void goToArtistPage(String username){
         Artist focused = dbManager.getArtist(username);
         context.setFocusedArtist(focused);
+        try {
+            setContent(Path.ARTIST_PROFILE);
+        } catch (IOException e) {
+            // TODO: log
+            e.printStackTrace();
+        }
+    }
+
+    public void goToArtistPage(Artist artist){
+        context.setFocusedArtist(artist);
         try {
             setContent(Path.ARTIST_PROFILE);
         } catch (IOException e) {

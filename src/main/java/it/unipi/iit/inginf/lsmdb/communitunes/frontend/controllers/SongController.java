@@ -1,20 +1,19 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.Link;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.*;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ReviewVBox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -23,7 +22,6 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
-import java.io.IOException;
 import java.util.stream.Collectors;
 
 public class SongController implements UIController {
@@ -43,6 +41,8 @@ public class SongController implements UIController {
     public Button editSong;
     public AnchorPane writeReview;
     public Slider ratingSlider;
+    public VBox reviews;
+    public TextArea reviewComment;
     private LayoutManager manager;
     private Song song;
 
@@ -81,6 +81,11 @@ public class SongController implements UIController {
                 }
             }
 
+            if(dbManager.checkIfUserReviewedSong(manager.context.getAuthenticatedUser(), song)){
+                writeReview.setManaged(false);
+                writeReview.setVisible(false);
+            }
+
             if(song.Title != null){
                 if(song.Title.length() >= 60){
                     songTitle.setText(song.Title.substring(0, 100) + "...");
@@ -92,6 +97,7 @@ public class SongController implements UIController {
 
             if(song.Artist != null){
                 artistName.setText(song.Artist.username);
+                artistName.setCursor(Cursor.HAND);
                 artistName.setOnMouseClicked(e -> { manager.goToArtistPage(song.Artist.username);});
             }
             else{
@@ -175,10 +181,38 @@ public class SongController implements UIController {
                 avgRating.getParent().setManaged(false);
                 avgRating.getParent().setVisible(false);
             }
+
+            for (Review review:
+                 song.LoadedReviews) {
+                ReviewVBox reviewBox;
+                if(manager.context.getAuthenticatedUser().Username != null && review.User.equals(manager.context.getAuthenticatedUser().Username)){
+                    reviewBox = new ReviewVBox(review, true);
+                }
+                else{
+                    reviewBox = new ReviewVBox(review, false);
+                }
+                reviews.getChildren().add(reviewBox);
+            }
+
+            if(reviews.getChildren().isEmpty()){
+                reviews.setVisible(false);
+                reviews.setManaged(false);
+            }
         }
     }
 
     public void insertReview(MouseEvent mouseEvent) {
+        if(manager.context.getAuthenticatedUser() != null) {
+            Review newReview;
+            if(reviewComment.getText().isEmpty()){
+                newReview = new Review(manager.context.getAuthenticatedUser().Username, (int)Math.round(ratingSlider.getValue()), null, song.ID);
+            }
+            else{
+                newReview = new Review(manager.context.getAuthenticatedUser().Username, (int)Math.round(ratingSlider.getValue()), reviewComment.getText(), song.ID);
+            }
+            dbManager.addReview(newReview);
+            manager.goToSongPage(song.ID);
+        }
     }
 
     public void seeAllReviews(MouseEvent mouseEvent) {
