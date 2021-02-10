@@ -200,7 +200,7 @@ public interface Persistence {
 
     /**
      *
-     * For each genre, display the ten songs that obtained the highest average rating,
+     * For each genre, display the six songs that obtained the highest average rating,
      * only considering the user ratings posted in the last month.
      *
      * @return

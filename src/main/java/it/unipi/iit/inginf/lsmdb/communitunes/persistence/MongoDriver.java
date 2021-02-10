@@ -179,7 +179,7 @@ class MongoDriver implements Closeable {
         Document update = new Document();
         update.append("$set", setData);
 
-        UpdateResult updateRes = usersCollection.updateOne(query, update);
+        UpdateResult updateRes = songsCollection.updateOne(query, update);
 
         return updateRes.getModifiedCount() != 0;
     }
