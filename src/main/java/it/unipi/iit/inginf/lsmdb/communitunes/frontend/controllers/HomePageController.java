@@ -31,13 +31,12 @@ public class HomePageController implements UIController {
         HashMap<String, List<SongPreview>> songsList = dbManager.getSuggestedSongs();
         List<Pair<String, ArtistPreview>> artistsList = dbManager.getRepresentativeArtist();
 
-        for(Iterator<Pair<String, ArtistPreview>> iter = artistsList.iterator(); iter.hasNext();){
-            Pair<String,ArtistPreview> element = iter.next();
-            List<SongPreview> songs = songsList.get(element.getValue0());
-            for(SongPreview song : songs){
-                System.out.println(song.Title);
-            }
-            mainVbox.getChildren().add(new HomepageAnchorPane(element.getValue0(), songs, element.getValue1()));
-        }
+//        for(Pair<String, ArtistPreview> artist : artistsList ){
+//            List<SongPreview> songs = songsList.get(artist.getValue0());
+//            for(SongPreview song : songs){
+//                System.out.println(song.Title);
+//            }
+//            mainVbox.getChildren().add(new HomepageAnchorPane(artist.getValue0(), songs, artist.getValue1()));
+//        }
     }
 }

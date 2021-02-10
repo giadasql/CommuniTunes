@@ -34,6 +34,7 @@ import static com.mongodb.client.model.Updates.*;
 
 import java.io.Closeable;
 import java.lang.reflect.Array;
+import java.time.LocalDate;
 import java.util.*;
 
 class MongoDriver implements Closeable {
@@ -204,21 +205,37 @@ class MongoDriver implements Closeable {
         cal.setTime(new Date());
         cal.add(Calendar.DAY_OF_MONTH, -30);
 
-        songsCollection.aggregate(Arrays.asList(addFields(new Field("reviews",
+        Document toProject = new Document("title", "$title")
+                .append("avg_rating", "$avg_rating")
+                .append("artist", "$artist")
+                .append("id", "$_id")
+                .append("image", "$image");
+
+        AggregateIterable<Document> result = songsCollection.aggregate(Arrays.asList(addFields(new Field("reviews",
                 new Document("$filter",
                         new Document("input", "$reviews")
                                 .append("as", "review")
                                 .append("cond",
                                         new Document("$and", Arrays.asList(new Document("$gt", Arrays.asList(new java.util.Date(), "$$review.posted")),
-                                                new Document("$lte", Arrays.asList(new java.util.Date(), "$$review.posted")))))))), addFields(new Field("avg_rating",
+                                                new Document("$lte", Arrays.asList(LocalDate.now().minusDays(30), "$$review.posted")))))))), addFields(new Field("avg_rating",
                 new Document("$avg", "$reviews.rating"))), match(ne("avg_rating",
                 new BsonNull())), sort(descending("avg_rating")), unwind("$genres",
-                new UnwindOptions().preserveNullAndEmptyArrays(false)), group("$genres", Accumulators.push("songs", and(eq("name", "$title"), eq("avg_rating", "$avg_rating"), eq("artist", "$artist"), eq("id", "$_id"), eq("image", "$image")))), addFields(new Field("songs",
-                new Document("$slice", Arrays.asList("$songs", 6L))))))
-                .forEach(doc->{
-                    System.out.println(doc);
-                    String genre = doc.getString("genres");
-                });
+                new UnwindOptions().preserveNullAndEmptyArrays(false)), group("$genres", Accumulators.push("songs", toProject)), addFields(new Field("songs",
+                new Document("$slice", Arrays.asList("$songs", 6L)))))).allowDiskUse(true);
+        for (Document resultDoc :
+        result){
+            String genre = resultDoc.getString("_id");
+            List<SongPreview> previews = new ArrayList<>();
+            List<Document> songs = (ArrayList<Document>)resultDoc.get("songs");
+            for (Document song : songs){
+                String title = song.getString("title");
+                String artist = song.getString("artist");
+                String songID = song.getObjectId("id").toString();
+                String image = song.getString("image");
+                previews.add(new SongPreview(songID, artist, title, image));
+            }
+            res.put(genre, previews);
+        }
         return res;
     }
 
