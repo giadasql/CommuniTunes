@@ -108,7 +108,7 @@ public interface Persistence {
      * @param username
      * @return
      */
-    List<ArtistPreview> getFollowersArtists(String username);
+    List<ArtistPreview> getFollowingArtists(String username);
 
     /**
      *
@@ -229,7 +229,7 @@ public interface Persistence {
      * @return a map with the two albums, with key "best" and "worst"
      *
      */
-    HashMap<String, String> getApprAlbum(Artist artist);
+    HashMap<String, String> getBestAndWorstAlbum(Artist artist);
 
     /**
      *

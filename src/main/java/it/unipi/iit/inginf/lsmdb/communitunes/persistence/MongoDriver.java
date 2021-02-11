@@ -10,7 +10,6 @@ import com.mongodb.client.result.UpdateResult;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
 import org.bson.*;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -191,6 +190,7 @@ class MongoDriver implements Closeable {
 
     public Map<String, List<Map<String, Object>>> getSuggestedSongs(){
         HashMap<String, List<Map<String, Object>>> res = new HashMap<>();
+
         Document toProject = new Document("title", "$title")
                 .append("avg_rating", "$avg_rating")
                 .append("artist", "$artist")
@@ -211,17 +211,17 @@ class MongoDriver implements Closeable {
         for (Document resultDoc :
         result){
             String genre = resultDoc.getString("_id");
-            List<Map<String, Object>> previews = new ArrayList<>();
+            List<Map<String, Object>> songMaps = new ArrayList<>();
             List<Document> songs = (ArrayList<Document>)resultDoc.get("songs");
             for (Document song : songs){
-                previews.add(getEntityMap(song, Arrays.asList("title", "artist", "_id", "image")));
+                songMaps.add(getEntityMap(song, Arrays.asList("title", "artist", "_id", "image")));
             }
-            res.put(genre, previews);
+            res.put(genre, songMaps);
         }
         return res;
     }
 
-    public HashMap<String, String> getApprAlbum(String username){
+    public HashMap<String, String> getBestAndWorstAlbum(String username){
         HashMap<String, String> res = new HashMap<>();
 
         Document query = songsCollection.aggregate(Arrays.asList(match(eq("artist", username)), addFields(new Field("avg_song_rating",

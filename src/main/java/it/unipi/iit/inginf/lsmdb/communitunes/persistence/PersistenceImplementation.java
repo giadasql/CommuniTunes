@@ -11,13 +11,12 @@ import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceIn
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 class PersistenceImplementation implements Persistence {
 
@@ -167,7 +166,7 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean editSong(Song newSong) {
-        return mongo.updateSong(newSong) && neo4j.updateSong(newSong.Title, newSong.Artist.username, newSong.Featurings, newSong.Image);
+        return mongo.updateSong(newSong) && neo4j.updateSong(newSong.ID, newSong.Title, newSong.Artist.username, newSong.Featurings.stream().map(x -> x.username).collect(Collectors.toList()), newSong.Image);
     }
 
     @Override
@@ -192,42 +191,84 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<UserPreview> getFollowedUsers(String username){
-        return neo4j.getFollowedUsers(username);
+        List<UserPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> users = neo4j.getFollowedUsers(username);
+        for (Map<String, Object> user:
+             users) {
+            result.add(buildUserPreviewFromMap(user));
+        }
+        return result;
     }
 
     @Override
     public List<UserPreview> getFollowers(String username){
-        return neo4j.getFollowers(username);
+        List<UserPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> users = neo4j.getFollowers(username);
+        for (Map<String, Object> user:
+                users) {
+            result.add(buildUserPreviewFromMap(user));
+        }
+        return result;
     }
 
     @Override
     public List<ArtistPreview> getFollowedArtists(String username){
-        return neo4j.getFollowedArtists(username);
+        List<ArtistPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> artists = neo4j.getFollowedArtists(username);
+        for (Map<String, Object> artist:
+                artists) {
+            result.add(buildArtistPreviewFromMap(artist));
+        }
+        return result;
     }
 
     @Override
-    public List<ArtistPreview> getFollowersArtists(String username){
-        return neo4j.getFollowersArtists(username);
+    public List<ArtistPreview> getFollowingArtists(String username){
+        List<ArtistPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> artists = neo4j.getFollowingArtists(username);
+        for (Map<String, Object> artist:
+                artists) {
+            result.add(buildArtistPreviewFromMap(artist));
+        }
+        return result;
     }
 
     @Override
     public List<SongPreview> getLikedSongs(String username){
-        return neo4j.getLikedSongs(username);
+        List<SongPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> songs = neo4j.getLikedSongs(username);
+        for (Map<String, Object> song:
+                songs) {
+            result.add(buildSongPreviewFromMap(song));
+        }
+        return result;
     }
 
     @Override
     public List<SongPreview> getArtistSongs(String username){
-        return neo4j.getArtistSongs(username);
+        List<SongPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> songs = neo4j.getArtistSongs(username);
+        for (Map<String, Object> song:
+                songs) {
+            result.add(buildSongPreviewFromMap(song));
+        }
+        return result;
     }
 
     @Override
     public List<SongPreview> getSuggestedSongs(User user) {
-        return neo4j.getSuggestedSongs(user.Username);
+        List<SongPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> songs = neo4j.getSuggestedSongs(user.Username);
+        for (Map<String, Object> song:
+                songs) {
+            result.add(buildSongPreviewFromMap(song));
+        }
+        return result;
     }
 
     @Override
-    public HashMap<String, String> getApprAlbum(Artist artist){
-        return mongo.getApprAlbum(artist.Username);
+    public HashMap<String, String> getBestAndWorstAlbum(Artist artist){
+        return mongo.getBestAndWorstAlbum(artist.Username);
     }
 
     @Override
@@ -269,34 +310,80 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<ArtistPreview> getSuggestedArtists(User user) {
-        return neo4j.getSuggestedArtists(user.Username);
+        List<ArtistPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> artists = neo4j.getSuggestedArtists(user.Username);
+        for (Map<String, Object> artist:
+                artists) {
+            result.add(buildArtistPreviewFromMap(artist));
+        }
+        return result;
     }
 
     @Override
     public List<UserPreview> getSuggestedUsers(User user) {
-        return neo4j.getSuggestedUsers(user.Username);
+        List<UserPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> users = neo4j.getSuggestedUsers(user.Username);
+        for (Map<String, Object> suggestion:
+                users) {
+            result.add(buildUserPreviewFromMap(suggestion));
+        }
+        return result;
     }
 
     @Override
     public List<UserPreview> getLikeMindedUsers(User user){
-        return neo4j.getLikeMindedUsers(user.Username);
+        List<UserPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> users = neo4j.getLikeMindedUsers(user.Username);
+        for (Map<String, Object> suggestion:
+                users) {
+            result.add(buildUserPreviewFromMap(suggestion));
+        }
+        return result;
     }
 
     @Override
     public List<SongPreview> getLikeMindedSongs(User user){
-        return neo4j.getLikeMindedSongs(user.Username);
+        List<SongPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> songs = neo4j.getLikeMindedSongs(user.Username);
+        for (Map<String, Object> song:
+                songs) {
+            result.add(buildSongPreviewFromMap(song));
+        }
+        return result;
     }
 
     @Override
     public List<UserPreview> getTopFans(Artist artist){
-        return neo4j.getTopFans(artist.Username);
+        List<UserPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> users = neo4j.getTopFans(artist.Username);
+        for (Map<String, Object> suggestion:
+                users) {
+            result.add(buildUserPreviewFromMap(suggestion));
+        }
+        return result;
     }
 
     @Override
-    public List<ArtistPreview> getSimilarArtists(Artist artist){ return neo4j.getSimilarArtists(artist.Username); }
+    public List<ArtistPreview> getSimilarArtists(Artist artist){
+        List<ArtistPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> artists = neo4j.getSimilarArtists(artist.Username);
+        for (Map<String, Object> similarArtist:
+                artists) {
+            result.add(buildArtistPreviewFromMap(similarArtist));
+        }
+        return result;
+    }
 
     @Override
-    public List<SongPreview> getPopularSongs(Artist artist) { return neo4j.getPopularSongs(artist.Username); }
+    public List<SongPreview> getPopularSongs(Artist artist) {
+        List<SongPreview> analyticResult = new ArrayList<>();
+        List<Map<String, Object>> result = neo4j.getPopularSongs(artist.Username);
+        for (Map<String, Object> song:
+                result) {
+            analyticResult.add(buildSongPreviewFromMap(song));
+        }
+        return analyticResult;
+    }
 
     @Override
     public boolean addFollow(User followed, User follower) {

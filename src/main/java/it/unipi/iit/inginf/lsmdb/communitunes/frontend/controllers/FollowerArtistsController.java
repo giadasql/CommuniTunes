@@ -33,7 +33,7 @@ public class FollowerArtistsController implements UIController {
         dbManager = PersistenceFactory.CreatePersistence();
         authManager = AuthenticationFactory.CreateAuthenticationManager();
 
-        user.LoadedArtistFollowers = dbManager.getFollowersArtists(user.Username);
+        user.LoadedArtistFollowers = dbManager.getFollowingArtists(user.Username);
         for(Iterator<ArtistPreview> iter = user.LoadedArtistFollowers.iterator(); iter.hasNext(); ){
             List<ArtistPreview> list = new ArrayList<>();
             for(int i = 0; i < 6; i++){
