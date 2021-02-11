@@ -9,7 +9,6 @@ import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceInconsistencyException;
 import org.javatuples.Pair;
-import org.javatuples.Triplet;
 
 import java.util.HashMap;
 import java.util.List;
@@ -278,7 +277,8 @@ public interface Persistence {
 
     /**
      *
-     * Get user's like-minded users, that like many songs that user likes.
+     * Get user's like-minded users, that like many songs that user likes, and a
+     * list of songs liked by those users to be suggested to user.
      *
      * @param user
      * @return
