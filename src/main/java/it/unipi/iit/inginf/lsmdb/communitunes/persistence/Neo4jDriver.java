@@ -285,9 +285,9 @@ class Neo4jDriver implements Closeable {
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
-                Result res = tx.run( "MATCH (u:User {username: $username})-[:FOLLOWS]->(f:User) WHERE NOT f:Artist," +
-                                "(f)-[:LIKES]->(s:Song)<-[:PERFORMS {isMainArtist: true}]-(a:Artist)" +
-                                "WITH COLLECT(DISTINCT(s.title))[0..15] AS Songs, a " +
+                Result res = tx.run( "MATCH (u:User {username: $username})-[:FOLLOWS]->(f:User) WHERE NOT f:Artist " +
+                                "MATCH (f)-[:LIKES]->(s:Song)<-[:PERFORMS {isMainArtist: true}]-(a:Artist)" +
+                                "WITH DISTINCT(s) AS Songs, a LIMIT 15" +
                                 "RETURN Songs.title AS title, a.username AS artist, Songs.songID AS _id, Songs.image AS image",
                         parameters("username", username));
                 while(res.hasNext()){
@@ -304,8 +304,8 @@ class Neo4jDriver implements Closeable {
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
-                Result res = tx.run( "MATCH (u:User {username: $username})-[:FOLLOWS]->(a:Artist)," +
-                                "(a)-[:PERFORMS]->(:Song)<-[:PERFORMS]-(f:Artist) WHERE NOT a.username = f.username" +
+                Result res = tx.run( "MATCH (u:User {username: $username})-[:FOLLOWS]->(a:Artist) " +
+                                "MATCH (a)-[:PERFORMS]->(:Song)<-[:PERFORMS]-(f:Artist) WHERE NOT a.username = f.username " +
                                 "RETURN f.username AS username, f.image AS image LIMIT 15",
                         parameters("username", username));
                 while(res.hasNext()){
@@ -322,8 +322,8 @@ class Neo4jDriver implements Closeable {
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
-                Result res = tx.run( "MATCH (u:User {username: $username})-[:FOLLOWS]->(m:User) WHERE NOT m:Artist," +
-                                "(m)-[:FOLLOWS]->(f:User) WHERE NOT f:Artist AND NOT f.username = u.username" +
+                Result res = tx.run( "MATCH (u:User {username: $username})-[:FOLLOWS]->(m:User) WHERE NOT m:Artist " +
+                                "MATCH (m)-[:FOLLOWS]->(f:User) WHERE NOT f:Artist AND NOT f.username = u.username AND NOT (u)-[:FOLLOWS]->(f)" +
                                 "RETURN f.username AS username, f.image AS image LIMIT 15",
                         parameters("username", username));
                 while(res.hasNext()){
@@ -342,12 +342,12 @@ class Neo4jDriver implements Closeable {
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
-                Result res = tx.run( "MATCH (u:User {username: $username})-[:LIKES]->(:Song)<-[:LIKES]-(f:User) WHERE NOT f:Artist," +
-                                "(u)-[:LIKES]->(s1:Song)" +
-                                "WITH u, f, COUNT(DISTINCT s1) AS s1Count" +
-                                "MATCH (u)-[:LIKES]->(s:Song)<-[:LIKES]-(f)" +
-                                "WITH f,s1Count, COUNT(DISTINCT s) AS commonSongsCount" +
-                                "WHERE commonSongsCount >= s1Count * 0.6" +
+                Result res = tx.run( "MATCH (u:User {username: $username})-[:LIKES]->(:Song)<-[:LIKES]-(f:User) WHERE NOT f:Artist " +
+                                "MATCH (u)-[:LIKES]->(s1:Song) " +
+                                "WITH u, f, COUNT(DISTINCT s1) AS s1Count " +
+                                "MATCH (u)-[:LIKES]->(s:Song)<-[:LIKES]-(f) " +
+                                "WITH f,s1Count, COUNT(DISTINCT s) AS commonSongsCount " +
+                                "WHERE commonSongsCount >= s1Count * 0.6 " +
                                 "RETURN f.username AS username, f.image AS image LIMIT 15 ",
                         parameters("username", username));
                 while(res.hasNext()){
@@ -364,13 +364,13 @@ class Neo4jDriver implements Closeable {
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
-                Result res = tx.run( "MATCH (u:User {username: $username})-[:LIKES]->(:Song)<-[:LIKES]-(f:User) WHERE NOT f:Artist," +
-                                "(u)-[:LIKES]->(s1:Song), (f)-[:LIKES]->(s2:Song)" +
-                                "WITH u, f, s2, COUNT(DISTINCT s1) AS s1Count" +
-                                "MATCH (u)-[:LIKES]->(s:Song)<-[:LIKES]-(f)" +
-                                "WITH s1Count,s2, COUNT(DISTINCT s) AS commonSongsCount" +
-                                "WHERE commonSongsCount >= s1Count * 0.6" +
-                                "RETURN s2.title AS title, a.username AS artist, s2.songID AS _id, s2.image AS image LIMIT 15",
+                Result res = tx.run( "MATCH (u:User {username: $username})-[:LIKES]->(:Song)<-[:LIKES]-(f:User) WHERE NOT f:Artist " +
+                                "MATCH (u)-[:LIKES]->(s1:Song) MATCH (f)-[:LIKES]->(s2:Song)<-[:PERFORMS {isMainArtist: true }]-(a:Artist) " +
+                                "WITH u, f, a, s2, COUNT(DISTINCT s1) AS s1Count " +
+                                "MATCH (u)-[:LIKES]->(s:Song)<-[:LIKES]-(f) " +
+                                "WITH s1Count,s2, a, COUNT(DISTINCT s) AS commonSongsCount " +
+                                "WHERE commonSongsCount >= s1Count * 0.6 " +
+                                "RETURN s2.title AS title, a.username AS artist, s2.songID AS _id, s2.image AS image LIMIT 15 ",
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();
@@ -386,13 +386,13 @@ class Neo4jDriver implements Closeable {
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
-                Result res = tx.run( "MATCH (a:Artist {username: $username})<-[:FOLLOWS]-(u:User) WHERE NOT u:Artist," +
-                                "(a)-[:PERFORMS {isMainArtist: true}]->(s:Song)" +
-                                "WITH u, s, COUNT(DISTINCT s) AS totalSongs" +
-                                "MATCH (s)<-[:LIKES]-(u)" +
-                                "WITH u, totalSongs, COUNT(DISTINCT s) AS likedSongs" +
-                                "WHERE likedSongs >= totalSongs * 0.6" +
-                                "RETURN u.username AS username, u.image AS image LIMIT 15",
+                Result res = tx.run( "MATCH (a:Artist {username: $username})<-[:FOLLOWS]-(u:User) WHERE NOT u:Artist " +
+                                "MATCH (a)-[:PERFORMS {isMainArtist: true}]->(s:Song) " +
+                                "WITH u, s, COUNT(DISTINCT s) AS totalSongs " +
+                                "MATCH (s)<-[:LIKES]-(u) " +
+                                "WITH u, totalSongs, COUNT(DISTINCT s) AS likedSongs " +
+                                "WHERE likedSongs >= totalSongs * 0.6 " +
+                                "RETURN u.username AS username, u.image AS image LIMIT 15 ",
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();
@@ -408,12 +408,12 @@ class Neo4jDriver implements Closeable {
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
-                Result res = tx.run( "MATCH (a:Artist {username: $username})<-[:FOLLOWS]-(u:User) WHERE NOT u:Artist" +
-                                "WITH u, a, COUNT(DISTINCT u) AS totFollowers" +
-                                "MATCH (u)-[:FOLLOWS]->(a1:Artist) WHERE NOT a1.username = a.username" +
-                                "WITH u, a, totFollowers, a1, COUNT(DISTINCT u) AS followOthers" +
-                                "WHERE followOthers >= totFollowers * 0.3" +
-                                "RETURN a1.username AS username, a1.image AS image LIMIT 15",
+                Result res = tx.run( "MATCH (a:Artist {username: $username})<-[:FOLLOWS]-(u:User) WHERE NOT u:Artist " +
+                                "WITH u, a, COUNT(DISTINCT u) AS totFollowers " +
+                                "MATCH (u)-[:FOLLOWS]->(a1:Artist) WHERE NOT a1.username = a.username " +
+                                "WITH u, a, totFollowers, a1, COUNT(DISTINCT u) AS followOthers " +
+                                "WHERE followOthers >= totFollowers * 0.3 " +
+                                "RETURN a1.username AS username, a1.image AS image LIMIT 15 ",
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();
@@ -429,15 +429,15 @@ class Neo4jDriver implements Closeable {
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
-                Result res = tx.run( "MATCH (a:Artist {username: $username})-[:PERFORMS {isMainArtist: true}]->(s:Song)," +
-                                "(s)<-[:LIKES]-(u:User) WHERE NOT u:Artist AND NOT u.username = a.username" +
-                                "WITH s, a, u, COUNT(DISTINCT u) AS totalLikes" +
-                                "MATCH (u), (s), (a)" +
-                                "WITH u,s,a,totalLikes, COUNT(DISTINCT u) AS externalLikes" +
-                                "WHERE NOT (u)-[:FOLLOWS]->(a) AND (u)-[:LIKES]->(s)" +
-                                "MATCH (s)" +
-                                "WHERE externalLikes >= totalLikes * 0.3" +
-                                "RETURN s.songID AS songID, s.title AS title, s.image AS Image LIMIT 15",
+                Result res = tx.run( "MATCH (a:Artist {username: $username})-[:PERFORMS {isMainArtist: true}]->(s:Song), " +
+                                "(s)<-[:LIKES]-(u:User) WHERE NOT u:Artist AND NOT u.username = a.username " +
+                                "WITH s, a, u, COUNT(DISTINCT u) AS totalLikes " +
+                                "MATCH (u), (s), (a) " +
+                                "WITH u,s,a,totalLikes, COUNT(DISTINCT u) AS externalLikes " +
+                                "WHERE NOT (u)-[:FOLLOWS]->(a) AND (u)-[:LIKES]->(s) " +
+                                "MATCH (s) " +
+                                "WHERE externalLikes >= totalLikes * 0.3 " +
+                                "RETURN s.songID AS _id, s.title AS title, s.image AS image LIMIT 15 ",
                         parameters("username", username));
                 while(res.hasNext()) {
                     Record r = res.next();
