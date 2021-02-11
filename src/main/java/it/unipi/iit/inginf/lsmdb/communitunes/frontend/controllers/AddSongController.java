@@ -2,6 +2,7 @@ package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Link;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
@@ -82,7 +83,7 @@ public class AddSongController implements UIController {
         else{
             String[] arrayFeat = feat.getText().split(" ");
             for(String s : arrayFeat){
-                song.Featurings.add(dbManager.getArtistPreview(s));
+                song.Featurings.add(new ArtistPreview(s, null));
             }
         }
         if(dbManager.addSong(song)){

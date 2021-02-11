@@ -8,15 +8,15 @@ import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigRea
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderType;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceInconsistencyException;
-import org.javatuples.Pair;
 import org.xml.sax.SAXException;
 
-import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 class PersistenceImplementation implements Persistence {
 
@@ -131,30 +131,6 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean updateArtist(Artist newArtist) {
-        /*
-        Artist toUpdate = getArtist(newArtist.Username);
-        if(toUpdate == null || newArtist.equals(toUpdate)){
-            return false;
-        }
-
-
-            Before contacting Neo4j, we check that the stage name of the artist, the only thing
-            beside the username we save about the artist, is still the same or not, in order to
-            avoid overhead for a communication that won't really change anything.
-
-        boolean check = toUpdate.StageName == newArtist.StageName;
-
-        toUpdate.Birthday = newArtist.Birthday;
-        toUpdate.Country = newArtist.Country;
-        toUpdate.Email = newArtist.Email;
-        toUpdate.Password = newArtist.Password;
-        toUpdate.StageName = newArtist.StageName;
-        toUpdate.Image = newArtist.Image;
-        toUpdate.ActiveYears = newArtist.ActiveYears;
-        toUpdate.Biography = newArtist.Biography;
-
-         */
-
         return mongo.updateArtist(newArtist) && neo4j.updateArtist(newArtist.Username, newArtist.StageName, newArtist.Image);
     }
 
@@ -163,7 +139,7 @@ class PersistenceImplementation implements Persistence {
     public boolean addSong(Song newSong) throws PersistenceInconsistencyException {
         String mongoID = mongo.addSong(newSong.Artist.username, newSong.Duration, newSong.Title, newSong.Album);
         if(mongoID != null){
-            int neoID = neo4j.addSong(newSong.Artist.username, newSong.Title, newSong.ID);
+            int neoID = neo4j.addSong(newSong.Artist.username, newSong.Title, newSong.ID, newSong.Featurings.stream().map(x -> x.username).collect(Collectors.toList()));
             if(neoID != -1){
                 return true;
             }
@@ -190,24 +166,7 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean editSong(Song newSong) {
-
-        /*Song toUpdate = getSong(newSong.ID);
-        if(toUpdate == null || newSong.equals(toUpdate)){
-            return false;
-        }
-
-
-            Before contacting Neo4j, we check if th list of featurings , in order to
-            avoid overhead for a communication that won't really change anything.
-
-        boolean check = toUpdate.Featurings.equals(newSong.Featurings);
-
-        toUpdate.Link = newSong.Link;
-        toUpdate.Image = newSong.Image;
-        toUpdate.Genres.addAll(newSong.Genres);
-         */
-
-        return mongo.updateSong(newSong) && neo4j.updateSong(newSong.Title, newSong.Artist.username, newSong.Featurings, newSong.Image);
+        return mongo.updateSong(newSong) && neo4j.updateSong(newSong.ID, newSong.Title, newSong.Artist.username, newSong.Featurings.stream().map(x -> x.username).collect(Collectors.toList()), newSong.Image);
     }
 
     @Override
@@ -232,89 +191,199 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<UserPreview> getFollowedUsers(String username){
-        return neo4j.getFollowedUsers(username);
+        List<UserPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> users = neo4j.getFollowedUsers(username);
+        for (Map<String, Object> user:
+             users) {
+            result.add(buildUserPreviewFromMap(user));
+        }
+        return result;
     }
 
     @Override
     public List<UserPreview> getFollowers(String username){
-        return neo4j.getFollowers(username);
+        List<UserPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> users = neo4j.getFollowers(username);
+        for (Map<String, Object> user:
+                users) {
+            result.add(buildUserPreviewFromMap(user));
+        }
+        return result;
     }
 
     @Override
     public List<ArtistPreview> getFollowedArtists(String username){
-        return neo4j.getFollowedArtists(username);
+        List<ArtistPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> artists = neo4j.getFollowedArtists(username);
+        for (Map<String, Object> artist:
+                artists) {
+            result.add(buildArtistPreviewFromMap(artist));
+        }
+        return result;
     }
 
     @Override
-    public List<ArtistPreview> getFollowersArtists(String username){
-        return neo4j.getFollowersArtists(username);
+    public List<ArtistPreview> getFollowingArtists(String username){
+        List<ArtistPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> artists = neo4j.getFollowingArtists(username);
+        for (Map<String, Object> artist:
+                artists) {
+            result.add(buildArtistPreviewFromMap(artist));
+        }
+        return result;
     }
 
     @Override
     public List<SongPreview> getLikedSongs(String username){
-        return neo4j.getLikedSongs(username);
+        List<SongPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> songs = neo4j.getLikedSongs(username);
+        for (Map<String, Object> song:
+                songs) {
+            result.add(buildSongPreviewFromMap(song));
+        }
+        return result;
     }
 
     @Override
     public List<SongPreview> getArtistSongs(String username){
-        return neo4j.getArtistSongs(username);
+        List<SongPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> songs = neo4j.getArtistSongs(username);
+        for (Map<String, Object> song:
+                songs) {
+            result.add(buildSongPreviewFromMap(song));
+        }
+        return result;
     }
 
     @Override
     public List<SongPreview> getSuggestedSongs(User user) {
-        return neo4j.getSuggestedSongs(user.Username);
+        List<SongPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> songs = neo4j.getSuggestedSongs(user.Username);
+        for (Map<String, Object> song:
+                songs) {
+            result.add(buildSongPreviewFromMap(song));
+        }
+        return result;
     }
 
     @Override
-    public HashMap<String, String> getApprAlbum(Artist artist){
-        return mongo.getApprAlbum(artist.Username);
+    public HashMap<String, String> getBestAndWorstAlbum(Artist artist){
+        return mongo.getBestAndWorstAlbum(artist.Username);
     }
 
     @Override
-    public List<Pair<String,ArtistPreview>> getRepresentativeArtist(){
-        return mongo.getRepresentativeArtist();
+    public Map<String, ArtistPreview> getRepresentativeArtist() {
+        Map<String, ArtistPreview> analyticResult = new HashMap<>();
+        Map<String, String> mongoResult = mongo.getRepresentativeArtist();
+        Map<String, ArtistPreview> usernameToPreview = new HashMap<>();
+        Collection<String> artists = mongoResult.values();
+        List<ArtistPreview> artistPreviews = getArtistPreviews(new ArrayList<>(artists));
+        for(ArtistPreview preview :
+            artistPreviews){
+            usernameToPreview.put(preview.username, preview);
+        }
+
+        for(String genre :
+                mongoResult.keySet()){
+            analyticResult.put(genre, usernameToPreview.getOrDefault(mongoResult.getOrDefault(genre, ""), null));
+        }
+
+        return  analyticResult;
     }
 
+
     @Override
-    public HashMap<String, List<SongPreview>> getSuggestedSongs() {
-        return mongo.getSuggestedSongs();
+    public Map<String, List<SongPreview>> getSuggestedSongs() {
+        Map<String, List<SongPreview>> analyticResult = new HashMap<>();
+        Map<String, List<Map<String, Object>>>  result = mongo.getSuggestedSongs();
+        for (String genre:
+             result.keySet()) {
+            List<Map<String, Object>> songsData = result.get(genre);
+            analyticResult.put(genre, new ArrayList<>());
+            for (Map<String, Object> songMap:
+                 songsData) {
+                analyticResult.get(genre).add(buildSongPreviewFromMap(songMap));
+            }
+        }
+        return analyticResult;
     }
 
     @Override
     public List<ArtistPreview> getSuggestedArtists(User user) {
-        return neo4j.getSuggestedArtists(user.Username);
+        List<ArtistPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> artists = neo4j.getSuggestedArtists(user.Username);
+        for (Map<String, Object> artist:
+                artists) {
+            result.add(buildArtistPreviewFromMap(artist));
+        }
+        return result;
     }
 
     @Override
     public List<UserPreview> getSuggestedUsers(User user) {
-        return neo4j.getSuggestedUsers(user.Username);
+        List<UserPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> users = neo4j.getSuggestedUsers(user.Username);
+        for (Map<String, Object> suggestion:
+                users) {
+            result.add(buildUserPreviewFromMap(suggestion));
+        }
+        return result;
     }
 
     @Override
     public List<UserPreview> getLikeMindedUsers(User user){
-        return neo4j.getLikeMindedUsers(user.Username);
+        List<UserPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> users = neo4j.getLikeMindedUsers(user.Username);
+        for (Map<String, Object> suggestion:
+                users) {
+            result.add(buildUserPreviewFromMap(suggestion));
+        }
+        return result;
     }
 
     @Override
     public List<SongPreview> getLikeMindedSongs(User user){
-        return neo4j.getLikeMindedSongs(user.Username);
+        List<SongPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> songs = neo4j.getLikeMindedSongs(user.Username);
+        for (Map<String, Object> song:
+                songs) {
+            result.add(buildSongPreviewFromMap(song));
+        }
+        return result;
     }
 
     @Override
     public List<UserPreview> getTopFans(Artist artist){
-        return neo4j.getTopFans(artist.Username);
+        List<UserPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> users = neo4j.getTopFans(artist.Username);
+        for (Map<String, Object> suggestion:
+                users) {
+            result.add(buildUserPreviewFromMap(suggestion));
+        }
+        return result;
     }
 
     @Override
-    public List<ArtistPreview> getColleagues(Artist artist){
-        return neo4j.getColleagues(artist.Username);
+    public List<ArtistPreview> getSimilarArtists(Artist artist){
+        List<ArtistPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> artists = neo4j.getSimilarArtists(artist.Username);
+        for (Map<String, Object> similarArtist:
+                artists) {
+            result.add(buildArtistPreviewFromMap(similarArtist));
+        }
+        return result;
     }
 
     @Override
-    public List<ArtistPreview> getSimilarArtists(Artist artist){ return neo4j.getSimilarArtists(artist.Username); }
-
-    @Override
-    public List<SongPreview> getPopularSongs(Artist artist) { return neo4j.getPopularSongs(artist.Username); }
+    public List<SongPreview> getPopularSongs(Artist artist) {
+        List<SongPreview> analyticResult = new ArrayList<>();
+        List<Map<String, Object>> result = neo4j.getPopularSongs(artist.Username);
+        for (Map<String, Object> song:
+                result) {
+            analyticResult.add(buildSongPreviewFromMap(song));
+        }
+        return analyticResult;
+    }
 
     @Override
     public boolean addFollow(User followed, User follower) {
@@ -362,9 +431,6 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean checkAdminCredentials(String username, String password){ return mongo.checkAdminCredentials(username, password); }
-
-    @Override
     public User getUser(String username) {
         Map<String, Object> userData = mongo.getUserData(username);
         if(userData != null){
@@ -410,9 +476,36 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public ArtistPreview getArtistPreview(String username){
-        Artist artist = getArtist(username);
-        return new ArtistPreview(artist.Username, artist.StageName, artist.Image);
+    public List<ArtistPreview> getArtistPreviews(List<String> usernames) {
+        List<ArtistPreview> artistPreviews = new ArrayList<>();
+        List<Map<String, Object>> artists = mongo.getArtistsWithFields("username", usernames, Arrays.asList("username", "image"));
+        for (Map<String, Object> artist:
+                artists) {
+            artistPreviews.add(buildArtistPreviewFromMap(artist));
+        }
+        return artistPreviews;
+    }
+
+    @Override
+    public List<UserPreview> getUserPreviews(List<String> usernames) {
+        List<UserPreview> userPreviews = new ArrayList<>();
+        List<Map<String, Object>> users = mongo.getUsersWithFields("username", usernames, Arrays.asList("username", "image"));
+        for (Map<String, Object> user:
+             users) {
+            userPreviews.add(buildUserPreviewFromMap(user));
+        }
+        return userPreviews;
+    }
+
+    @Override
+    public List<SongPreview> getSongPreviews(List<String> ids) {
+        List<SongPreview> songPreviews = new ArrayList<>();
+        List<Map<String, Object>> songs = mongo.getSongsWithFields("_id", ids, Arrays.asList("_id", "image", "artist", "title"));
+        for (Map<String, Object> song:
+                songs) {
+            songPreviews.add(buildSongPreviewFromMap(song));
+        }
+        return songPreviews;
     }
 
     private User buildUserFromMap(Map<String, Object> userData){
@@ -438,16 +531,14 @@ class PersistenceImplementation implements Persistence {
         for (Map<String,Object> artistMap : followedArtistsList){
             String artistUsername = (artistMap.get("username") instanceof String ? (String)artistMap.get("username") : null);
             String artistImage = (artistMap.get("image") instanceof String ? (String)artistMap.get("image") : null);
-            String artistStageName = (artistMap.get("stageName") instanceof String ? (String)artistMap.get("stageName") : null);
-            artistFollowed.add(new ArtistPreview(artistUsername, artistStageName, artistImage));
+            artistFollowed.add(new ArtistPreview(artistUsername, artistImage));
         }
 
         Iterable<Map<String,Object>> followerArtistsList = (Iterable<Map<String,Object>>)userData.get("followerArtists");
         for (Map<String,Object> artistMap : followerArtistsList){
             String artistUsername = (artistMap.get("username") instanceof String ? (String)artistMap.get("username") : null);
             String artistImage = (artistMap.get("image") instanceof String ? (String)artistMap.get("image") : null);
-            String artistStageName = (artistMap.get("stageName") instanceof String ? (String)artistMap.get("stageName") : null);
-            artistFollowers.add(new ArtistPreview(artistUsername, artistStageName, artistImage));
+            artistFollowers.add(new ArtistPreview(artistUsername, artistImage));
         }
 
         Iterable<Map<String,Object>> likesList = (Iterable<Map<String,Object>>)userData.get("likes");
@@ -503,16 +594,14 @@ class PersistenceImplementation implements Persistence {
         for (Map<String,Object> artistMap : followedArtistsList){
             String artistUsername = (artistMap.get("username") instanceof String ? (String)artistMap.get("username") : null);
             String artistImage = (artistMap.get("image") instanceof String ? (String)artistMap.get("image") : null);
-            String artistStageName = (artistMap.get("stageName") instanceof String ? (String)artistMap.get("stageName") : null);
-            artistFollowed.add(new ArtistPreview(artistUsername, artistStageName, artistImage));
+            artistFollowed.add(new ArtistPreview(artistUsername, artistImage));
         }
 
         Iterable<Map<String,Object>> followerArtistsList = (Iterable<Map<String,Object>>)artistData.get("followerArtists");
         for (Map<String,Object> artistMap : followerArtistsList){
             String artistUsername = (artistMap.get("username") instanceof String ? (String)artistMap.get("username") : null);
             String artistImage = (artistMap.get("image") instanceof String ? (String)artistMap.get("image") : null);
-            String artistStageName = (artistMap.get("stageName") instanceof String ? (String)artistMap.get("stageName") : null);
-            artistFollowers.add(new ArtistPreview(artistUsername, artistStageName, artistImage));
+            artistFollowers.add(new ArtistPreview(artistUsername, artistImage));
         }
 
         Iterable<Map<String,Object>> likesList = (Iterable<Map<String,Object>>)artistData.get("likes");
@@ -575,9 +664,8 @@ class PersistenceImplementation implements Persistence {
         if(songData.get("mainArtist") != null){
             Map<String, Object> artistMap = (Map<String, Object>)songData.get("mainArtist");
             String artistUsername = (artistMap.get("username") instanceof String ? (String)artistMap.get("username") : null);
-            String stageName = (artistMap.get("stageName") instanceof String ? (String)artistMap.get("stageName") : null);
             String artistImage = (artistMap.get("image") instanceof String ? (String)artistMap.get("image") : null);
-            artist = new ArtistPreview(artistUsername, stageName, artistImage);
+            artist = new ArtistPreview(artistUsername, artistImage);
         }
 
         if(songData.get("featurings") != null) {
@@ -585,8 +673,7 @@ class PersistenceImplementation implements Persistence {
             for (Map<String, Object> featArtistMap : featuringsList) {
                 String featUsername = (featArtistMap.get("username") instanceof String ? (String) featArtistMap.get("username") : null);
                 String featImage = (featArtistMap.get("image") instanceof String ? (String) featArtistMap.get("image") : null);
-                String featStageName = (featArtistMap.get("stageName") instanceof String ? (String) featArtistMap.get("stageName") : null);
-                featurings.add(new ArtistPreview(featUsername, featStageName, featImage));
+                featurings.add(new ArtistPreview(featUsername, featImage));
             }
         }
 
@@ -622,6 +709,25 @@ class PersistenceImplementation implements Persistence {
         return new Review(id, user, rating, text, songID);
     }
 
+    private ArtistPreview buildArtistPreviewFromMap(Map<String, Object> artistData){
+        String username = (artistData.get("username") instanceof String ? (String)artistData.get("username") : null);
+        String image = (artistData.get("image") instanceof String ? (String)artistData.get("image") : null);
+        return new ArtistPreview(username, image);
+    }
+
+    private UserPreview buildUserPreviewFromMap(Map<String, Object> userData){
+        String username = (userData.get("username") instanceof String ? (String)userData.get("username") : null);
+        String image = (userData.get("image") instanceof String ? (String)userData.get("image") : null);
+        return new UserPreview(username, image);
+    }
+
+    private SongPreview buildSongPreviewFromMap(Map<String, Object> songData){
+        String id = (songData.get("_id") instanceof String ? (String)songData.get("_id") : null);
+        String image = (songData.get("image") instanceof String ? (String)songData.get("image") : null);
+        String artistUsername = (songData.get("artist") instanceof String ? (String)songData.get("artist") : null);
+        String title = (songData.get("title") instanceof String ? (String)songData.get("title") : null);
+        return new SongPreview(id, artistUsername, title, image);
+    }
 
     public void close(){
         if(mongo != null){

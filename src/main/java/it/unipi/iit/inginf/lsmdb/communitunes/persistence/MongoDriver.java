@@ -2,7 +2,6 @@ package it.unipi.iit.inginf.lsmdb.communitunes.persistence;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
-import com.mongodb.MongoCommandException;
 import com.mongodb.client.*;
 import com.mongodb.client.model.*;
 import com.mongodb.client.result.DeleteResult;
@@ -11,29 +10,19 @@ import com.mongodb.client.result.UpdateResult;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
 import org.bson.*;
 import org.bson.conversions.Bson;
-import org.bson.types.BasicBSONList;
 import org.bson.types.ObjectId;
-import org.javatuples.Pair;
 
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Projections.*;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Accumulators.*;
 
-import javax.print.Doc;
-
-import static com.mongodb.client.model.Aggregates.*;
-import static com.mongodb.client.model.Filters.*;
-import static com.mongodb.client.model.Projections.*;
 import static com.mongodb.client.model.Sorts.descending;
 import static com.mongodb.client.model.Updates.*;
 
 import java.io.Closeable;
-import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -199,16 +188,13 @@ class MongoDriver implements Closeable {
         return updateRes.getModifiedCount() != 0;
     }
 
-    public HashMap<String, List<SongPreview>> getSuggestedSongs(){
-        HashMap<String, List<SongPreview>> res = new HashMap<>();
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        cal.add(Calendar.DAY_OF_MONTH, -30);
+    public Map<String, List<Map<String, Object>>> getSuggestedSongs(){
+        HashMap<String, List<Map<String, Object>>> res = new HashMap<>();
 
         Document toProject = new Document("title", "$title")
                 .append("avg_rating", "$avg_rating")
                 .append("artist", "$artist")
-                .append("id", "$_id")
+                .append("_id", "$_id")
                 .append("image", "$image");
 
         AggregateIterable<Document> result = songsCollection.aggregate(Arrays.asList(addFields(new Field("reviews",
@@ -225,21 +211,17 @@ class MongoDriver implements Closeable {
         for (Document resultDoc :
         result){
             String genre = resultDoc.getString("_id");
-            List<SongPreview> previews = new ArrayList<>();
+            List<Map<String, Object>> songMaps = new ArrayList<>();
             List<Document> songs = (ArrayList<Document>)resultDoc.get("songs");
             for (Document song : songs){
-                String title = song.getString("title");
-                String artist = song.getString("artist");
-                String songID = song.getObjectId("id").toString();
-                String image = song.getString("image");
-                previews.add(new SongPreview(songID, artist, title, image));
+                songMaps.add(getEntityMap(song, Arrays.asList("title", "artist", "_id", "image")));
             }
-            res.put(genre, previews);
+            res.put(genre, songMaps);
         }
         return res;
     }
 
-    public HashMap<String, String> getApprAlbum(String username){
+    public HashMap<String, String> getBestAndWorstAlbum(String username){
         HashMap<String, String> res = new HashMap<>();
 
         Document query = songsCollection.aggregate(Arrays.asList(match(eq("artist", username)), addFields(new Field("avg_song_rating",
@@ -252,22 +234,24 @@ class MongoDriver implements Closeable {
         return res;
     }
 
-    public List<Pair<String, ArtistPreview>> getRepresentativeArtist(){
-        List<Pair<String, ArtistPreview>> res = new ArrayList<>();
+    public Map<String, String> getRepresentativeArtist(){
+        Map<String, String> res = new HashMap<>();
+
+        Bson group_id = new BasicDBObject("genre", "$genres")
+                .append("artist", "$artist");
 
         songsCollection.aggregate(Arrays.asList(addFields(new Field("avg_song_rating",
                 new Document("$avg", "$reviews.rating"))), unwind("$genres",
-                new UnwindOptions().preserveNullAndEmptyArrays(false)), group(and(eq("genre", "$genres"), eq("artist", "$artist")), sum("songs_count", 1L), avg("songs_avg_rating", "$avg_song_rating")), match(ne("songs_avg_rating",
+                new UnwindOptions().preserveNullAndEmptyArrays(false)), group(group_id, sum("songs_count", 1L), avg("songs_avg_rating", "$avg_song_rating")), match(ne("songs_avg_rating",
                 new BsonNull())), addFields(new Field("points",
                 new Document("$sum", Arrays.asList(new Document("$multiply", Arrays.asList("$songs_count", 0.3d)),
                         new Document("$multiply", Arrays.asList("$songs_avg_rating", 0.7d)))))), sort(descending("points")),
                         group("$_id.genre", first("best_artist", "$_id.artist"))))
                 .forEach(doc->{
-                    String genre = doc.getString("genre");
+                    String genre = doc.getString("_id");
                     String artistUsername = doc.getString("best_artist");
-                    res.add(new Pair(genre, getArtistPreview(artistUsername)));
+                    res.put(genre, artistUsername);
         });
-
         return res;
     }
 
@@ -310,14 +294,6 @@ class MongoDriver implements Closeable {
         Document artist = usersCollection.find(and(eq("username", username), ne("stage_name", null))).first();
         if(artist != null){
             return getArtistMap(artist);
-        }
-        return null;
-    }
-
-    private ArtistPreview getArtistPreview(String username){
-        Document artist = usersCollection.find(eq("username", username)).first();
-        if(artist != null){
-            return new ArtistPreview(username, artist.getString("stageName"), artist.getString("image"));
         }
         return null;
     }
@@ -477,6 +453,23 @@ class MongoDriver implements Closeable {
         return artistValues;
     }
 
+    private Map<String, Object> getEntityMap(Document doc, List<String> fields){
+        if(doc == null || fields == null){
+            return null;
+        }
+        HashMap<String, Object> values = new HashMap<>();
+        for (String field:
+             fields) {
+            if("_id".equals(field)){
+                values.put(field, doc.get(field).toString());
+            }
+            else{
+                values.put(field, doc.get(field));
+            }
+        }
+        return values;
+    }
+
     public boolean checkIfUserReviewedSong(String username, String songID){
         BasicDBObject criteria = new BasicDBObject();
         criteria.append("_id", new ObjectId(songID));
@@ -487,5 +480,30 @@ class MongoDriver implements Closeable {
     @Override
     public void close() {
         mongoClient.close();
+    }
+
+    public List<Map<String, Object>> getArtistsWithFields(String identityField, List<String> identifiers, List<String> fields) {
+        return getDataWithFields(usersCollection, identityField, identifiers, fields);
+    }
+
+    public List<Map<String, Object>> getUsersWithFields(String identityField, List<String> identifiers, List<String> fields) {
+        return getDataWithFields(usersCollection, identityField, identifiers, fields);
+    }
+
+    public List<Map<String, Object>> getSongsWithFields(String identityField, List<String> identifiers, List<String> fields) {
+        return getDataWithFields(songsCollection, identityField, identifiers, fields);
+    }
+
+    private List<Map<String, Object>> getDataWithFields(MongoCollection<Document> collection, String identityField, List<String> identifiers, List<String> fields){
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        Bson match = match(in(identityField, identifiers));
+        Bson project = Aggregates.project(fields(include(fields)));
+        AggregateIterable<Document> result = collection.aggregate(Arrays.asList(match, project));
+        for (Document doc:
+                result) {
+            Map<String, Object> entityMap = getEntityMap(doc, fields);
+            resultList.add(entityMap);
+        }
+        return resultList;
     }
 }
