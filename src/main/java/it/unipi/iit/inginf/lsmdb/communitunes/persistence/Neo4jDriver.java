@@ -226,6 +226,40 @@ class Neo4jDriver implements Closeable {
         }
     }
 
+    public List<ArtistPreview> getFollowedArtists(String username){
+        List<ArtistPreview> artists = new ArrayList<>();
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (u:User {username: $username})-[:FOLLOWS]->(a:Artist)" +
+                                "RETURN a.username AS User, a.image AS Image, a.stageName AS stageName",
+                        parameters("username", username));
+                while(res.hasNext()){
+                    Record r = res.next();
+                    artists.add(new ArtistPreview(r.get("User").asString(), r.get("stageName").asString(), r.get("Image").asString()));
+                }
+                return artists;
+            });
+        }
+    }
+
+    public List<ArtistPreview> getFollowersArtists(String username){
+        List<ArtistPreview> artists = new ArrayList<>();
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (u:User {username: $username})<-[:FOLLOWS]-(a:Artist)" +
+                                "RETURN a.username AS User, a.image AS Image, a.stageName AS stageName",
+                        parameters("username", username));
+                while(res.hasNext()){
+                    Record r = res.next();
+                    artists.add(new ArtistPreview(r.get("User").asString(), r.get("stageName").asString(), r.get("Image").asString()));
+                }
+                return artists;
+            });
+        }
+    }
+
     public List<SongPreview> getLikedSongs(String username){
         List<SongPreview> songs = new ArrayList<>();
         try ( Session session = driver.session())

@@ -37,7 +37,7 @@
                               </AnchorPane>
                               <AnchorPane prefHeight="63.0" prefWidth="190.0">
                                  <children>
-                                    <Button fx:id="editProfile" layoutX="78.0" layoutY="3.0" mnemonicParsing="false" onMouseClicked="#goToEdit" prefHeight="34.0" prefWidth="74.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Edit">
+                                    <Button fx:id="editProfile" layoutX="36.0" layoutY="3.0" mnemonicParsing="false" onMouseClicked="#goToEdit" prefHeight="34.0" prefWidth="74.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Edit">
                                        <font>
                                           <Font name="Book Antiqua" size="16.0" />
                                        </font>
@@ -45,7 +45,15 @@
                                           <Cursor fx:constant="HAND" />
                                        </cursor>
                                     </Button>
-                                    <Button fx:id="followUnfollow" layoutX="68.0" layoutY="3.0" mnemonicParsing="false" onMouseClicked="#followUser" prefHeight="35.0" prefWidth="95.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Follow">
+                                    <Button fx:id="followUnfollow" layoutX="62.0" layoutY="3.0" mnemonicParsing="false" onMouseClicked="#followUser" prefHeight="35.0" prefWidth="95.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Follow">
+                                       <cursor>
+                                          <Cursor fx:constant="HAND" />
+                                       </cursor>
+                                       <font>
+                                          <Font name="Book Antiqua Bold" size="16.0" />
+                                       </font>
+                                    </Button>
+                                    <Button fx:id="userAnalytics" layoutX="127.0" layoutY="3.0" mnemonicParsing="false" onMouseClicked="#goToAnalytics" prefHeight="35.0" prefWidth="95.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Analytics">
                                        <cursor>
                                           <Cursor fx:constant="HAND" />
                                        </cursor>

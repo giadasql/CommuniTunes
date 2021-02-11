@@ -1,5 +1,6 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.components;
 
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
 import javafx.scene.layout.AnchorPane;
@@ -62,6 +63,18 @@ public class listHbox extends HBox {
                 innerHboxOne.getChildren().add(new SongPreviewVBox(song, null));
             else
                 innerHboxTwo.getChildren().add(new SongPreviewVBox(song, null));
+            counter++;
+        }
+        return this;
+    }
+
+    public HBox buildArtistList(List<ArtistPreview> list){
+        int counter = 1;
+        for(ArtistPreview artist : list){
+            if(counter <= 3)
+                innerHboxOne.getChildren().add(new ArtistPreviewVBox(artist, null));
+            else
+                innerHboxTwo.getChildren().add(new ArtistPreviewVBox(artist, null));
             counter++;
         }
         return this;

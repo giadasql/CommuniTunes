@@ -218,13 +218,16 @@ public class ArtistController implements UIController {
         }
     }
 
-    public void showAnalytics(MouseEvent mouseEvent) {
+    public void showAnalytics(MouseEvent mouseEvent) throws IOException {
+        manager.setContent(Path.ARTIST_ANALYTICS);
     }
 
-    public void showAllSongs(MouseEvent mouseEvent) {
+    public void showAllSongs(MouseEvent mouseEvent) throws IOException {
+        manager.setContent(Path.ARTIST_SONGS);
     }
 
-    public void addSong(MouseEvent mouseEvent) {
+    public void addSong(MouseEvent mouseEvent) throws IOException {
+        manager.setContent(Path.ADD_SONG);
     }
 
     public void editProfile(MouseEvent mouseEvent) throws IOException {

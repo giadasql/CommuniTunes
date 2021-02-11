@@ -102,6 +102,20 @@ public interface Persistence {
      * @param username
      * @return
      */
+    List<ArtistPreview> getFollowedArtists(String username);
+
+    /**
+     *
+     * @param username
+     * @return
+     */
+    List<ArtistPreview> getFollowersArtists(String username);
+
+    /**
+     *
+     * @param username
+     * @return
+     */
     List<SongPreview> getLikedSongs(String username);
 
     /**
