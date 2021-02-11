@@ -38,6 +38,7 @@ public class UserProfileController implements UIController {
     public Button followUnfollow;
     public Circle avatarCircle;
     public Button editProfile;
+    public Button userAnalytics;
     public VBox infoVBox;
     public Text country;
     public Text birthday;
@@ -86,12 +87,16 @@ public class UserProfileController implements UIController {
                 manager.context.getAuthenticatedUser().Username.equals(manager.context.getFocusedUser().Username)){
             editProfile.setVisible(true);
             editProfile.setManaged(true);
+            userAnalytics.setVisible(true);
+            userAnalytics.setManaged(true);
             followUnfollow.setVisible(false);
             followUnfollow.setManaged(false);
         }
         else{
             editProfile.setVisible(false);
             editProfile.setManaged(false);
+            userAnalytics.setVisible(false);
+            userAnalytics.setManaged(false);
             followUnfollow.setVisible(true);
             followUnfollow.setManaged(true);
             if(dbManager.checkFollow(user, manager.context.getAuthenticatedUser())){
@@ -151,7 +156,7 @@ public class UserProfileController implements UIController {
         }
 
         for(UserPreview preview : user.LoadedFollowed){
-            followedBox.getChildren().add(new UserPreviewVBox(preview, this::showUser));
+            followedBox.getChildren().add(new UserPreviewVBox(preview, null));
         }
 
         if(followedBox.getChildren().isEmpty()){
@@ -160,7 +165,7 @@ public class UserProfileController implements UIController {
         }
 
         for(UserPreview preview : user.LoadedFollowers){
-            followersBox.getChildren().add(new UserPreviewVBox(preview, this::showUser));
+            followersBox.getChildren().add(new UserPreviewVBox(preview, null));
         }
 
         if(followersBox.getChildren().isEmpty()){
@@ -169,7 +174,7 @@ public class UserProfileController implements UIController {
         }
 
         for(ArtistPreview preview : user.LoadedArtistFollowed){
-            followedArtistsBox.getChildren().add(new ArtistPreviewVBox(preview, this::showArtist));
+            followedArtistsBox.getChildren().add(new ArtistPreviewVBox(preview, null));
         }
 
         if(followedArtistsBox.getChildren().isEmpty()){
@@ -178,7 +183,7 @@ public class UserProfileController implements UIController {
         }
 
         for(ArtistPreview preview : user.LoadedArtistFollowers){
-            followerArtistsBox.getChildren().add(new ArtistPreviewVBox(preview, this::showArtist));
+            followerArtistsBox.getChildren().add(new ArtistPreviewVBox(preview, null));
         }
 
         if(followerArtistsBox.getChildren().isEmpty()){
@@ -188,49 +193,32 @@ public class UserProfileController implements UIController {
 
     }
 
+    public void goToAnalytics(MouseEvent mouseEvent) throws IOException {
+        manager.setContent(Path.USER_ANALYTICS);
+    }
+
     public void goToEdit(MouseEvent mouseEvent) throws IOException {
         manager.setContent(Path.USER_EDIT);
     }
 
-    public void showAllFollowedArtists(MouseEvent mouseEvent) {
+    public void showAllFollowedArtists(MouseEvent mouseEvent) throws IOException {
+        manager.setContent(Path.FOLLOWED_ARTISTS);
     }
 
-    public void showAllFollowers(MouseEvent mouseEvent) {
+    public void showAllFollowers(MouseEvent mouseEvent) throws IOException {
+        manager.setContent(Path.FOLLOWERS_PAGE);
     }
 
-    public void showAllFollowed(MouseEvent mouseEvent) {
+    public void showAllFollowed(MouseEvent mouseEvent) throws IOException{
+        manager.setContent(Path.FOLLOWED_PAGE);
     }
 
-    public void showAllArtistFollowers(MouseEvent mouseEvent) {
+    public void showAllArtistFollowers(MouseEvent mouseEvent) throws IOException {
+        manager.setContent(Path.FOLLOWER_ARTISTS);
     }
 
-    public void showAllLikes(MouseEvent mouseEvent) {
-    }
-
-    public void showArtist(ArtistPreviewClickedEvent event) {
-        Artist focusedArtist = dbManager.getArtist(event.preview.username);
-        manager.context.setFocusedArtist(focusedArtist);
-        try {
-            manager.setContent(Path.ARTIST_PROFILE);
-        } catch (IOException e) {
-            // TODO: log
-            e.printStackTrace();
-        }
-    }
-
-    public void showSong(SongPreviewClickedEvent event) {
-        System.out.print(event.preview.Title);
-    }
-
-    public void showUser(UserPreviewClickedEvent event) {
-        User focused = dbManager.getUser(event.preview.username);
-        manager.context.setFocusedUser(focused);
-        try {
-            manager.setContent(Path.USER_PROFILE);
-        } catch (IOException e) {
-            // TODO: log
-            e.printStackTrace();
-        }
+    public void showAllLikes(MouseEvent mouseEvent) throws IOException {
+        manager.setContent(Path.LIKED_SONGS);
     }
 
     public void followUser(MouseEvent mouseEvent) {

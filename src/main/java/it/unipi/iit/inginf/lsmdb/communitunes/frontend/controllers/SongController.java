@@ -5,6 +5,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ReviewVBox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
 import javafx.beans.value.ChangeListener;
@@ -22,6 +23,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
+import java.io.IOException;
 import java.util.stream.Collectors;
 
 public class SongController implements UIController {
@@ -216,6 +218,10 @@ public class SongController implements UIController {
     }
 
     public void seeAllReviews(MouseEvent mouseEvent) {
+    }
+
+    public void goToEdit(MouseEvent mouseEvent) throws IOException {
+        manager.setContent(Path.SONG_EDIT);
     }
 
 

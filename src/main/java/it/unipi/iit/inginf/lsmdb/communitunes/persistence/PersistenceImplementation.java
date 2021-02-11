@@ -201,6 +201,16 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
+    public List<ArtistPreview> getFollowedArtists(String username){
+        return neo4j.getFollowedArtists(username);
+    }
+
+    @Override
+    public List<ArtistPreview> getFollowersArtists(String username){
+        return neo4j.getFollowersArtists(username);
+    }
+
+    @Override
     public List<SongPreview> getLikedSongs(String username){
         return neo4j.getLikedSongs(username);
     }
