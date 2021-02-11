@@ -120,7 +120,7 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    public int addSong(String artist, String title, String songID) {
+    public int addSong(String artist, String title, String songID, List<String> feats) {
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
@@ -128,11 +128,14 @@ class Neo4jDriver implements Closeable {
                 parameters.put("username", artist);
                 parameters.put("title", title);
                 parameters.put("songID", songID);
+                parameters.put("feat", feats);
                 Result res = tx.run( "MATCH (a:Artist) WHERE a.username = $username " +
+                                "MATCH (feat:Artist) WHERE feat.username in $feat " +
                                 "CREATE (s:Song {title: $title, songID: $songID})," +
-                                "(a)-[:PERFORMS {isMainArtist: true}]->(s) RETURN ID(s)",
+                                "(a)-[:PERFORMS {isMainArtist: true}]->(s)"  +
+                                "(feat)-[:PERFORMS {isMainArtist: false}]->(s) " +
+                                "RETURN ID(s)",
                       parameters);
-                // TODO: qui non vengono aggiunti i feat
                 if (res.hasNext()) {
                     return res.single().get(0).asInt();
                 }
@@ -166,7 +169,7 @@ class Neo4jDriver implements Closeable {
                 parameters.put("image", image);
                 parameters.put("songID", id);
                 Result res = tx.run( "MATCH (a:Artist {username: $username})-[:PERFORMS {isMainArtist: true}]->(s:Song {songID: $songID}) SET s.image = $image, s.title = $title" +
-                                "MATCH (a2:Artist) WHERE ar.username in $artists\n" +
+                                "MATCH (a2:Artist) WHERE ar.username IN $artists\n" +
                                 "MERGE (a2)-[:PERFORMS {isMainArtist: false]->(s)\n" +
                                 "RETURN count(s)",
                         parameters);

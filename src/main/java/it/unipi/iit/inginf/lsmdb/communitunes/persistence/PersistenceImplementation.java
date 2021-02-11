@@ -139,7 +139,7 @@ class PersistenceImplementation implements Persistence {
     public boolean addSong(Song newSong) throws PersistenceInconsistencyException {
         String mongoID = mongo.addSong(newSong.Artist.username, newSong.Duration, newSong.Title, newSong.Album);
         if(mongoID != null){
-            int neoID = neo4j.addSong(newSong.Artist.username, newSong.Title, newSong.ID);
+            int neoID = neo4j.addSong(newSong.Artist.username, newSong.Title, newSong.ID, newSong.Featurings.stream().map(x -> x.username).collect(Collectors.toList()));
             if(neoID != -1){
                 return true;
             }
