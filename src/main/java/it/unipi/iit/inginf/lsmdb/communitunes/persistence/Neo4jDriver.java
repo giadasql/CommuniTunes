@@ -168,7 +168,7 @@ class Neo4jDriver implements Closeable {
                 parameters.put("artists", Featurings);
                 parameters.put("image", image);
                 parameters.put("songID", id);
-                Result res = tx.run( "MATCH (a:Artist {username: $username})-[:PERFORMS {isMainArtist: true}]->(s:Song {songID: $songID}) SET s.image = $image, s.title = $title" +
+                Result res = tx.run( "MATCH (a:Artist {username: $username})-[:PERFORMS {isMainArtist: true}]->(s:Song {songID: $songID}) SET s.image = $image, s.title = $title\n" +
                                 "MATCH (a2:Artist) WHERE ar.username IN $artists\n" +
                                 "MERGE (a2)-[:PERFORMS {isMainArtist: false]->(s)\n" +
                                 "RETURN count(s)",

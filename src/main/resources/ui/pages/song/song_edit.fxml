@@ -52,7 +52,7 @@
                   </AnchorPane>
                   <AnchorPane prefHeight="100.0" prefWidth="376.0">
                      <children>
-                        <TextField fx:id="genres" layoutX="64.0" layoutY="14.0" prefHeight="25.0" prefWidth="230.0">
+                        <TextField fx:id="genres" layoutX="64.0" layoutY="14.0" prefHeight="25.0" prefWidth="230.0" promptText="Genre1;Genre2...">
                            <cursor>
                               <Cursor fx:constant="TEXT" />
                            </cursor>
@@ -65,7 +65,7 @@
                <children>
                   <AnchorPane prefHeight="15.0" prefWidth="258.0">
                      <children>
-                        <Label layoutX="95.0" layoutY="9.0" prefHeight="34.0" prefWidth="119.0" text="Link" textAlignment="CENTER" textFill="WHITE">
+                        <Label layoutX="95.0" layoutY="9.0" prefHeight="34.0" prefWidth="119.0" text="Links" textAlignment="CENTER" textFill="WHITE">
                            <font>
                               <Font name="Book Antiqua Bold" size="26.0" />
                            </font>
@@ -74,7 +74,7 @@
                   </AnchorPane>
                   <AnchorPane prefHeight="100.0" prefWidth="376.0">
                      <children>
-                        <TextField fx:id="link" layoutX="63.0" layoutY="21.0" prefHeight="25.0" prefWidth="230.0">
+                        <TextField fx:id="link" layoutX="63.0" layoutY="21.0" prefHeight="25.0" prefWidth="230.0" promptText="Label1:URL1;Label2:URL2...">
                            <cursor>
                               <Cursor fx:constant="TEXT" />
                            </cursor>
@@ -97,28 +97,6 @@
                   <AnchorPane prefHeight="100.0" prefWidth="376.0">
                      <children>
                         <TextField fx:id="image" layoutX="63.0" layoutY="23.0" prefHeight="25.0" prefWidth="230.0">
-                           <cursor>
-                              <Cursor fx:constant="TEXT" />
-                           </cursor>
-                        </TextField>
-                     </children>
-                  </AnchorPane>
-               </children>
-            </HBox>
-            <HBox prefHeight="61.0" prefWidth="700.0">
-               <children>
-                  <AnchorPane prefHeight="15.0" prefWidth="258.0">
-                     <children>
-                        <Label layoutX="96.0" layoutY="15.0" prefHeight="34.0" prefWidth="147.0" text="Featuring" textAlignment="CENTER" textFill="WHITE">
-                           <font>
-                              <Font name="Book Antiqua Bold" size="26.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </AnchorPane>
-                  <AnchorPane prefHeight="100.0" prefWidth="376.0">
-                     <children>
-                        <TextField fx:id="feat" layoutX="65.0" layoutY="23.0" prefHeight="25.0" prefWidth="230.0">
                            <cursor>
                               <Cursor fx:constant="TEXT" />
                            </cursor>

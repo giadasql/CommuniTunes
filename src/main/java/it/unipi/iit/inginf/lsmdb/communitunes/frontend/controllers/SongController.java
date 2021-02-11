@@ -18,10 +18,15 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import org.neo4j.driver.internal.shaded.io.netty.util.internal.StringUtil;
 
 import java.io.IOException;
 import java.util.stream.Collectors;
@@ -45,6 +50,7 @@ public class SongController implements UIController {
     public Slider ratingSlider;
     public VBox reviews;
     public TextArea reviewComment;
+    public HBox genres;
     private LayoutManager manager;
     private Song song;
 
@@ -165,6 +171,20 @@ public class SongController implements UIController {
                 feat.getParent().setManaged(false);
             }
 
+            if(!song.Genres.isEmpty()){
+                for (String genre : song.Genres){
+                    Text genreName = new Text();
+                    genreName.setText(" " + genre);
+                    genreName.setFill(Color.WHITE);
+                    genreName.setFont(Font.font("Book Antiqua", 20));
+                    genres.getChildren().add(genreName);
+                }
+            }
+            else{
+                genres.getParent().setManaged(false);
+                genres.getParent().setVisible(false);
+            }
+
             ratingSlider.valueProperty().addListener(new ChangeListener<Number>() {
                 @Override
                 public void changed(
@@ -175,6 +195,7 @@ public class SongController implements UIController {
                             String.valueOf(newValue.intValue()));
                 }
             });
+
 
             if(song.AvgRating != -1){
                 avgRating.setText(String.valueOf((int)Math.round(song.AvgRating)));

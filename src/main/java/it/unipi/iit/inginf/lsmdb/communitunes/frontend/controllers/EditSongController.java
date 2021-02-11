@@ -23,7 +23,6 @@ public class EditSongController implements UIController {
     public TextField genres;
     public TextField link;
     public TextField image;
-    public TextField feat;
 
     private Song song;
     private Persistence dbManager;
@@ -34,16 +33,16 @@ public class EditSongController implements UIController {
             song.Genres = null;
         }
         else{
-            String[] arrayGenres = genres.getText().split(" ");
+            String[] arrayGenres = genres.getText().split(";");
             song.Genres = Arrays.asList(arrayGenres);
         }
         if(link.getText() == null || "".equals(link.getText())){
             song.Links = null;
         }
         else{
-            String[] arrayLinks = link.getText().split(" ");
+            String[] arrayLinks = link.getText().split(";");
             for(String s : arrayLinks){
-                String[] nameUrl = s.split(",");
+                String[] nameUrl = s.split(":");
                 song.Links.add(new Link(nameUrl[0], nameUrl[1]));
             }
         }
@@ -53,16 +52,6 @@ public class EditSongController implements UIController {
         else{
             song.Image = image.getText();
         }
-        // TODO: this doesn't do what it's expected to do, maybe it's better to not allow changing the featurings
-//        if(feat.getText() == null || "".equals(feat.getText())){
-//            song.Featurings = null;
-//        }
-//        else{
-//            String[] arrayFeat = feat.getText().split(" ");
-//            for(String s : arrayFeat){
-//                song.Featurings.add(dbManager.getArtistPreview(s));
-//            }
-//        }
         if(dbManager.editSong(song)){
             msg.setFill(Color.GREEN);
             msg.setText("The information was successfully updated.");
@@ -90,21 +79,16 @@ public class EditSongController implements UIController {
     }
 
     private void setDefaultValues(){
-        String temp = "";
+        StringBuilder temp = new StringBuilder();
         for(String genre : song.Genres){
-            temp = temp + genre + " ";
+            temp.append(genre).append(";");
         }
-        genres.setText(temp);
-        temp = "";
-        for(ArtistPreview artist : song.Featurings){
-            temp = temp + artist.username + " ";
-        }
-        feat.setText(temp);
-        temp = "";
+        genres.setText(temp.toString());
+        temp = new StringBuilder();
         for(Link link : song.Links){
-            temp = temp + link.name + "," + link.url + " ";
+            temp.append(link.name).append(":").append(link.url).append(";");
         }
-        link.setText(temp);
+        link.setText(temp.toString());
         image.setText(song.Image);
     }
 }

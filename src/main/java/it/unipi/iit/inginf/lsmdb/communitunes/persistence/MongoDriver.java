@@ -385,7 +385,7 @@ class MongoDriver implements Closeable {
         songValues.put("id", song.getObjectId("_id").toString());
         songValues.put("duration", song.get("length"));
         songValues.put("image", song.get("image"));
-        songValues.put("links", song.getList("sites", Document.class));
+        songValues.put("links", song.getList("links", Document.class));
         songValues.put("album", song.get("album"));
         songValues.put("avgRating", song.get("avgRating"));
         List<Map<String, Object>> reviews = new ArrayList<>();
