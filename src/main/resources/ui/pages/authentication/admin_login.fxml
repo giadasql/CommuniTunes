@@ -46,7 +46,7 @@
                   <Cursor fx:constant="HAND" />
                </cursor>
             </Button>
-            <Hyperlink layoutX="426.0" layoutY="449.0" onAction="#showUser" text="User" textFill="WHITE">
+            <Hyperlink layoutX="426.0" layoutY="449.0" onAction="#showLogin" text="User" textFill="WHITE">
                <font>
                   <Font name="Calibri" size="18.0" />
                </font>

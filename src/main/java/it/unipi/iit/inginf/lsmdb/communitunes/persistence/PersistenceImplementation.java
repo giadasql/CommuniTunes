@@ -306,6 +306,11 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
+    public List<ArtistPreview> getColleagues(Artist artist){
+        return neo4j.getColleagues(artist.Username);
+    }
+
+    @Override
     public List<ArtistPreview> getSimilarArtists(Artist artist){ return neo4j.getSimilarArtists(artist.Username); }
 
     @Override
@@ -355,6 +360,9 @@ class PersistenceImplementation implements Persistence {
     public int checkCredentials(String username, String password) {
         return mongo.checkCredentials(username, password);
     }
+
+    @Override
+    public boolean checkAdminCredentials(String username, String password){ return mongo.checkAdminCredentials(username, password); }
 
     @Override
     public User getUser(String username) {

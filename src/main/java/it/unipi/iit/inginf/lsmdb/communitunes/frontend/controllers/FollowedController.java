@@ -4,7 +4,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationFacto
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.listHbox;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ListHbox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
@@ -46,7 +46,7 @@ public class FollowedController implements UIController {
             }
 
 
-            mainVbox.getChildren().add(new listHbox().buildUserList(list));
+            mainVbox.getChildren().add(new ListHbox().buildUserList(list));
         }
     }
 

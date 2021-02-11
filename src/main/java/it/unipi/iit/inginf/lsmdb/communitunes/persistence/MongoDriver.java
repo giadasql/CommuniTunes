@@ -285,6 +285,19 @@ class MongoDriver implements Closeable {
         }
     }
 
+    public boolean checkAdminCredentials(String username, String password){
+        Bson myMatch = match(and(eq("username", username), eq("password", password)));
+        Bson myProject = project(fields(include("isAdmin")));
+        Document user = usersCollection.aggregate(Arrays.asList(myMatch, myProject)).first();
+
+        if(user == null || user.getBoolean("isAdmin") == null){
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
     public Map<String, Object> getUserData(String username){
         Document user = usersCollection.find(eq("username", username)).first();
         if(user != null){

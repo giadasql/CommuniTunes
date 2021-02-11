@@ -33,6 +33,16 @@ class AuthenticationManagerImplementation implements AuthenticationManager {
     }
 
     @Override
+    public AuthResult adminLogin(String username, String psw) {
+        if(persistenceManager.checkAdminCredentials(username, securePassword(psw))) {
+            return new AuthResult(username, true, Role.Admin, null);
+        }
+        else {
+            return new AuthResult(null, false, null, WrongCredentials);
+        }
+    }
+
+    @Override
     public AuthResult Register(String username, String email, String psw) throws PersistenceInconsistencyException {
         String usernameRegex = "^[a-zA-Z0-9._-]{3,}$";
         if(!username.matches(usernameRegex)){

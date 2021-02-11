@@ -8,14 +8,14 @@ import javafx.scene.layout.HBox;
 
 import java.util.List;
 
-public class listHbox extends HBox {
+public class ListHbox extends HBox {
 
     public AnchorPane anchorOne;
     public AnchorPane anchorTwo;
     public HBox innerHboxOne;
     public HBox innerHboxTwo;
 
-    public listHbox(){
+    public ListHbox(){
         anchorOne = new AnchorPane();
         anchorTwo = new AnchorPane();
         anchorOne.setPrefWidth(496.0);

@@ -4,7 +4,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationFacto
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.listHbox;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ListHbox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
@@ -45,7 +45,7 @@ public class ArtistSongs implements UIController {
                 list.add(song);
             }
 
-            mainVbox.getChildren().add(new listHbox().buildSongList(list));
+            mainVbox.getChildren().add(new ListHbox().buildSongList(list));
         }
     }
 

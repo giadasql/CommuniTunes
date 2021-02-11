@@ -8,6 +8,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ArtistPreviewV
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.SongPreviewVBox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.UserPreviewVBox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
@@ -30,7 +31,7 @@ public class UserAnalyticsController implements UIController {
     private Persistence dbManager;
 
     public void init() {
-        this.manager = manager;
+        this.manager = LayoutManagerFactory.getManager();
         dbManager = PersistenceFactory.CreatePersistence();
         user = manager.context.getAuthenticatedUser();
         List<ArtistPreview> suggestedArtistsList = dbManager.getSuggestedArtists(user);
