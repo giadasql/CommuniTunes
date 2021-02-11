@@ -1,5 +1,9 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.persistence;
 
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
+import org.javatuples.Pair;
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 import java.io.Closeable;
@@ -287,12 +291,11 @@ class Neo4jDriver implements Closeable {
             return session.writeTransaction(tx -> {
                 Result res = tx.run( "MATCH (u:User {username: $username})-[:FOLLOWS]->(f:User) WHERE NOT f:Artist " +
                                 "MATCH (f)-[:LIKES]->(s:Song)<-[:PERFORMS {isMainArtist: true}]-(a:Artist)" +
-                                "WITH DISTINCT(s) AS Songs, a LIMIT 15" +
-                                "RETURN Songs.title AS title, a.username AS artist, Songs.songID AS _id, Songs.image AS image",
+                                "RETURN DISTINCT(s {.title, artist: a.username, _id: s.songID, .image}) AS suggestedSongs LIMIT 15",
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();
-                    songs.add(r.asMap());
+                    songs.add(r.get("suggestedSongs", new HashMap<>()));
                 }
                 return songs;
             });
@@ -324,11 +327,11 @@ class Neo4jDriver implements Closeable {
             return session.writeTransaction(tx -> {
                 Result res = tx.run( "MATCH (u:User {username: $username})-[:FOLLOWS]->(m:User) WHERE NOT m:Artist " +
                                 "MATCH (m)-[:FOLLOWS]->(f:User) WHERE NOT f:Artist AND NOT f.username = u.username AND NOT (u)-[:FOLLOWS]->(f)" +
-                                "RETURN f.username AS username, f.image AS image LIMIT 15",
+                                "RETURN DISTINCT(f {.username, .image }) AS suggestedUsers LIMIT 7",
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();
-                    users.add(r.asMap());
+                    users.add(r.get("suggestedUsers", new HashMap<>()));
                 }
                 return users;
             });
@@ -336,47 +339,39 @@ class Neo4jDriver implements Closeable {
     }
     //  In this function, we find all the users (that are not artists) that like a song our target user likes. Then, we
     //  count how many songs our user likes and how many songs in common our target user and the other user like. We then
-    // choose as like-minded users those that like 60% or more of the songs that our target user likes.
-    public List<Map<String, Object>> getLikeMindedUsers(String username){
-        List<Map<String, Object>> users = new ArrayList<>();
+    // choose as like-minded users those that like 30% or more of the songs that our target user likes. We also return some of the
+    // songs that are liked by like-minded users
+    public Map<String, List<Map<String, Object>>> getLikeMindedUsers(String username){
+        List<Map<String, Object>> suggestedUsers = new ArrayList<>();
+        List<Map<String, Object>> suggestedSongs = new ArrayList<>();
+        Map<String, List<Map<String, Object>>> suggestions = new HashMap<>();
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
-                Result res = tx.run( "MATCH (u:User {username: $username})-[:LIKES]->(:Song)<-[:LIKES]-(f:User) WHERE NOT f:Artist " +
-                                "MATCH (u)-[:LIKES]->(s1:Song) " +
-                                "WITH u, f, COUNT(DISTINCT s1) AS s1Count " +
-                                "MATCH (u)-[:LIKES]->(s:Song)<-[:LIKES]-(f) " +
-                                "WITH f,s1Count, COUNT(DISTINCT s) AS commonSongsCount " +
-                                "WHERE commonSongsCount >= s1Count * 0.6 " +
-                                "RETURN f.username AS username, f.image AS image LIMIT 15 ",
+                Result res = tx.run( "MATCH (u:User {username: $username})-[:LIKES]->(s:Song)\n" +
+                                            "MATCH (u2:User)-[:LIKES]->(s2:Song)<-[:LIKES]-(u)\n" +
+                                            "WHERE u2 <> u\n" +
+                                            "WITH COLLECT(DISTINCT(s.songID)) AS uSongs, COUNT(DISTINCT(s)) AS userSongsCount, u2, COUNT(DISTINCT(s2)) AS commonSongsCount\n" +
+                                            "WHERE commonSongsCount >= userSongsCount * 0.3\n" +
+                                            "MATCH (u2)-[:LIKES]->(s3:Song)<-[:PERFORMS {isMainArtist: true}]-(a:Artist)\n" +
+                                            "WHERE NOT s3.songID IN uSongs\n" +
+                                            "WITH s3, u2, a.username AS artist ORDER BY commonSongsCount/userSongsCount\n" +
+                                            "RETURN COLLECT(DISTINCT(s3 {.title, .image, artist, _id: s3.songID}))[0..6] AS songs, COLLECT(DISTINCT(u2 {.username, .image}))[0..6] AS users",
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();
-                    users.add(r.asMap());
+                    List<Object> songs = r.get("songs").asList();
+                    for (Object song : songs){
+                        suggestedSongs.add((Map<String,Object>)song);
+                    }
+                    List<Object> users = r.get("users").asList();
+                    for (Object user : users){
+                        suggestedUsers.add((Map<String,Object>)user);
+                    }
                 }
-                return users;
-            });
-        }
-    }
-
-    public List<Map<String, Object>> getLikeMindedSongs(String username){
-        List<Map<String, Object>> songs = new ArrayList<>();
-        try ( Session session = driver.session())
-        {
-            return session.writeTransaction(tx -> {
-                Result res = tx.run( "MATCH (u:User {username: $username})-[:LIKES]->(:Song)<-[:LIKES]-(f:User) WHERE NOT f:Artist " +
-                                "MATCH (u)-[:LIKES]->(s1:Song) MATCH (f)-[:LIKES]->(s2:Song)<-[:PERFORMS {isMainArtist: true }]-(a:Artist) " +
-                                "WITH u, f, a, s2, COUNT(DISTINCT s1) AS s1Count " +
-                                "MATCH (u)-[:LIKES]->(s:Song)<-[:LIKES]-(f) " +
-                                "WITH s1Count,s2, a, COUNT(DISTINCT s) AS commonSongsCount " +
-                                "WHERE commonSongsCount >= s1Count * 0.6 " +
-                                "RETURN s2.title AS title, a.username AS artist, s2.songID AS _id, s2.image AS image LIMIT 15 ",
-                        parameters("username", username));
-                while(res.hasNext()){
-                    Record r = res.next();
-                    songs.add(r.asMap());
-                }
-                return songs;
+                suggestions.put("songs", suggestedSongs);
+                suggestions.put("users", suggestedUsers);
+                return suggestions;
             });
         }
     }

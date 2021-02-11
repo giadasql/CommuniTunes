@@ -283,17 +283,7 @@ public interface Persistence {
      * @param user
      * @return
      */
-    List<UserPreview> getLikeMindedUsers(User user);
-
-    /**
-     *
-     * Get songs liked by user's like-minded users.
-     *
-     * @param user
-     * @return
-     *
-     */
-    List<SongPreview> getLikeMindedSongs(User user);
+    Pair<List<UserPreview>, List<SongPreview>> getLikeMindedUsers(User user);
 
     /**
      *

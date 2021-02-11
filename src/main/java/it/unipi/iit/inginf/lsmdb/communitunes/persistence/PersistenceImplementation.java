@@ -8,6 +8,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigRea
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderType;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceInconsistencyException;
+import org.javatuples.Pair;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -331,26 +332,21 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<UserPreview> getLikeMindedUsers(User user){
-        List<UserPreview> result = new  ArrayList<>();
-        List<Map<String, Object>> users = neo4j.getLikeMindedUsers(user.Username);
+    public Pair<List<UserPreview>, List<SongPreview>> getLikeMindedUsers(User user){
+        List<UserPreview> suggestedUsers = new  ArrayList<>();
+        List<SongPreview> suggestedSongs = new  ArrayList<>();
+        Map<String, List<Map<String, Object>>> suggestions = neo4j.getLikeMindedUsers(user.Username);
         for (Map<String, Object> suggestion:
-                users) {
-            result.add(buildUserPreviewFromMap(suggestion));
+                suggestions.getOrDefault("users", new ArrayList<>())) {
+            suggestedUsers.add(buildUserPreviewFromMap(suggestion));
         }
-        return result;
+        for (Map<String, Object> suggestion:
+                suggestions.getOrDefault("songs", new ArrayList<>())) {
+            suggestedSongs.add(buildSongPreviewFromMap(suggestion));
+        }
+        return new Pair<>(suggestedUsers, suggestedSongs);
     }
 
-    @Override
-    public List<SongPreview> getLikeMindedSongs(User user){
-        List<SongPreview> result = new  ArrayList<>();
-        List<Map<String, Object>> songs = neo4j.getLikeMindedSongs(user.Username);
-        for (Map<String, Object> song:
-                songs) {
-            result.add(buildSongPreviewFromMap(song));
-        }
-        return result;
-    }
 
     @Override
     public List<UserPreview> getTopFans(Artist artist){

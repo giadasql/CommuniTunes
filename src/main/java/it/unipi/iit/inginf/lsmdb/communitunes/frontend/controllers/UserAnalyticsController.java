@@ -14,6 +14,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
+import org.javatuples.Pair;
 
 import java.io.IOException;
 import java.util.List;
@@ -35,10 +36,15 @@ public class UserAnalyticsController implements UIController {
         dbManager = PersistenceFactory.CreatePersistence();
         user = manager.context.getAuthenticatedUser();
         List<ArtistPreview> suggestedArtistsList = dbManager.getSuggestedArtists(user);
+        System.out.println("1");
         List<UserPreview> suggestedUsersList = dbManager.getSuggestedUsers(user);
-        List<UserPreview> likemindedUsersList = dbManager.getLikeMindedUsers(user);
+        System.out.println("2");
+        Pair<List<UserPreview>, List<SongPreview>> likeMinded = dbManager.getLikeMindedUsers(user);
+        List<UserPreview> likemindedUsersList = likeMinded.getValue0();
+        List<SongPreview> likemindedSongsList = likeMinded.getValue1();
+        System.out.println("3");
         List<SongPreview> suggestedSongsList = dbManager.getSuggestedSongs(user);
-        List<SongPreview> likemindedSongsList = dbManager.getLikeMindedSongs(user);
+        System.out.println("4");
 
         for(ArtistPreview artist : suggestedArtistsList){
             suggestedArtists.getChildren().add(new ArtistPreviewVBox(artist, null));
