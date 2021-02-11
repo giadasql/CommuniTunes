@@ -8,14 +8,6 @@ import java.util.List;
 
 public class SongPreview implements Preview{
 
-    public SongPreview(String ID, String artistName, String artistUsername, String title, String image) {
-        this.ID = ID;
-        ArtistName = artistName;
-        ArtistUsername = artistUsername;
-        Title = title;
-        Image = image;
-    }
-
     public SongPreview(String ID, String artistUsername, String title, String image) {
         this.ID = ID;
         ArtistUsername = artistUsername;
@@ -24,8 +16,6 @@ public class SongPreview implements Preview{
     }
 
     public String ID;
-
-    public String ArtistName;
 
     public String ArtistUsername;
 

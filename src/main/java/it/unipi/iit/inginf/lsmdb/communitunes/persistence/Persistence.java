@@ -13,6 +13,7 @@ import org.javatuples.Triplet;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Interface for the persistence management.
@@ -68,12 +69,10 @@ public interface Persistence {
      */
     Song getSong(String songID);
 
-    /**
-     *
-     * @param useranem
-     * @return
-     */
-    ArtistPreview getArtistPreview(String usenrname);
+
+    List<ArtistPreview> getArtistPreviews(List<String> usernames);
+    List<UserPreview> getUserPreviews(List<String> usernames);
+    List<SongPreview> getSongPreviews(List<String> usernames);
 
     /**
      *
@@ -205,7 +204,7 @@ public interface Persistence {
      *
      * @return
      */
-    HashMap<String, List<SongPreview>> getSuggestedSongs();
+    Map<String, List<SongPreview>> getSuggestedSongs();
 
     /**
      *
@@ -226,7 +225,7 @@ public interface Persistence {
      * @return
      *
      */
-    List<Pair<String, ArtistPreview>> getRepresentativeArtist();
+    Map<String, ArtistPreview> getRepresentativeArtist();
 
     /**
      *
@@ -315,6 +314,7 @@ public interface Persistence {
     boolean deleteLike(User user, Song song);
 
     boolean checkIfUserReviewedSong(User user, Song song);
+
 
     /**
      *

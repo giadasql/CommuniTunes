@@ -15,6 +15,7 @@ import org.javatuples.Pair;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class HomePageController implements UIController {
 
@@ -28,9 +29,9 @@ public class HomePageController implements UIController {
     public void init() {
         this.manager = LayoutManagerFactory.getManager();
         dbManager = PersistenceFactory.CreatePersistence();
-        HashMap<String, List<SongPreview>> songsList = dbManager.getSuggestedSongs();
-        List<Pair<String, ArtistPreview>> artistsList = dbManager.getRepresentativeArtist();
-
+        Map<String, List<SongPreview>> songsList = dbManager.getSuggestedSongs();
+        Map<String, ArtistPreview> artistsList = dbManager.getRepresentativeArtist();
+        System.out.println("ok");
 //        for(Pair<String, ArtistPreview> artist : artistsList ){
 //            List<SongPreview> songs = songsList.get(artist.getValue0());
 //            for(SongPreview song : songs){

@@ -53,15 +53,16 @@ public class EditSongController implements UIController {
         else{
             song.Image = image.getText();
         }
-        if(feat.getText() == null || "".equals(feat.getText())){
-            song.Featurings = null;
-        }
-        else{
-            String[] arrayFeat = feat.getText().split(" ");
-            for(String s : arrayFeat){
-                song.Featurings.add(dbManager.getArtistPreview(s));
-            }
-        }
+        // TODO: this doesn't do what it's expected to do, maybe it's better to not allow changing the featurings
+//        if(feat.getText() == null || "".equals(feat.getText())){
+//            song.Featurings = null;
+//        }
+//        else{
+//            String[] arrayFeat = feat.getText().split(" ");
+//            for(String s : arrayFeat){
+//                song.Featurings.add(dbManager.getArtistPreview(s));
+//            }
+//        }
         if(dbManager.editSong(song)){
             msg.setFill(Color.GREEN);
             msg.setText("The information was successfully updated.");
