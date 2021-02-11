@@ -51,6 +51,14 @@ public interface Persistence {
     /**
      *
      * @param username
+     * @param password
+     * @return
+     */
+    boolean checkAdminCredentials(String username, String password);
+
+    /**
+     *
+     * @param username
      * @return
      */
     User getUser(String username);
@@ -297,6 +305,15 @@ public interface Persistence {
      *
      */
     List<UserPreview> getTopFans(Artist artist);
+
+    /**
+     *
+     * Get artists that worked with artist.
+     *
+     * @param artist
+     * @return
+     */
+    List<ArtistPreview> getColleagues(Artist artist);
 
     /**
      *

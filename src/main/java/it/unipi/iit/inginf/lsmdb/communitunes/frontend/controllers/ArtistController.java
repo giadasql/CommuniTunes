@@ -4,8 +4,12 @@ import com.sun.javafx.application.HostServicesDelegate;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Link;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ArtistPreviewVBox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.SongPreviewVBox;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.UserPreviewVBox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
@@ -55,9 +59,13 @@ public class ArtistController implements UIController {
     public Text country;
     public HBox birthdayBox;
     public Text birthday;
+    public HBox followedArtistsBox;
+    public HBox followersBox;
+    public HBox followedBox;
+    public HBox followerArtistsBox;
+
     private Artist artist;
     private LayoutManager manager;
-
     private Persistence dbManager;
 
     private boolean biographyExpanded = false;
@@ -202,6 +210,42 @@ public class ArtistController implements UIController {
                     songsHbox.getChildren().add(new SongPreviewVBox(songPreview, null));
             }
         }
+
+        for(UserPreview preview : artist.LoadedFollowed){
+            followedBox.getChildren().add(new UserPreviewVBox(preview, null));
+        }
+
+        if(followedBox.getChildren().isEmpty()){
+            followedBox.getParent().setVisible(false);
+            followedBox.getParent().setManaged(false);
+        }
+
+        for(UserPreview preview : artist.LoadedFollowers){
+            followersBox.getChildren().add(new UserPreviewVBox(preview, null));
+        }
+
+        if(followersBox.getChildren().isEmpty()){
+            followersBox.getParent().setVisible(false);
+            followersBox.getParent().setManaged(false);
+        }
+
+        for(ArtistPreview preview : artist.LoadedArtistFollowed){
+            followedArtistsBox.getChildren().add(new ArtistPreviewVBox(preview, null));
+        }
+
+        if(followedArtistsBox.getChildren().isEmpty()){
+            followedArtistsBox.getParent().setVisible(false);
+            followedArtistsBox.getParent().setManaged(false);
+        }
+
+        for(ArtistPreview preview : artist.LoadedArtistFollowers){
+            followerArtistsBox.getChildren().add(new ArtistPreviewVBox(preview, null));
+        }
+
+        if(followerArtistsBox.getChildren().isEmpty()){
+            followerArtistsBox.getParent().setVisible(false);
+            followerArtistsBox.getParent().setManaged(false);
+        }
     }
 
 
@@ -224,6 +268,22 @@ public class ArtistController implements UIController {
 
     public void showAllSongs(MouseEvent mouseEvent) throws IOException {
         manager.setContent(Path.ARTIST_SONGS);
+    }
+
+    public void showAllFollowedArtists(MouseEvent mouseEvent) throws IOException {
+        manager.setContent(Path.FOLLOWED_ARTISTS);
+    }
+
+    public void showAllFollowers(MouseEvent mouseEvent) throws IOException {
+        manager.setContent(Path.FOLLOWERS_PAGE);
+    }
+
+    public void showAllFollowed(MouseEvent mouseEvent) throws IOException{
+        manager.setContent(Path.FOLLOWED_PAGE);
+    }
+
+    public void showAllArtistFollowers(MouseEvent mouseEvent) throws IOException {
+        manager.setContent(Path.FOLLOWER_ARTISTS);
     }
 
     public void addSong(MouseEvent mouseEvent) throws IOException {

@@ -29,7 +29,6 @@ public class AuthenticationController implements UIController {
     @FXML
     private PasswordField password;
 
-    private Stage primary;
     private LayoutManager manager;
     private AuthenticationManager authManager;
     private Persistence dbManager;
@@ -54,6 +53,19 @@ public class AuthenticationController implements UIController {
         }
     }
 
+    @FXML
+    public void adminLoginEventHandler(ActionEvent event) throws IOException {
+        if (authManager != null && manager != null){
+            AuthResult result = authManager.adminLogin(username.getText(), password.getText());
+            if(result.Success){
+                errorMsg.setText("");
+                manager.setContent(Path.HOMEPAGE_ADMIN);
+            }
+            else{
+                errorMsg.setText(result.ErrorMsg);
+            }
+        }
+    }
 
     @Override
     public void init() {
@@ -84,8 +96,8 @@ public class AuthenticationController implements UIController {
     }
 
     @FXML
-    public void showAdmin(ActionEvent actionEvent) {
-
+    public void showAdmin(ActionEvent actionEvent) throws IOException {
+        manager.showAuthenticationPage(Path.ADMIN_LOGIN);
     }
 
     @FXML

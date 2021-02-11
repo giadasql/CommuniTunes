@@ -4,8 +4,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationFacto
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.listHbox;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ListHbox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
@@ -40,13 +39,13 @@ public class LikedSongsController implements UIController {
             List<SongPreview> list = new ArrayList<>();
             for(int i = 0; i < 6; i++){
                 SongPreview song;
-                if(!iter.hasNext())
-                    break;
                 song = iter.next();
                 list.add(song);
+                if(!iter.hasNext())
+                    break;
             }
-
-            mainVbox.getChildren().add(new listHbox().buildSongList(list));
+            ListHbox Hbox = new ListHbox();
+            mainVbox.getChildren().add(Hbox.buildSongList(list));
         }
     }
 
