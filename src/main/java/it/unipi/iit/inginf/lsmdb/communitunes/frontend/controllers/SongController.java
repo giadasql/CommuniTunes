@@ -137,17 +137,23 @@ public class SongController implements UIController {
                 albumName.getParent().setManaged(false);
             }
 
-            if(!song.Links.isEmpty()){
-                for (Link link : song.Links.stream().limit(4).collect(Collectors.toList())){
-                    if(link != null && link.url != null){
-                        Hyperlink hyperlink = new Hyperlink();
-                        hyperlink.setText(link.name);
-                        hyperlink.getStyleClass().add("song-site");
-                        hyperlink.setOnAction(e -> {
-                            manager.context.hostServices.showDocument(link.url);
-                        });
-                        links.getChildren().add(hyperlink);
+            if(!(song.Links == null)){
+                if(!song.Links.isEmpty()){
+                    for (Link link : song.Links.stream().limit(4).collect(Collectors.toList())){
+                        if(link != null && link.url != null){
+                            Hyperlink hyperlink = new Hyperlink();
+                            hyperlink.setText(link.name);
+                            hyperlink.getStyleClass().add("song-site");
+                            hyperlink.setOnAction(e -> {
+                                manager.context.hostServices.showDocument(link.url);
+                            });
+                            links.getChildren().add(hyperlink);
+                        }
                     }
+                }
+                else{
+                    links.getParent().setManaged(false);
+                    links.getParent().setVisible(false);
                 }
             }
             else{

@@ -168,7 +168,7 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean editSong(Song newSong) {
-        return mongo.updateSong(newSong) && neo4j.updateSong(newSong.ID, newSong.Title, newSong.Artist.username, newSong.Featurings.stream().map(x -> x.username).collect(Collectors.toList()), newSong.Image);
+        return mongo.updateSong(newSong) && neo4j.updateSong(newSong.ID, newSong.Title, newSong.Artist.username, newSong.Image);
     }
 
     @Override
