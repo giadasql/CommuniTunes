@@ -168,7 +168,7 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean editSong(Song newSong) {
-        return mongo.updateSong(newSong) && neo4j.updateSong(newSong.ID, newSong.Title, newSong.Artist.username, newSong.Featurings.stream().map(x -> x.username).collect(Collectors.toList()), newSong.Image);
+        return mongo.updateSong(newSong) && neo4j.updateSong(newSong.ID, newSong.Title, newSong.Artist.username, newSong.Image);
     }
 
     @Override
@@ -192,9 +192,9 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<UserPreview> getFollowedUsers(String username){
+    public List<UserPreview> getFollowedUsers(String username, int startIndex, int count){
         List<UserPreview> result = new  ArrayList<>();
-        List<Map<String, Object>> users = neo4j.getFollowedUsers(username);
+        List<Map<String, Object>> users = neo4j.getFollowedUsers(username, startIndex, count);
         for (Map<String, Object> user:
              users) {
             result.add(buildUserPreviewFromMap(user));
@@ -203,9 +203,9 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<UserPreview> getFollowers(String username){
+    public List<UserPreview> getFollowers(String username, int startIndex, int count){
         List<UserPreview> result = new  ArrayList<>();
-        List<Map<String, Object>> users = neo4j.getFollowers(username);
+        List<Map<String, Object>> users = neo4j.getFollowers(username, startIndex, count);
         for (Map<String, Object> user:
                 users) {
             result.add(buildUserPreviewFromMap(user));
@@ -214,9 +214,9 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<ArtistPreview> getFollowedArtists(String username){
+    public List<ArtistPreview> getFollowedArtists(String username, int startIndex, int count){
         List<ArtistPreview> result = new  ArrayList<>();
-        List<Map<String, Object>> artists = neo4j.getFollowedArtists(username);
+        List<Map<String, Object>> artists = neo4j.getFollowedArtists(username, startIndex, count);
         for (Map<String, Object> artist:
                 artists) {
             result.add(buildArtistPreviewFromMap(artist));
@@ -225,9 +225,9 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<ArtistPreview> getFollowingArtists(String username){
+    public List<ArtistPreview> getFollowingArtists(String username, int startIndex, int count){
         List<ArtistPreview> result = new  ArrayList<>();
-        List<Map<String, Object>> artists = neo4j.getFollowingArtists(username);
+        List<Map<String, Object>> artists = neo4j.getFollowingArtists(username, startIndex, count);
         for (Map<String, Object> artist:
                 artists) {
             result.add(buildArtistPreviewFromMap(artist));
@@ -236,9 +236,9 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<SongPreview> getLikedSongs(String username){
+    public List<SongPreview> getLikedSongs(String username, int startIndex, int count){
         List<SongPreview> result = new  ArrayList<>();
-        List<Map<String, Object>> songs = neo4j.getLikedSongs(username);
+        List<Map<String, Object>> songs = neo4j.getLikedSongs(username, startIndex, count);
         for (Map<String, Object> song:
                 songs) {
             result.add(buildSongPreviewFromMap(song));
@@ -247,9 +247,9 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<SongPreview> getArtistSongs(String username){
+    public List<SongPreview> getArtistSongs(String username, int startIndex, int count){
         List<SongPreview> result = new  ArrayList<>();
-        List<Map<String, Object>> songs = neo4j.getArtistSongs(username);
+        List<Map<String, Object>> songs = neo4j.getArtistSongs(username, startIndex, count);
         for (Map<String, Object> song:
                 songs) {
             result.add(buildSongPreviewFromMap(song));

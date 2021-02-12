@@ -8,6 +8,7 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.Link;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import org.bson.*;
@@ -124,11 +125,17 @@ class MongoDriver implements Closeable {
         Document query = new Document();
         query.append("_id", new ObjectId(newArtist.ID));
         Document setData = new Document();
+        BasicDBList linkList = new BasicDBList();
+        for (Link link:
+                newArtist.Links) {
+            linkList.add(new BasicDBObject("name", link.name).append("link", link.url));
+        }
         setData.append("password", newArtist.Password).append("email", newArtist.Email)
                 .append("country", newArtist.Country).append("birthday", newArtist.Birthday)
                 .append("activity", newArtist.ActiveYears).append("image", newArtist.Image)
                 .append("biography", newArtist.Biography).append("stageName", newArtist.StageName)
-                .append("first_name", newArtist.FirstName).append("last_name", newArtist.LastName);
+                .append("first_name", newArtist.FirstName).append("last_name", newArtist.LastName)
+                .append("sites", linkList);
         Document update = new Document();
         update.append("$set", setData);
 
@@ -167,7 +174,14 @@ class MongoDriver implements Closeable {
         Document query = new Document();
         query.append("_id", new ObjectId(newSong.ID));
         Document setData = new Document();
-        setData.append("links", newSong.Links)
+        BasicDBList linkList = new BasicDBList();
+        if(newSong.Links != null){
+            for (Link link:
+                    newSong.Links) {
+                linkList.add(new BasicDBObject("name", link.name).append("link", link.url));
+            }
+        }
+        setData.append("links", linkList)
                 .append("image", newSong.Image)
                 .append("genres", newSong.Genres);
         Document update = new Document();
@@ -455,7 +469,7 @@ class MongoDriver implements Closeable {
 
         BasicDBList list = new BasicDBList();
         list.add("$reviews");
-        list.add(nMax);
+        list.add(nMax * -1);
         Bson slice = new BasicDBObject("reviews", new BasicDBObject("$slice", list));
 
         Bson project = Aggregates.project(Projections.fields(include("reviews"), slice));

@@ -162,19 +162,16 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    public boolean updateSong(String id, String title, String artist, List<String> Featurings, String image){
+    public boolean updateSong(String id, String title, String artist, String image){
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
                 HashMap<String, Object> parameters = new HashMap<>();
                 parameters.put("username", artist);
                 parameters.put("title", title);
-                parameters.put("artists", Featurings);
                 parameters.put("image", image);
                 parameters.put("songID", id);
                 Result res = tx.run( "MATCH (a:Artist {username: $username})-[:PERFORMS {isMainArtist: true}]->(s:Song {songID: $songID}) SET s.image = $image, s.title = $title\n" +
-                                "MATCH (a2:Artist) WHERE ar.username IN $artists\n" +
-                                "MERGE (a2)-[:PERFORMS {isMainArtist: false]->(s)\n" +
                                 "RETURN count(s)",
                         parameters);
                 return (res.single().get(0).asInt() >= 1);
@@ -182,14 +179,14 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    public List<Map<String, Object>> getFollowedUsers(String username){
+    public List<Map<String, Object>> getFollowedUsers(String username, int startIndex, int count){
         List<Map<String, Object>> users = new ArrayList<>();
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
                 Result res = tx.run( "MATCH (u:User {username: $username})-[:FOLLOWS]->(m:User)" +
-                                "RETURN m.username AS username, m.image AS image",
-                        parameters("username", username));
+                                "RETURN m.username AS username, m.image AS image SKIP $toSkip LIMIT $count",
+                        parameters("username", username, "toSkip", startIndex, "count", count));
                 while(res.hasNext()){
                     Record r = res.next();
                     users.add(r.asMap());
@@ -199,14 +196,14 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    public List<Map<String, Object>> getFollowers(String username){
+    public List<Map<String, Object>> getFollowers(String username, int startIndex, int count){
         List<Map<String, Object>> users = new ArrayList<>();
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
                 Result res = tx.run( "MATCH (u:User {username: $username})<-[:FOLLOWS]-(m:User)" +
-                                "RETURN m.username AS username, m.image AS image",
-                        parameters("username", username));
+                                "RETURN m.username AS username, m.image AS image ORDER BY m.username SKIP $toSkip LIMIT $count",
+                        parameters("username", username, "toSkip", startIndex, "count", count));
                 while(res.hasNext()){
                     Record r = res.next();
                     users.add(r.asMap());
@@ -216,14 +213,14 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    public List<Map<String, Object>> getFollowedArtists(String username){
+    public List<Map<String, Object>> getFollowedArtists(String username, int startIndex, int count){
         List<Map<String, Object>> artists = new ArrayList<>();
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
                 Result res = tx.run( "MATCH (u:User {username: $username})-[:FOLLOWS]->(a:Artist)" +
-                                "RETURN a.username AS username, a.image AS image",
-                        parameters("username", username));
+                                "RETURN a.username AS username, a.image AS image SKIP $toSkip LIMIT $count",
+                        parameters("username", username, "toSkip", startIndex, "count", count));
                 while(res.hasNext()){
                     Record r = res.next();
                     artists.add(r.asMap());
@@ -233,14 +230,14 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    public List<Map<String, Object>> getFollowingArtists(String username){
+    public List<Map<String, Object>> getFollowingArtists(String username, int startIndex, int count){
         List<Map<String, Object>> artists = new ArrayList<>();
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
                 Result res = tx.run( "MATCH (u:User {username: $username})<-[:FOLLOWS]-(a:Artist)" +
-                                "RETURN a.username AS username, a.image AS image",
-                        parameters("username", username));
+                                "RETURN a.username AS username, a.image AS image SKIP $toSkip LIMIT $count",
+                        parameters("username", username, "toSkip", startIndex, "count", count));
                 while(res.hasNext()){
                     Record r = res.next();
                     artists.add(r.asMap());
@@ -250,14 +247,14 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    public List<Map<String, Object>> getLikedSongs(String username){
+    public List<Map<String, Object>> getLikedSongs(String username, int startIndex, int count){
         List<Map<String, Object>> songs = new ArrayList<>();
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
                 Result res = tx.run( "MATCH (u:User {username: $username})-[:LIKES]->(s:Song)<-[:PERFORMS {isMainArtist: true}]-(a:Artist)" +
-                                "RETURN s.title AS title, a.username AS artist, s.songID AS _id, s.image AS image",
-                        parameters("username", username));
+                                "RETURN s.title AS title, a.username AS artist, s.songID AS _id, s.image AS image SKIP $toSkip LIMIT $count",
+                        parameters("username", username, "toSkip", startIndex, "count", count));
                 while(res.hasNext()){
                     Record r = res.next();
                     songs.add(r.asMap());
@@ -267,14 +264,14 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    public List<Map<String, Object>> getArtistSongs(String username){
+    public List<Map<String, Object>> getArtistSongs(String username, int startIndex, int count){
         List<Map<String, Object>> songs = new ArrayList<>();
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
                 Result res = tx.run( "MATCH (s:Song)<-[:PERFORMS {isMainArtist: true}]-(a:Artist {username: $username})" +
-                                "RETURN s.title AS title, a.username AS artistUsername, s.songID AS _id, s.image AS image",
-                        parameters("username", username));
+                                "RETURN s.title AS title, a.username AS artistUsername, s.songID AS _id, s.image AS image SKIP $toSkip LIMIT $count",
+                        parameters("username", username, "toSkip", startIndex, "count", count));
                 while(res.hasNext()){
                     Record r = res.next();
                     songs.add(r.asMap());
@@ -409,7 +406,7 @@ class Neo4jDriver implements Closeable {
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();
-                    users.add(r.asMap());
+                    users.add(r.get("topFan", new HashMap<>()));
                 }
                 return users;
             });
@@ -429,7 +426,7 @@ class Neo4jDriver implements Closeable {
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();
-                    artists.add(r.asMap());
+                    artists.add(r.get("similarArtist", new HashMap<>()));
                 }
                 return artists;
             });
@@ -449,7 +446,7 @@ class Neo4jDriver implements Closeable {
                         parameters("username", username));
                 while(res.hasNext()) {
                     Record r = res.next();
-                    songs.add(r.asMap());
+                    songs.add(r.get("s", new HashMap<>()));
                 }
                 return songs;
             });

@@ -20,7 +20,6 @@ import java.util.List;
 
 public class ArtistAnalytics implements UIController {
 
-    public HBox artistColleague;
     public HBox similarArtists;
     public HBox topFans;
     public HBox popularSongs;

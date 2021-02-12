@@ -2,6 +2,7 @@ package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.authentication.Role;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ListHbox;
@@ -10,6 +11,9 @@ import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFact
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
+import javafx.event.ActionEvent;
+import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
@@ -20,11 +24,18 @@ import java.util.List;
 
 public class FollowerArtistsController implements UIController {
     public VBox mainVbox;
+    public Button nextPageBtn;
+    public Button prevPageBtn;
+    public ScrollPane scrollPane;
 
     private User user;
     private Persistence dbManager;
     private AuthenticationManager authManager;
     private LayoutManager manager;
+
+    private int startIndex = 0;
+    private final int count = 54;
+
 
     @Override
     public void init(){
@@ -33,23 +44,61 @@ public class FollowerArtistsController implements UIController {
         dbManager = PersistenceFactory.CreatePersistence();
         authManager = AuthenticationFactory.CreateAuthenticationManager();
 
-        user.LoadedArtistFollowers = dbManager.getFollowingArtists(user.Username);
-        for(Iterator<ArtistPreview> iter = user.LoadedArtistFollowers.iterator(); iter.hasNext(); ){
-            List<ArtistPreview> list = new ArrayList<>();
-            for(int i = 0; i < 6; i++){
-                ArtistPreview artist;
-                if(!iter.hasNext())
-                    break;
-                artist = iter.next();
-                list.add(artist);
+        List<ArtistPreview> followingArtists = dbManager.getFollowingArtists(user.Username, startIndex, count);
+        prevPageBtn.setDisable(true);
+        showPreviews(followingArtists);
+    }
+
+    public void showPreviews(List<ArtistPreview> toShow){
+        scrollPane.setVvalue(0);
+        mainVbox.getChildren().clear();
+        if(toShow == null){
+            return;
+        }
+        List<ArtistPreview> temp = new ArrayList<>();
+        for(ArtistPreview artistPreview : toShow){
+            temp.add(artistPreview);
+            if(temp.size() == 6){
+                mainVbox.getChildren().add(new ListHbox().buildArtistList(temp));
+                temp = new ArrayList<>();
             }
-
-
-            mainVbox.getChildren().add(new ListHbox().buildArtistList(list));
+        }
+        if(temp.size() > 0){
+            mainVbox.getChildren().add(new ListHbox().buildArtistList(temp));
         }
     }
 
     public void closeWindow(MouseEvent mouseEvent) throws IOException {
-        manager.setContent(Path.USER_PROFILE);
+        if(manager.context.getFocusedRole() == Role.Artist){
+            manager.setContent(Path.ARTIST_PROFILE);
+        }
+        else{
+            manager.setContent(Path.USER_PROFILE);
+        }
+    }
+
+    public void nextPage(ActionEvent actionEvent) {
+        startIndex = startIndex + count;
+        List<ArtistPreview> newPreviews = dbManager.getFollowingArtists(user.Username, startIndex, count);
+        if(!newPreviews.isEmpty()){
+            showPreviews(newPreviews);
+            prevPageBtn.setDisable(false);
+        }
+        else{
+            nextPageBtn.setDisable(true);
+            startIndex = startIndex - count;
+        }
+    }
+
+    public void prevPage(ActionEvent actionEvent) {
+        if(startIndex >= count){
+            startIndex = startIndex - count;
+            List<ArtistPreview> newPreviews = dbManager.getFollowingArtists(user.Username, startIndex, count);
+            showPreviews(newPreviews);
+            nextPageBtn.setDisable(false);
+        }
+        if(startIndex == 0){
+            prevPageBtn.setDisable(true);
+        }
     }
 }
