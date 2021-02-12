@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
@@ -25,100 +26,149 @@
                            <children>
                               <ScrollPane layoutX="19.0" layoutY="68.0" prefHeight="431.0" prefWidth="406.0">
                                  <content>
-                                    <VBox fx:id="requestReportBox" prefHeight="428.0" prefWidth="401.0">
+                                    <VBox fx:id="reportBox" prefHeight="428.0" prefWidth="401.0">
                                        <children>
-                                          <AnchorPane prefHeight="48.0" prefWidth="401.0">
+                                          <AnchorPane prefHeight="75.0" prefWidth="401.0">
                                              <children>
-                                                <Text layoutX="27.0" layoutY="31.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username">
+                                                <Text layoutY="21.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username:">
                                                    <font>
-                                                      <Font size="18.0" />
+                                                      <Font size="16.0" />
                                                    </font>
                                                 </Text>
-                                                <Button fx:id="analyticsArtist2" layoutX="205.0" layoutY="7.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="96.0" style="-fx-border-color: black;" styleClass="hover-btn" text="Ban">
+                                                <Text layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Comment:">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Text>
+                                                <Text layoutX="79.0" layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Lorem ipsum..." wrappingWidth="310.0">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Text>
+                                                <Button fx:id="analyticsArtist221" layoutX="301.0" layoutY="3.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="100.0" style="-fx-border-color: black;" text="Delete">
                                                    <font>
                                                       <Font size="24.0" />
                                                    </font>
-                                                </Button>
-                                                <Button fx:id="analyticsArtist21" layoutX="301.0" layoutY="7.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="96.0" style="-fx-border-color: black;" styleClass="hover-btn" text="Cancel">
-                                                   <font>
-                                                      <Font size="24.0" />
-                                                   </font>
+                                                   <styleClass>
+                                                      <String fx:value="hover-btn" />
+                                                      <String fx:value="admin-btn" />
+                                                   </styleClass>
                                                 </Button>
                                              </children>
                                           </AnchorPane>
-                                          <AnchorPane prefHeight="48.0" prefWidth="401.0">
+                                          <AnchorPane prefHeight="75.0" prefWidth="401.0">
                                              <children>
-                                                <Text layoutX="27.0" layoutY="31.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username">
+                                                <Text layoutY="21.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username:">
                                                    <font>
-                                                      <Font size="18.0" />
+                                                      <Font size="16.0" />
                                                    </font>
                                                 </Text>
-                                                <Button fx:id="analyticsArtist21" layoutX="205.0" layoutY="7.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="96.0" style="-fx-border-color: black;" styleClass="hover-btn" text="Ban">
+                                                <Text layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Comment:">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Text>
+                                                <Text layoutX="79.0" layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Lorem ipsum..." wrappingWidth="310.0">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Text>
+                                                <Button fx:id="analyticsArtist221" layoutX="201.0" layoutY="3.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="100.0" style="-fx-border-color: black;" text="Ban">
                                                    <font>
                                                       <Font size="24.0" />
                                                    </font>
+                                                   <styleClass>
+                                                      <String fx:value="hover-btn" />
+                                                      <String fx:value="admin-btn" />
+                                                   </styleClass>
                                                 </Button>
-                                                <Button fx:id="analyticsArtist211" layoutX="301.0" layoutY="7.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="96.0" style="-fx-border-color: black;" styleClass="hover-btn" text="Cancel">
+                                                <Button fx:id="analyticsArtist2211" layoutX="301.0" layoutY="3.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="100.0" style="-fx-border-color: black;" text="Delete">
                                                    <font>
                                                       <Font size="24.0" />
                                                    </font>
+                                                   <styleClass>
+                                                      <String fx:value="hover-btn" />
+                                                      <String fx:value="admin-btn" />
+                                                   </styleClass>
                                                 </Button>
                                              </children>
                                           </AnchorPane>
-                                          <AnchorPane prefHeight="48.0" prefWidth="401.0">
+                                          <AnchorPane prefHeight="75.0" prefWidth="401.0">
                                              <children>
-                                                <Text layoutX="27.0" layoutY="31.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username">
+                                                <Text layoutY="21.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username:">
                                                    <font>
-                                                      <Font size="18.0" />
+                                                      <Font size="16.0" />
                                                    </font>
                                                 </Text>
-                                                <Button fx:id="analyticsArtist21" layoutX="205.0" layoutY="7.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="96.0" style="-fx-border-color: black;" styleClass="hover-btn" text="Ban">
+                                                <Text layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Comment:">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Text>
+                                                <Text layoutX="79.0" layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Lorem ipsum..." wrappingWidth="310.0">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Text>
+                                                <Button fx:id="analyticsArtist221" layoutX="201.0" layoutY="3.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="100.0" style="-fx-border-color: black;" text="Ban">
                                                    <font>
                                                       <Font size="24.0" />
                                                    </font>
+                                                   <styleClass>
+                                                      <String fx:value="hover-btn" />
+                                                      <String fx:value="admin-btn" />
+                                                   </styleClass>
                                                 </Button>
-                                                <Button fx:id="analyticsArtist212" layoutX="301.0" layoutY="7.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="96.0" style="-fx-border-color: black;" styleClass="hover-btn" text="Cancel">
+                                                <Button fx:id="analyticsArtist2212" layoutX="301.0" layoutY="3.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="100.0" style="-fx-border-color: black;" text="Delete">
                                                    <font>
                                                       <Font size="24.0" />
                                                    </font>
+                                                   <styleClass>
+                                                      <String fx:value="hover-btn" />
+                                                      <String fx:value="admin-btn" />
+                                                   </styleClass>
                                                 </Button>
+                                                <Text fx:id="msg" layoutX="164.0" layoutY="44.0" strokeType="OUTSIDE" strokeWidth="0.0">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Text>
                                              </children>
                                           </AnchorPane>
-                                          <AnchorPane prefHeight="48.0" prefWidth="401.0">
+                                          <AnchorPane prefHeight="75.0" prefWidth="401.0">
                                              <children>
-                                                <Text layoutX="27.0" layoutY="31.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username">
+                                                <Text layoutY="21.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username:">
                                                    <font>
-                                                      <Font size="18.0" />
+                                                      <Font size="16.0" />
                                                    </font>
                                                 </Text>
-                                                <Button fx:id="analyticsArtist21" layoutX="205.0" layoutY="7.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="96.0" style="-fx-border-color: black;" styleClass="hover-btn" text="Ban">
+                                                <Text layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Comment:">
                                                    <font>
-                                                      <Font size="24.0" />
-                                                   </font>
-                                                </Button>
-                                                <Button fx:id="analyticsArtist213" layoutX="301.0" layoutY="7.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="96.0" style="-fx-border-color: black;" styleClass="hover-btn" text="Cancel">
-                                                   <font>
-                                                      <Font size="24.0" />
-                                                   </font>
-                                                </Button>
-                                             </children>
-                                          </AnchorPane>
-                                          <AnchorPane prefHeight="48.0" prefWidth="401.0">
-                                             <children>
-                                                <Text layoutX="27.0" layoutY="31.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username">
-                                                   <font>
-                                                      <Font size="18.0" />
+                                                      <Font size="16.0" />
                                                    </font>
                                                 </Text>
-                                                <Button fx:id="analyticsArtist21" layoutX="205.0" layoutY="7.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="96.0" style="-fx-border-color: black;" styleClass="hover-btn" text="Ban">
+                                                <Text layoutX="79.0" layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Lorem ipsum..." wrappingWidth="310.0">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Text>
+                                                <Button fx:id="analyticsArtist221" layoutX="201.0" layoutY="3.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="100.0" style="-fx-border-color: black;" text="Ban">
                                                    <font>
                                                       <Font size="24.0" />
                                                    </font>
+                                                   <styleClass>
+                                                      <String fx:value="hover-btn" />
+                                                      <String fx:value="admin-btn" />
+                                                   </styleClass>
                                                 </Button>
-                                                <Button fx:id="analyticsArtist214" layoutX="301.0" layoutY="7.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="96.0" style="-fx-border-color: black;" styleClass="hover-btn" text="Cancel">
+                                                <Button fx:id="analyticsArtist2213" layoutX="301.0" layoutY="3.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="100.0" style="-fx-border-color: black;" text="Delete">
                                                    <font>
                                                       <Font size="24.0" />
                                                    </font>
+                                                   <styleClass>
+                                                      <String fx:value="hover-btn" />
+                                                      <String fx:value="admin-btn" />
+                                                   </styleClass>
                                                 </Button>
                                              </children>
                                           </AnchorPane>
@@ -126,142 +176,28 @@
                                     </VBox>
                                  </content>
                               </ScrollPane>
-                              <Button fx:id="analyticsArtist" layoutX="19.0" layoutY="33.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="204.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Reports">
+                              <Button layoutX="19.0" layoutY="33.0" mnemonicParsing="false" onMouseClicked="#showReports" prefHeight="35.0" prefWidth="204.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Reports">
                                  <font>
                                     <Font size="24.0" />
                                  </font>
                               </Button>
-                              <Button fx:id="analyticsArtist1" layoutX="222.0" layoutY="33.0" mnemonicParsing="false" prefHeight="35.0" prefWidth="203.0" style="-fx-border-color: white;" styleClass="hover-btn" text="User requests">
+                              <Button layoutX="222.0" layoutY="33.0" mnemonicParsing="false" onMouseClicked="#showRequests" prefHeight="35.0" prefWidth="203.0" style="-fx-border-color: white;" styleClass="hover-btn" text="User requests">
                                  <font>
                                     <Font size="16.0" />
                                  </font>
                               </Button>
+                              <ScrollPane layoutX="19.0" layoutY="68.0" prefHeight="431.0" prefWidth="406.0" visible="false">
+                                 <content>
+                                    <VBox fx:id="requestBox" prefHeight="428.0" prefWidth="401.0" />
+                                 </content>
+                              </ScrollPane>
                            </children>
                         </AnchorPane>
                         <AnchorPane prefHeight="527.0" prefWidth="443.0">
                            <children>
                               <ScrollPane layoutX="19.0" layoutY="69.0" prefHeight="431.0" prefWidth="406.0">
                                  <content>
-                                    <VBox fx:id="searchBox" prefHeight="428.0" prefWidth="401.0">
-                                       <children>
-                                          <AnchorPane prefHeight="75.0" prefWidth="401.0">
-                                             <children>
-                                                <Text layoutY="21.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username:">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Text>
-                                                <Text layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Comment:">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Text>
-                                                <Text layoutX="79.0" layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Lorem ipsum..." wrappingWidth="310.0">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Text>
-                                                <Button fx:id="analyticsArtist22" layoutX="201.0" layoutY="3.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="100.0" style="-fx-border-color: black;" styleClass="hover-btn" text="Ban">
-                                                   <font>
-                                                      <Font size="24.0" />
-                                                   </font>
-                                                </Button>
-                                                <Button fx:id="analyticsArtist221" layoutX="301.0" layoutY="3.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="100.0" style="-fx-border-color: black;" styleClass="hover-btn" text="Delete">
-                                                   <font>
-                                                      <Font size="24.0" />
-                                                   </font>
-                                                </Button>
-                                             </children>
-                                          </AnchorPane>
-                                          <AnchorPane prefHeight="75.0" prefWidth="401.0">
-                                             <children>
-                                                <Text layoutY="21.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username:">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Text>
-                                                <Text layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Comment:">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Text>
-                                                <Text layoutX="79.0" layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Lorem ipsum..." wrappingWidth="310.0">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Text>
-                                                <Button fx:id="analyticsArtist221" layoutX="201.0" layoutY="3.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="100.0" style="-fx-border-color: black;" styleClass="hover-btn" text="Ban">
-                                                   <font>
-                                                      <Font size="24.0" />
-                                                   </font>
-                                                </Button>
-                                                <Button fx:id="analyticsArtist2211" layoutX="301.0" layoutY="3.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="100.0" style="-fx-border-color: black;" styleClass="hover-btn" text="Delete">
-                                                   <font>
-                                                      <Font size="24.0" />
-                                                   </font>
-                                                </Button>
-                                             </children>
-                                          </AnchorPane>
-                                          <AnchorPane prefHeight="75.0" prefWidth="401.0">
-                                             <children>
-                                                <Text layoutY="21.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username:">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Text>
-                                                <Text layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Comment:">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Text>
-                                                <Text layoutX="79.0" layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Lorem ipsum..." wrappingWidth="310.0">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Text>
-                                                <Button fx:id="analyticsArtist221" layoutX="201.0" layoutY="3.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="100.0" style="-fx-border-color: black;" styleClass="hover-btn" text="Ban">
-                                                   <font>
-                                                      <Font size="24.0" />
-                                                   </font>
-                                                </Button>
-                                                <Button fx:id="analyticsArtist2212" layoutX="301.0" layoutY="3.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="100.0" style="-fx-border-color: black;" styleClass="hover-btn" text="Delete">
-                                                   <font>
-                                                      <Font size="24.0" />
-                                                   </font>
-                                                </Button>
-                                             </children>
-                                          </AnchorPane>
-                                          <AnchorPane prefHeight="75.0" prefWidth="401.0">
-                                             <children>
-                                                <Text layoutY="21.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username:">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Text>
-                                                <Text layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Comment:">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Text>
-                                                <Text layoutX="79.0" layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Lorem ipsum..." wrappingWidth="310.0">
-                                                   <font>
-                                                      <Font size="16.0" />
-                                                   </font>
-                                                </Text>
-                                                <Button fx:id="analyticsArtist221" layoutX="201.0" layoutY="3.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="100.0" style="-fx-border-color: black;" styleClass="hover-btn" text="Ban">
-                                                   <font>
-                                                      <Font size="24.0" />
-                                                   </font>
-                                                </Button>
-                                                <Button fx:id="analyticsArtist2213" layoutX="301.0" layoutY="3.0" mnemonicParsing="false" prefHeight="23.0" prefWidth="100.0" style="-fx-border-color: black;" styleClass="hover-btn" text="Delete">
-                                                   <font>
-                                                      <Font size="24.0" />
-                                                   </font>
-                                                </Button>
-                                             </children>
-                                          </AnchorPane>
-                                       </children>
-                                    </VBox>
+                                    <VBox fx:id="searchBox" prefHeight="428.0" prefWidth="401.0" />
                                  </content>
                               </ScrollPane>
                               <Text fill="WHITE" layoutX="19.0" layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Search for:">
