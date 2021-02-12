@@ -13,6 +13,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import org.bson.*;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.javatuples.Triplet;
 
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Projections.*;
@@ -30,6 +31,7 @@ class MongoDriver implements Closeable {
     private final MongoClient mongoClient;
     private final MongoCollection<Document> usersCollection;
     private final MongoCollection<Document> songsCollection;
+    private final MongoCollection<Document> reportsCollection;
 
     MongoDriver(String connectionString){
         MongoDatabase database;
@@ -38,12 +40,14 @@ class MongoDriver implements Closeable {
             database = mongoClient.getDatabase("project");
             usersCollection = database.getCollection("users");
             songsCollection = database.getCollection("songs");
+            reportsCollection = database.getCollection("reports");
         }
         else{
             // TODO: raise exception
             mongoClient = null;
             usersCollection = null;
             songsCollection = null;
+            reportsCollection = null;
         }
     }
 
@@ -280,6 +284,61 @@ class MongoDriver implements Closeable {
         else {
             return true;
         }
+    }
+
+    public boolean deleteRequest(String username) {
+        Bson filter = and(eq("username", username), exists("requestedStageName"));
+        DeleteResult deleteResult = reportsCollection.deleteOne(filter);
+        return deleteResult.wasAcknowledged() && deleteResult.getDeletedCount() >= 1;
+    }
+
+    public boolean deleteReport(String username) {
+        Bson filter = and(eq("username", username), exists("numReports"));
+        DeleteResult deleteResult = reportsCollection.deleteOne(filter);
+        return deleteResult.wasAcknowledged() && deleteResult.getDeletedCount() >= 1;
+    }
+
+    public boolean deleteComment(String commentId){
+        Bson filterReport = eq("comments._id", new ObjectId(commentId));
+        Bson filterReview = eq("reviews._id", new ObjectId(commentId));
+
+        DeleteResult deleteResultReport = reportsCollection.deleteOne(filterReport);
+        DeleteResult deleteResultReview = reportsCollection.deleteOne(filterReview);
+
+        return deleteResultReport.wasAcknowledged() && deleteResultReview.wasAcknowledged()
+                && deleteResultReport.getDeletedCount() == 1 && deleteResultReview.getDeletedCount() == 1;
+    }
+
+    public List<Triplet<String, Integer, HashMap<String, String>>> getReports(){
+        List<Triplet<String,Integer,HashMap<String, String>>> res = new ArrayList<>();
+
+        Bson myCheck = exists("numReports");
+        Bson mySort = sort(descending("numReports"));
+        Bson myLimit = limit(50);
+
+        reportsCollection.aggregate(Arrays.asList(myCheck, mySort, myLimit)).forEach(doc->{
+            HashMap<String, String> comments = new HashMap<>();
+            List<Document> commentsList = doc.getList("comments", Document.class);
+            for(Document comment : commentsList){
+                comments.put(comment.getString("_id"), comment.getString("review"));
+            }
+
+            res.add(new Triplet(doc.getString("username"), doc.getInteger("numReports"), comments));
+        });
+
+        return res;
+    }
+
+    public HashMap<String,String> getRequests(){
+        HashMap<String,String> res = new HashMap<>();
+
+        Bson myCheck = exists("requestedStageName");
+        Bson myLimit = limit(50);
+
+        reportsCollection.aggregate(Arrays.asList(myCheck, myLimit)).forEach(doc->{
+            res.put(doc.getString("username"), doc.getString("requestedStageName"));
+        });
+        return res;
     }
 
     public Map<String, Object> getUserData(String username){

@@ -9,6 +9,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigRea
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderType;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceInconsistencyException;
 import org.javatuples.Pair;
+import org.javatuples.Triplet;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -445,6 +446,38 @@ class PersistenceImplementation implements Persistence {
     @Override
     public boolean checkAdminCredentials(String username, String password) {
         return false;
+    }
+
+    @Override
+    public boolean deleteRequest(String username){
+        return mongo.deleteRequest(username);
+    }
+
+    @Override
+    public boolean deleteReport(String username){
+        return mongo.deleteReport(username);
+    }
+
+    @Override
+    public boolean deleteComment(String commentId){ return mongo.deleteComment(commentId); }
+
+    @Override
+    public List<Report> getReports(){
+        List<Triplet<String, Integer, HashMap<String, String>>> reports =  mongo.getReports();
+        List<Report> res = new ArrayList<>();
+        for(Triplet t : reports){
+            res.add(new Report(t.getValue0().toString(), (Integer)t.getValue1(), (HashMap<String, String>)t.getValue2()));
+        }
+        return res;
+    }
+
+    public List<Request> getRequests(){
+        HashMap<String, String> requests =  mongo.getRequests();
+        List<Request> res = new ArrayList<>();
+        for(Map.Entry<String, String> entry : requests.entrySet()){
+            res.add(new Request(entry.getKey(), entry.getValue()));
+        }
+        return res;
     }
 
     @Override

@@ -18,9 +18,22 @@
   -fx-text-fill:white;
 }
 
+.admin-btn{
+	-fx-border-color: black;
+	-fx-font-family: "Book Antiqua";
+	-fx-font-size: 16px;
+	-fx-background-color:transparent;
+	-fx-text-fill: black;
+}
+
 .hover-btn:hover{  
   -fx-background-color:white;
   -fx-text-fill: #001a4d;
+}
+
+.admin-btn:hover{
+	-fx-background-color: grey;
+	-fx-text-fill:#001a4d;
 }
 
 .hover-btn-green:hover{  

@@ -1,9 +1,6 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.persistence;
 
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.Review;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.*;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
@@ -339,6 +336,49 @@ public interface Persistence {
 
     boolean checkIfUserReviewedSong(User user, Song song);
 
+    /**
+     *
+     * Retrieve a list of the most reported users to be shown to the
+     * admin.
+     *
+     * @return
+     */
+    List<Report> getReports();
+
+    /**
+     *
+     * Retrieve a list of requests made by users to upgrade their account
+     * to artist.
+     *
+     * @return
+     */
+    List<Request> getRequests();
+
+    /**
+     *
+     * Deletes a request from a user to get upgraded to artist.
+     *
+     * @param username
+     */
+    boolean deleteRequest(String username);
+
+    /**
+     *
+     * Deletes reports of a user.
+     *
+     * @param username
+     */
+    boolean deleteReport(String username);
+
+
+    /**
+     *
+     * Delete a comment by id.
+     *
+     * @param commentId
+     * @return
+     */
+    boolean deleteComment(String commentId);
 
     /**
      *
