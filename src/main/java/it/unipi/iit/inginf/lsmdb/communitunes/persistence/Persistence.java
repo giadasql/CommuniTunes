@@ -239,6 +239,9 @@ public interface Persistence {
      */
     HashMap<String, String> getBestAndWorstAlbum(Artist artist);
 
+
+    List<ArtistPreview> getCoworkersOfFollowedArtists(User user);
+
     /**
      *
      * For each genre, find the most representative artist, combining the number of

@@ -273,6 +273,17 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
+    public List<ArtistPreview> getCoworkersOfFollowedArtists(User user) {
+        List<ArtistPreview> result = new  ArrayList<>();
+        List<Map<String, Object>> artists = neo4j.getCoworkersOfFollowedArtists(user.Username);
+        for (Map<String, Object> artist:
+                artists) {
+            result.add(buildArtistPreviewFromMap(artist));
+        }
+        return result;
+    }
+
+    @Override
     public Map<String, ArtistPreview> getRepresentativeArtist() {
         Map<String, ArtistPreview> analyticResult = new HashMap<>();
         Map<String, String> mongoResult = mongo.getRepresentativeArtist();

@@ -35,8 +35,8 @@ class Neo4jDriver implements Closeable {
         try ( Session session = driver.session())
         {
             return session.readTransaction(tx -> {
-                Result res = tx.run( "MATCH (u:User { username: $username }) RETURN u", parameters("username", username));
-                return res.hasNext();
+                Result res = tx.run( "MATCH (u:User { username: $username }) RETURN COUNT(u) AS userCount", parameters("username", username));
+                return res.single().get("userCount", 0) > 0;
             });
         }
     }
@@ -291,7 +291,7 @@ class Neo4jDriver implements Closeable {
             return session.writeTransaction(tx -> {
                 Result res = tx.run( "MATCH (u:User {username: $username})-[:FOLLOWS]->(f:User) WHERE NOT f:Artist " +
                                 "MATCH (f)-[:LIKES]->(s:Song)<-[:PERFORMS {isMainArtist: true}]-(a:Artist)" +
-                                "RETURN DISTINCT(s {.title, artist: a.username, _id: s.songID, .image}) AS suggestedSongs LIMIT 15",
+                                "RETURN DISTINCT(s {.title, artist: a.username, _id: s.songID, .image}) AS suggestedSongs LIMIT 6",
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();
@@ -309,7 +309,7 @@ class Neo4jDriver implements Closeable {
             return session.writeTransaction(tx -> {
                 Result res = tx.run( "MATCH (u:User {username: $username})-[:FOLLOWS]->(a:Artist) " +
                                 "MATCH (a)-[:PERFORMS]->(:Song)<-[:PERFORMS]-(f:Artist) WHERE NOT a.username = f.username " +
-                                "RETURN f.username AS username, f.image AS image LIMIT 15",
+                                "RETURN f.username AS username, f.image AS image LIMIT 6",
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();
@@ -327,7 +327,7 @@ class Neo4jDriver implements Closeable {
             return session.writeTransaction(tx -> {
                 Result res = tx.run( "MATCH (u:User {username: $username})-[:FOLLOWS]->(m:User) WHERE NOT m:Artist " +
                                 "MATCH (m)-[:FOLLOWS]->(f:User) WHERE NOT f:Artist AND NOT f.username = u.username AND NOT (u)-[:FOLLOWS]->(f)" +
-                                "RETURN DISTINCT(f {.username, .image }) AS suggestedUsers LIMIT 7",
+                                "RETURN DISTINCT(f {.username, .image }) AS suggestedUsers LIMIT 6",
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();
@@ -372,6 +372,26 @@ class Neo4jDriver implements Closeable {
                 suggestions.put("songs", suggestedSongs);
                 suggestions.put("users", suggestedUsers);
                 return suggestions;
+            });
+        }
+    }
+
+    public List<Map<String, Object>> getCoworkersOfFollowedArtists(String username){
+        List<Map<String, Object>> artists = new ArrayList<>();
+        try ( Session session = driver.session())
+        {
+            return session.writeTransaction(tx -> {
+                Result res = tx.run( "MATCH (u:User { username: $username })-[:FOLLOWS]->(followedArtist:Artist)\n" +
+                                "WITH DISTINCT  followedArtist, u\n" +
+                                "MATCH (followedArtist)-[:PERFORMS]->(s:Song)<-[:PERFORMS]-(suggestedArtist:Artist)\n" +
+                                "WHERE NOT (u)-[:FOLLOWS]->(suggestedArtist)\n" +
+                                "RETURN DISTINCT suggestedArtist { .username, .image } LIMIT 6",
+                        parameters("username", username));
+                while(res.hasNext()){
+                    Record r = res.next();
+                    artists.add(r.get("suggestedArtist", new HashMap<>()));
+                }
+                return artists;
             });
         }
     }

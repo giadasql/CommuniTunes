@@ -1,6 +1,8 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.components;
 
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.UserPreviewClickedEvent;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.geometry.Pos;
@@ -22,25 +24,33 @@ public abstract class PreviewVBox extends VBox {
         super.setWidth(125);
         super.setHeight(150);
         super.setAlignment(Pos.TOP_CENTER);
-        ImageView imageView = new ImageView();
+        imageView = new ImageView();
         imageView.setFitWidth(this.getWidth());
         imageView.setFitHeight(this.getHeight() - 30);
         if(img != null){
             try{
                 Image image = new Image(img, true);
+                image.errorProperty().addListener(new ChangeListener<Boolean>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean t1) {
+                        if(!aBoolean && t1){
+                            setDefaultImage();
+                        }
+                    }
+                });
                 if (image.isError()) {
-                    image = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
+                    setDefaultImage();
                 }
-                imageView.setImage(image);
+                else {
+                    imageView.setImage(image);
+                }
             }
             catch(Exception exc) {
-                Image image = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
-                imageView.setImage(image);
+                setDefaultImage();
             }
         }
         else{
-            Image image = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
-            imageView.setImage(image);
+            setDefaultImage();
         }
         super.getChildren().add(imageView);
         Text text;
@@ -65,4 +75,9 @@ public abstract class PreviewVBox extends VBox {
     protected abstract void onMouseClicked(MouseEvent mouseEvent);
 
     static final EventType<Event> PREVIEW_CLICKED = new EventType<>(Event.ANY, "PREVIEW_CLICKED");
+
+    public void setDefaultImage(){
+        Image image = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
+        imageView.setImage(image);
+    }
 }

@@ -45,6 +45,7 @@ public class UserAnalyticsController implements UIController {
         System.out.println("3");
         List<SongPreview> suggestedSongsList = dbManager.getSuggestedSongs(user);
         System.out.println("4");
+        List<ArtistPreview> coworkers = dbManager.getCoworkersOfFollowedArtists(user);
 
         for(ArtistPreview artist : suggestedArtistsList){
             suggestedArtists.getChildren().add(new ArtistPreviewVBox(artist, null));
