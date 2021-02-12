@@ -2,6 +2,7 @@ package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.authentication.Role;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ListHbox;
@@ -49,7 +50,12 @@ public class FollowedController implements UIController {
     }
 
     public void closeWindow(MouseEvent mouseEvent) throws IOException {
-        manager.setContent(Path.USER_PROFILE);
+        if(manager.context.getFocusedRole() == Role.Artist){
+            manager.setContent(Path.ARTIST_PROFILE);
+        }
+        else{
+            manager.setContent(Path.USER_PROFILE);
+        }
     }
 
     public void showPreviews(List<UserPreview> toShow){

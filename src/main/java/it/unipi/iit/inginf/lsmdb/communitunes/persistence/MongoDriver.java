@@ -80,15 +80,14 @@ class MongoDriver implements Closeable {
         return deleteResult.wasAcknowledged() && deleteResult.getDeletedCount() >= 1;
     }
 
-    // TODO: check if a field is null. If it is, remove it from the document
-    public boolean updateUser(User newUser){
+    public boolean updateUser(String id, String password, String email, String country, LocalDate birthday, String firstName, String lastName, String image){
         Document query = new Document();
-        query.append("_id", new ObjectId(newUser.ID));
+        query.append("_id", new ObjectId(id));
         Document setData = new Document();
-        setData.append("password", newUser.Password).append("email", newUser.Email)
-                .append("country", newUser.Country).append("birthday", newUser.Birthday)
-                .append("first_name", newUser.FirstName).append("last_name", newUser.LastName)
-                .append("image", newUser.Image);
+        setData.append("password", password).append("email", email)
+                .append("country", country).append("birthday", birthday)
+                .append("first_name", firstName).append("last_name", lastName)
+                .append("image", image);
         Document update = new Document();
         update.append("$set", setData);
 
@@ -114,27 +113,26 @@ class MongoDriver implements Closeable {
         // We don't check the number of deleted songs to understand if the query was performed correctly,
         // since we may have deleted a user without songs
     public boolean deleteArtist(String username) {
-        String id = getIdFromUsername(username);
-        DeleteResult songsDelete = songsCollection.deleteMany(eq("artistId", id));
+        DeleteResult songsDelete = songsCollection.deleteMany(eq("artist", username));
         DeleteResult deleteResult = usersCollection.deleteOne(eq("username", username));
         return deleteResult.wasAcknowledged() && songsDelete.wasAcknowledged() && deleteResult.getDeletedCount() >= 1;
     }
 
     // TODO: check if a field is null. If it is, remove it from the document
-    public boolean updateArtist(Artist newArtist){
+    public boolean updateArtist(String id, String password, String email, String country, LocalDate birthday, String firstName, String lastName, String image, String activity, String biography, String stageName, List<Link> links){
         Document query = new Document();
-        query.append("_id", new ObjectId(newArtist.ID));
+        query.append("_id", new ObjectId(id));
         Document setData = new Document();
         BasicDBList linkList = new BasicDBList();
         for (Link link:
-                newArtist.Links) {
+                links) {
             linkList.add(new BasicDBObject("name", link.name).append("link", link.url));
         }
-        setData.append("password", newArtist.Password).append("email", newArtist.Email)
-                .append("country", newArtist.Country).append("birthday", newArtist.Birthday)
-                .append("activity", newArtist.ActiveYears).append("image", newArtist.Image)
-                .append("biography", newArtist.Biography).append("stageName", newArtist.StageName)
-                .append("first_name", newArtist.FirstName).append("last_name", newArtist.LastName)
+        setData.append("password", password).append("email", email)
+                .append("country", country).append("birthday", birthday)
+                .append("activity", activity).append("image", image)
+                .append("biography", biography).append("stageName", stageName)
+                .append("first_name", firstName).append("last_name", lastName)
                 .append("sites", linkList);
         Document update = new Document();
         update.append("$set", setData);
@@ -144,12 +142,27 @@ class MongoDriver implements Closeable {
         return updateRes.getModifiedCount() != 0;
     }
 
-    public String addSong(String artist, String duration, String title, String album){
+    public String addSong(String artist, String duration, String title, String album, String image, List<Link> links, List<String> genres){
         Document song = new Document();
+        BasicDBList linkList = new BasicDBList();
+        if(links != null){
+            for (Link link:
+                    links) {
+                linkList.add(new BasicDBObject("name", link.name).append("link", link.url));
+            }
+            song.append("links", linkList);
+        }
+        BasicDBList genreList = new BasicDBList();
+        if(genres != null){
+            genreList.addAll(genres);
+            song.append("genres", genreList);
+        }
         song.append("artist", artist);
-        song.append("name", title);
+        song.append("title", title);
         song.append("lenght", duration);
         song.append("album", album);
+        song.append("image", image);
+
         InsertOneResult insertOneResult = songsCollection.insertOne(song);
         return insertOneResult.getInsertedId() == null ? null : insertOneResult.getInsertedId().asObjectId().getValue().toString();
     }
@@ -170,20 +183,21 @@ class MongoDriver implements Closeable {
     }
 
     // TODO: check if a field is null. If it is, remove it from the document
-    public boolean updateSong(Song newSong){
+    public boolean updateSong(String id, String image, String album, List<String> genres, List<Link> links){
         Document query = new Document();
-        query.append("_id", new ObjectId(newSong.ID));
+        query.append("_id", new ObjectId(id));
         Document setData = new Document();
         BasicDBList linkList = new BasicDBList();
-        if(newSong.Links != null){
+        if(links != null){
             for (Link link:
-                    newSong.Links) {
+                    links) {
                 linkList.add(new BasicDBObject("name", link.name).append("link", link.url));
             }
         }
         setData.append("links", linkList)
-                .append("image", newSong.Image)
-                .append("genres", newSong.Genres);
+                .append("image", image)
+                .append("genres", genres)
+                .append("album", album);
         Document update = new Document();
         update.append("$set", setData);
 

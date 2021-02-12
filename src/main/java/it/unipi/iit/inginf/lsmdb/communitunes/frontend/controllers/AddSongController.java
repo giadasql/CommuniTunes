@@ -1,5 +1,6 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Link;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
@@ -16,6 +17,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class AddSongController implements UIController {
@@ -39,9 +41,9 @@ public class AddSongController implements UIController {
             msg.setText("The title is mandatory to add a new song.");
             return;
         }
-        else{
-            song.Title = title.getText();
-        }
+        song = new Song(title.getText());
+        Artist artist = manager.context.getFocusedArtist();
+        song.Artist = new ArtistPreview(artist.Username, artist.Image);
         if(album.getText() == null || "".equals(album.getText())){
             song.Album = null;
         }
@@ -58,17 +60,20 @@ public class AddSongController implements UIController {
             song.Genres = null;
         }
         else{
-            String[] arrayGenres = genres.getText().split(" ");
+            String[] arrayGenres = genres.getText().split(";");
             song.Genres = Arrays.asList(arrayGenres);
         }
         if(link.getText() == null || "".equals(link.getText())){
             song.Links = null;
         }
         else{
-            String[] arrayLinks = link.getText().split(" ");
+            String[] arrayLinks = link.getText().split(";");
+            song.Links = new ArrayList<>();
             for(String s : arrayLinks){
-                String[] nameUrl = s.split(",");
-                song.Links.add(new Link(nameUrl[0], nameUrl[1]));
+                String[] nameUrl = s.split(":", 2);
+                if(nameUrl.length >= 2){
+                    song.Links.add(new Link(nameUrl[0], nameUrl[1]));
+                }
             }
         }
         if(image.getText() == null || "".equals(image.getText())){
@@ -78,10 +83,10 @@ public class AddSongController implements UIController {
             song.Image = image.getText();
         }
         if(feat.getText() == null || "".equals(feat.getText())){
-            song.Featurings = null;
+            song.Featurings = new ArrayList<>();
         }
         else{
-            String[] arrayFeat = feat.getText().split(" ");
+            String[] arrayFeat = feat.getText().split(";");
             for(String s : arrayFeat){
                 song.Featurings.add(new ArtistPreview(s, null));
             }
@@ -103,12 +108,11 @@ public class AddSongController implements UIController {
     @Override
     public void init(){
         manager = LayoutManagerFactory.getManager();
-        song = manager.context.getFocusedSong();
         dbManager = PersistenceFactory.CreatePersistence();
     }
 
     public void closeAddWindow(MouseEvent mouseEvent) throws IOException {
-        manager.setContent(Path.ARTIST_EDIT);
+        manager.setContent(Path.ARTIST_PROFILE);
     }
 
     public void setDefaultValues(){

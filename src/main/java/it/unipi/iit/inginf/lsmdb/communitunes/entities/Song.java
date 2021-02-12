@@ -32,6 +32,11 @@ public class Song extends Entity {
 
     public double AvgRating;
 
+    public Song(String title){
+        super(null);
+        this.Title = title;
+    }
+
     public Song(String ID, ArtistPreview artist, String duration, String title, String image, String album, List<Review> loadedReviews, List<Link> links, List<String> genres, List<ArtistPreview> featurings, int likes, double avgRating) {
         super(ID);
         Artist = artist;

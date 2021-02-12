@@ -63,6 +63,7 @@ public class ArtistController implements UIController {
     public HBox followersBox;
     public HBox followedBox;
     public HBox followerArtistsBox;
+    public Button addSongBtn;
 
     private Artist artist;
     private LayoutManager manager;
@@ -104,12 +105,20 @@ public class ArtistController implements UIController {
             editProfile.setManaged(true);
             followUnfollow.setVisible(false);
             followUnfollow.setManaged(false);
+            analyticsArtist.setVisible(true);
+            analyticsArtist.setManaged(true);
+            addSongBtn.setVisible(true);
+            addSongBtn.setManaged(true);
         }
         else {
-                editProfile.setVisible(false);
-                editProfile.setManaged(false);
-                followUnfollow.setVisible(true);
-                followUnfollow.setManaged(true);
+            editProfile.setVisible(false);
+            editProfile.setManaged(false);
+            followUnfollow.setVisible(true);
+            followUnfollow.setManaged(true);
+            analyticsArtist.setVisible(false);
+            analyticsArtist.setManaged(false);
+            addSongBtn.setVisible(false);
+            addSongBtn.setManaged(false);
             if(dbManager.checkFollow(artist, manager.context.getAuthenticatedUser())){
                 followUnfollow.setText("Unfollow");
                 followingFocusedUser = true;
