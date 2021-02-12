@@ -48,6 +48,12 @@
   -fx-text-fill: black;
 }
 
+.hover-btn-red:hover{  
+	-fx-border-color: red;
+  -fx-background-color:red;
+  -fx-text-fill: black;
+}
+
 .user-info-label{
 	-fx-text-fill: white;
 	-fx-font-family: "Book Antiqua";

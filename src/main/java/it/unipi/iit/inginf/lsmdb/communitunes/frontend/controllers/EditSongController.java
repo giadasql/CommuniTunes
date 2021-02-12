@@ -93,4 +93,15 @@ public class EditSongController implements UIController {
         link.setText(temp.toString());
         image.setText(song.Image);
     }
+
+    public void deleteSong(ActionEvent actionEvent) {
+        if(dbManager.deleteSong(song)){
+            try {
+                manager.setContent(Path.ARTIST_PROFILE);
+            } catch (IOException e) {
+                // TODO: log
+                e.printStackTrace();
+            }
+        }
+    }
 }

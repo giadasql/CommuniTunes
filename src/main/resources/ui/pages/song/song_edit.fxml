@@ -135,6 +135,19 @@
                         </Button>
                      </children>
                   </AnchorPane>
+                  <AnchorPane prefHeight="55.0" prefWidth="148.0">
+                     <children>
+                        <Button layoutX="34.0" layoutY="10.0" mnemonicParsing="false" onAction="#deleteSong" prefHeight="35.0" prefWidth="81.0" stylesheets="@../../style/style.css" text="Delete">
+                           <styleClass>
+                              <String fx:value="hover-btn" />
+                              <String fx:value="hover-btn-red" />
+                           </styleClass>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Button>
+                     </children>
+                  </AnchorPane>
                </children>
             </HBox>
          </children>
