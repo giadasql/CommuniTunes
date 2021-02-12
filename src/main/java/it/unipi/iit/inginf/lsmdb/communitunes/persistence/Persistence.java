@@ -94,42 +94,42 @@ public interface Persistence {
      * @param username
      * @return
      */
-    List<UserPreview> getFollowedUsers(String username);
+    List<UserPreview> getFollowedUsers(String username, int startIndex, int count);
 
     /**
      *
      * @param username
      * @return
      */
-    List<UserPreview> getFollowers(String username);
+    List<UserPreview> getFollowers(String username, int startIndex, int count);
 
     /**
      *
      * @param username
      * @return
      */
-    List<ArtistPreview> getFollowedArtists(String username);
+    List<ArtistPreview> getFollowedArtists(String username, int startIndex, int count);
 
     /**
      *
      * @param username
      * @return
      */
-    List<ArtistPreview> getFollowingArtists(String username);
+    List<ArtistPreview> getFollowingArtists(String username, int startIndex, int count);
 
     /**
      *
      * @param username
      * @return
      */
-    List<SongPreview> getLikedSongs(String username);
+    List<SongPreview> getLikedSongs(String username, int startIndex, int count);
 
     /**
      *
      * @param username
      * @return
      */
-    List<SongPreview> getArtistSongs(String username);
+    List<SongPreview> getArtistSongs(String username, int startIndex, int count);
 
     /**
      *

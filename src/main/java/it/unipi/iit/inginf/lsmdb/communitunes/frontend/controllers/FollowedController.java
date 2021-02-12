@@ -10,6 +10,9 @@ import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFact
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
+import javafx.event.ActionEvent;
+import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
@@ -21,11 +24,17 @@ import java.util.List;
 public class FollowedController implements UIController {
 
     public VBox mainVbox;
+    public Button prevPageBtn;
+    public Button nextPageBtn;
+    public ScrollPane scrollPane;
 
     private User user;
     private Persistence dbManager;
     private AuthenticationManager authManager;
     private LayoutManager manager;
+
+    private int startIndex = 0;
+    private final int count = 54;
 
     @Override
     public void init(){
@@ -34,23 +43,56 @@ public class FollowedController implements UIController {
         dbManager = PersistenceFactory.CreatePersistence();
         authManager = AuthenticationFactory.CreateAuthenticationManager();
 
-        user.LoadedFollowed = dbManager.getFollowedUsers(user.Username);
-        for(Iterator<UserPreview> iter = user.LoadedFollowed.iterator(); iter.hasNext(); ){
-            List<UserPreview> list = new ArrayList<>();
-            for(int i = 0; i < 6; i++){
-                UserPreview user;
-                if(!iter.hasNext())
-                    break;
-                user = iter.next();
-                list.add(user);
-            }
-
-
-            mainVbox.getChildren().add(new ListHbox().buildUserList(list));
-        }
+        List<UserPreview> followedUsers = dbManager.getFollowedUsers(user.Username, startIndex, count);
+        prevPageBtn.setDisable(true);
+        showPreviews(followedUsers);
     }
 
     public void closeWindow(MouseEvent mouseEvent) throws IOException {
         manager.setContent(Path.USER_PROFILE);
+    }
+
+    public void showPreviews(List<UserPreview> toShow){
+        scrollPane.setVvalue(0);
+        mainVbox.getChildren().clear();
+        if(toShow == null){
+            return;
+        }
+        List<UserPreview> temp = new ArrayList<>();
+        for(UserPreview userPreview : toShow){
+            temp.add(userPreview);
+            if(temp.size() == 6){
+                mainVbox.getChildren().add(new ListHbox().buildUserList(temp));
+                temp = new ArrayList<>();
+            }
+        }
+        if(temp.size() > 0){
+            mainVbox.getChildren().add(new ListHbox().buildUserList(temp));
+        }
+    }
+
+    public void nextPage(ActionEvent actionEvent) {
+        startIndex = startIndex + count;
+        List<UserPreview> newPreviews = dbManager.getFollowedUsers(user.Username, startIndex, count);
+        if(!newPreviews.isEmpty()){
+            showPreviews(newPreviews);
+            prevPageBtn.setDisable(false);
+        }
+        else{
+            nextPageBtn.setDisable(true);
+            startIndex = startIndex - count;
+        }
+    }
+
+    public void prevPage(ActionEvent actionEvent) {
+        if(startIndex >= count){
+            startIndex = startIndex - count;
+            List<UserPreview> newPreviews = dbManager.getFollowedUsers(user.Username, startIndex, count);
+            showPreviews(newPreviews);
+            nextPageBtn.setDisable(false);
+        }
+        if(startIndex == 0){
+            prevPageBtn.setDisable(true);
+        }
     }
 }
