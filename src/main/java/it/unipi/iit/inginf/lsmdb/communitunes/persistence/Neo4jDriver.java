@@ -407,7 +407,7 @@ class Neo4jDriver implements Closeable {
                                 "MATCH (s)<-[:LIKES]-(u) " +
                                 "WITH u, totalSongs, COUNT(DISTINCT s) AS likedSongs " +
                                 "WHERE likedSongs >= totalSongs * 0.6 " +
-                                "RETURN u.username AS username, u.image AS image LIMIT 15 ",
+                                "RETURN u.username AS username, u.image AS image LIMIT 7",
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();
@@ -428,7 +428,7 @@ class Neo4jDriver implements Closeable {
                                 "MATCH (u)-[:FOLLOWS]->(a1:Artist) WHERE NOT a1.username = a.username " +
                                 "WITH u, a, totFollowers, a1, COUNT(DISTINCT u) AS followOthers " +
                                 "WHERE followOthers >= totFollowers * 0.3 " +
-                                "RETURN a1.username AS username, a1.image AS image LIMIT 15 ",
+                                "RETURN a1.username AS username, a1.image AS image LIMIT 7 ",
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();
@@ -452,7 +452,7 @@ class Neo4jDriver implements Closeable {
                                 "WHERE NOT (u)-[:FOLLOWS]->(a) AND (u)-[:LIKES]->(s) " +
                                 "MATCH (s) " +
                                 "WHERE externalLikes >= totalLikes * 0.3 " +
-                                "RETURN s.songID AS _id, s.title AS title, s.image AS image LIMIT 15 ",
+                                "RETURN s.songID AS _id, s.title AS title, s.image AS image LIMIT 7 ",
                         parameters("username", username));
                 while(res.hasNext()) {
                     Record r = res.next();
