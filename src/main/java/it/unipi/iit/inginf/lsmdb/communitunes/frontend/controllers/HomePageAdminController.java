@@ -1,13 +1,13 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationManager;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.Report;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.Request;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.*;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ArtistPreviewVBox;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.SongPreviewVBox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.SongPreviewClickedEvent;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceInconsistencyException;
@@ -61,6 +61,9 @@ public class HomePageAdminController implements UIController {
                 if(deleteUser(report.reportedUser)){
                     reportPane.setVisible(false);
                     reportPane.setManaged(false);
+                    if(report.reportedUser.equals(searchText.getText()) && searchMenu.getValue().toString().equals("User")){
+                        searchBox.getChildren().clear();
+                    }
                 }
             });
 
@@ -219,24 +222,47 @@ public class HomePageAdminController implements UIController {
             printMissingValueMessage();
             return;
         }
-        else if(searchMenu.getValue().toString() == "Song"){
-            if(searchText.getText() == ""){
+        else if(searchMenu.getValue().toString().equals("Song")){
+            if(searchText.getText().equals("")){
                 printMissingValueMessage();
                 return;
             }
             searchBox.getChildren().clear();
-
-        }else if(searchMenu.getValue().toString() == "Comment"){
-            if(searchText.getText() == ""){
+            insertSongPreview(searchText.getText());
+        }else if(searchMenu.getValue().toString().equals("Comment")){
+            if(searchText.getText().equals("")){
                 printMissingValueMessage();
                 return;
             }
             searchBox.getChildren().clear();
-
-
+            getReviewsByUsername(searchText.getText());
         }else{
             printMissingValueMessage();
             return;
+        }
+    }
+
+    public void insertSongPreview(String title){
+        List<SongPreview> songs = dbManager.getSongs(title);
+        for(SongPreview song : songs){
+            searchBox.getChildren().add(new SongPreviewVBox(song, this::retrieveAndShowComments));
+        }
+    }
+
+    public void retrieveAndShowComments(SongPreviewClickedEvent event) {
+        searchBox.getChildren().clear();
+        List<Review> comments = dbManager.getReviews(event.preview.ID, 50);
+        for(Review comment : comments){
+            AnchorPane commentPane = buildCommentPane(comment.User, comment.ID, comment.Text);
+            searchBox.getChildren().add(commentPane);
+        }
+    }
+
+    public void getReviewsByUsername(String username){
+        List<Review> reviews = dbManager.getReviewsByUsername(username);
+        for(Review comment : reviews){
+            AnchorPane commentPane = buildCommentPane(comment.User, comment.ID, comment.Text);
+            searchBox.getChildren().add(commentPane);
         }
     }
 
