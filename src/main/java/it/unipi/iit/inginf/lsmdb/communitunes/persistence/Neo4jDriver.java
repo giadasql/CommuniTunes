@@ -284,7 +284,7 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    public List<Map<String, Object>> getSuggestedSongs(String username){
+    public List<Map<String, Object>> getFollowedUsersLikedSongs(String username){
         List<Map<String, Object>> songs = new ArrayList<>();
         try ( Session session = driver.session())
         {
@@ -303,7 +303,7 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    public List<Map<String, Object>> getSuggestedArtists(String username){
+    public List<Map<String, Object>> getArtistsFollowedByFriends(String username){
         List<Map<String, Object>> artists = new ArrayList<>();
         try ( Session session = driver.session())
         {
@@ -322,7 +322,7 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    public List<Map<String, Object>> getSuggestedUsers(String username){
+    public List<Map<String, Object>> getUsersFollowedByFriends(String username){
         List<Map<String, Object>> users = new ArrayList<>();
         try ( Session session = driver.session())
         {
@@ -343,21 +343,21 @@ class Neo4jDriver implements Closeable {
     //  count how many songs our user likes and how many songs in common our target user and the other user like. We then
     // choose as like-minded users those that like 30% or more of the songs that our target user likes. We also return some of the
     // songs that are liked by like-minded users
-    public Map<String, List<Map<String, Object>>> getLikeMindedUsers(String username){
+    public Map<String, List<Map<String, Object>>> getLikeMindedUsersAndTheSongsTheyLike(String username){
         List<Map<String, Object>> suggestedUsers = new ArrayList<>();
         List<Map<String, Object>> suggestedSongs = new ArrayList<>();
         Map<String, List<Map<String, Object>>> suggestions = new HashMap<>();
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
-                Result res = tx.run( "MATCH (u:User {username: $username})\n" +
-                                "MATCH (u2:User)-[:LIKES]->(s2:Song)<-[:LIKES]-(u)\n" +
-                                "WHERE u2 <> u AND NOT (u2)-[:FOLLOWS]->(u)\n" +
-                                "WITH  u, u2, COUNT(DISTINCT(s2)) AS commonSongsCount\n" +
-                                "MATCH (u2)-[:LIKES]->(s3:Song)<-[:PERFORMS {isMainArtist: true}]-(a:Artist)\n" +
-                                "WHERE NOT (u)-[:LIKES]->(s3)\n" +
-                                "WITH s3, u2, a ORDER BY commonSongsCount DESC\n" +
-                                "RETURN COLLECT(DISTINCT(s3 {.title, .image, artist: a.username, _id: s3.songID}))[0..6] AS songs, COLLECT(DISTINCT(u2 {.username, .image}))[0..6] AS users",
+                Result res = tx.run( "MATCH (u:User {username: $username})-[:LIKES]->(s:Song)\n" +
+                                "MATCH (u2:User)-[:LIKES]->(s)\n" +
+                                "WHERE u2 <> u AND NOT (u)-[:FOLLOWS]->(u2)\n" +
+                                "WITH  u, u2, COUNT(DISTINCT(s)) AS commonSongsCount ORDER BY commonSongsCount DESC LIMIT 6\n" +
+                                "MATCH (u2)-[:LIKES]->(s2:Song)<-[:PERFORMS {isMainArtist: true}]-(a:Artist)\n" +
+                                "WHERE NOT (u)-[:LIKES]->(s2)\n" +
+                                "WITH s2, u2, a, commonSongsCount LIMIT 6\n" +
+                                "RETURN COLLECT(DISTINCT(s2 {.title, .image, artist: a.username, _id: s2.songID})) AS songs, COLLECT(DISTINCT(u2 {.username, .image, tot: commonSongsCount})) AS users",
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();
@@ -425,7 +425,7 @@ class Neo4jDriver implements Closeable {
                                 "MATCH (u)-[:FOLLOWS]->(similarArtist:Artist)\n" +
                                 "WHERE similarArtist <> a\n" +
                                 "WITH COUNT(DISTINCT u) AS commonFollowers, similarArtist {.username, .image} AS similarArtist\n" +
-                                "RETURN similarArtist ORDER BY commonFollowers DESC",
+                                "RETURN similarArtist ORDER BY commonFollowers DESC LIMIT 6",
                         parameters("username", username));
                 while(res.hasNext()){
                     Record r = res.next();

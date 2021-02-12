@@ -33,18 +33,9 @@ public class ArtistAnalytics implements UIController {
         this.manager = LayoutManagerFactory.getManager();
         dbManager = PersistenceFactory.CreatePersistence();
         artist = manager.context.getAuthenticatedArtist();
-        List<ArtistPreview> artistColleagueList = dbManager.getColleagues(artist);
         List<ArtistPreview> similarArtistsList = dbManager.getSimilarArtists(artist);
         List<UserPreview> topFansList = dbManager.getTopFans(artist);
         List<SongPreview> popularSongsList = dbManager.getPopularSongs(artist);
-
-        for(ArtistPreview artist : artistColleagueList){
-            artistColleague.getChildren().add(new ArtistPreviewVBox(artist, null));
-        }
-        if(artistColleague.getChildren().isEmpty()){
-            artistColleague.getParent().setVisible(false);
-            artistColleague.getParent().setManaged(false);
-        }
 
         for(ArtistPreview artist : similarArtistsList){
             similarArtists.getChildren().add(new ArtistPreviewVBox(artist, null));

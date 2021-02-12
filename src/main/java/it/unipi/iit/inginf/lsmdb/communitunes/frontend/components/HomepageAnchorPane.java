@@ -5,6 +5,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
@@ -17,6 +18,7 @@ public class HomepageAnchorPane extends AnchorPane {
     private final HBox genreHbox;
     private final List<SongPreview> songs;
     private final ArtistPreview artist;
+    private final VBox layout;
 
     private static final Font FONT = new Font("Book Antiqua", 20.0);
 
@@ -25,6 +27,8 @@ public class HomepageAnchorPane extends AnchorPane {
         this.songs = songs;
         this.artist = artist;
         this.genre.setFont(FONT);
+        this.layout = new VBox();
+        this.genre.setTextFill(Color.WHITE);
         genreHbox = new HBox();
         genreHbox.setPrefWidth(885.0);
         genreHbox.setPrefHeight(165.0);
@@ -34,19 +38,22 @@ public class HomepageAnchorPane extends AnchorPane {
         line.setStartY(30);
         line.setEndY(30);
         line.setStroke(Color.WHITE);
-
-        AnchorPane.setLeftAnchor(this.genre, 14.0);
-        AnchorPane.setTopAnchor(this.genre, 21.0);
-        AnchorPane.setLeftAnchor(line, 0.0);
-        AnchorPane.setTopAnchor(line, 0.0);
-        AnchorPane.setLeftAnchor(genreHbox, 8.0);
-        AnchorPane.setTopAnchor(genreHbox, 38.0);
-        getChildren().addAll(this.genre, line, genreHbox);
+//
+//        AnchorPane.setLeftAnchor(this.genre, 14.0);
+//        AnchorPane.setTopAnchor(this.genre, 21.0);
+//        AnchorPane.setLeftAnchor(line, 0.0);
+//        AnchorPane.setTopAnchor(line, 0.0);
+//        AnchorPane.setLeftAnchor(genreHbox, 8.0);
+//        AnchorPane.setTopAnchor(genreHbox, 38.0);
+        this.layout.getChildren().addAll(this.genre, line, genreHbox);
+        getChildren().add(layout);
 
         genreHbox.setVisible(true);
         genreHbox.setManaged(true);
 
-        genreHbox.getChildren().add(new ArtistPreviewVBox(artist, null));
+        if(artist != null){
+            genreHbox.getChildren().add(new ArtistPreviewVBox(artist, null));
+        }
 
         for(SongPreview song : songs){
             genreHbox.getChildren().add(new SongPreviewVBox(song, null));

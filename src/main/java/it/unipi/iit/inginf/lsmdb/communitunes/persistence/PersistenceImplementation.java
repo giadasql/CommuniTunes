@@ -257,9 +257,9 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<SongPreview> getSuggestedSongs(User user) {
+    public List<SongPreview> getFollowedUsersLikedSongs(User user) {
         List<SongPreview> result = new  ArrayList<>();
-        List<Map<String, Object>> songs = neo4j.getSuggestedSongs(user.Username);
+        List<Map<String, Object>> songs = neo4j.getFollowedUsersLikedSongs(user.Username);
         for (Map<String, Object> song:
                 songs) {
             result.add(buildSongPreviewFromMap(song));
@@ -305,9 +305,9 @@ class PersistenceImplementation implements Persistence {
 
 
     @Override
-    public Map<String, List<SongPreview>> getSuggestedSongs() {
+    public Map<String, List<SongPreview>> getBestSongsForEachGenre() {
         Map<String, List<SongPreview>> analyticResult = new HashMap<>();
-        Map<String, List<Map<String, Object>>>  result = mongo.getSuggestedSongs();
+        Map<String, List<Map<String, Object>>>  result = mongo.getBestSongsForEachGenre();
         for (String genre:
              result.keySet()) {
             List<Map<String, Object>> songsData = result.get(genre);
@@ -321,9 +321,9 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<ArtistPreview> getSuggestedArtists(User user) {
+    public List<ArtistPreview> getArtistsFollowedByFriends(User user) {
         List<ArtistPreview> result = new  ArrayList<>();
-        List<Map<String, Object>> artists = neo4j.getSuggestedArtists(user.Username);
+        List<Map<String, Object>> artists = neo4j.getArtistsFollowedByFriends(user.Username);
         for (Map<String, Object> artist:
                 artists) {
             result.add(buildArtistPreviewFromMap(artist));
@@ -332,9 +332,9 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<UserPreview> getSuggestedUsers(User user) {
+    public List<UserPreview> getUsersFollowedByFriends(User user) {
         List<UserPreview> result = new  ArrayList<>();
-        List<Map<String, Object>> users = neo4j.getSuggestedUsers(user.Username);
+        List<Map<String, Object>> users = neo4j.getUsersFollowedByFriends(user.Username);
         for (Map<String, Object> suggestion:
                 users) {
             result.add(buildUserPreviewFromMap(suggestion));
@@ -343,10 +343,10 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public Pair<List<UserPreview>, List<SongPreview>> getLikeMindedUsers(User user){
+    public Pair<List<UserPreview>, List<SongPreview>> getLikeMindedUsersAndTheSongsTheyLike(User user){
         List<UserPreview> suggestedUsers = new  ArrayList<>();
         List<SongPreview> suggestedSongs = new  ArrayList<>();
-        Map<String, List<Map<String, Object>>> suggestions = neo4j.getLikeMindedUsers(user.Username);
+        Map<String, List<Map<String, Object>>> suggestions = neo4j.getLikeMindedUsersAndTheSongsTheyLike(user.Username);
         for (Map<String, Object> suggestion:
                 suggestions.getOrDefault("users", new ArrayList<>())) {
             suggestedUsers.add(buildUserPreviewFromMap(suggestion));
@@ -368,11 +368,6 @@ class PersistenceImplementation implements Persistence {
             result.add(buildUserPreviewFromMap(suggestion));
         }
         return result;
-    }
-
-    @Override
-    public List<ArtistPreview> getColleagues(Artist artist) {
-        return null;
     }
 
     @Override

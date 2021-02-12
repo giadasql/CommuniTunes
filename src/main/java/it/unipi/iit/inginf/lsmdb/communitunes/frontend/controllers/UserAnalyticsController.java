@@ -26,6 +26,7 @@ public class UserAnalyticsController implements UIController {
     public HBox likemindedUsers;
     public HBox suggestedSongs;
     public HBox likemindedSongs;
+    public HBox coworkersHbox;
 
     private User user;
     private LayoutManager manager;
@@ -35,17 +36,18 @@ public class UserAnalyticsController implements UIController {
         this.manager = LayoutManagerFactory.getManager();
         dbManager = PersistenceFactory.CreatePersistence();
         user = manager.context.getAuthenticatedUser();
-        List<ArtistPreview> suggestedArtistsList = dbManager.getSuggestedArtists(user);
+        List<ArtistPreview> suggestedArtistsList = dbManager.getArtistsFollowedByFriends(user);
         System.out.println("1");
-        List<UserPreview> suggestedUsersList = dbManager.getSuggestedUsers(user);
+        List<UserPreview> suggestedUsersList = dbManager.getUsersFollowedByFriends(user);
         System.out.println("2");
-        Pair<List<UserPreview>, List<SongPreview>> likeMinded = dbManager.getLikeMindedUsers(user);
+        Pair<List<UserPreview>, List<SongPreview>> likeMinded = dbManager.getLikeMindedUsersAndTheSongsTheyLike(user);
+        System.out.println("3");
         List<UserPreview> likemindedUsersList = likeMinded.getValue0();
         List<SongPreview> likemindedSongsList = likeMinded.getValue1();
-        System.out.println("3");
-        List<SongPreview> suggestedSongsList = dbManager.getSuggestedSongs(user);
+        List<SongPreview> suggestedSongsList = dbManager.getFollowedUsersLikedSongs(user);
         System.out.println("4");
         List<ArtistPreview> coworkers = dbManager.getCoworkersOfFollowedArtists(user);
+        System.out.println("5");
 
         for(ArtistPreview artist : suggestedArtistsList){
             suggestedArtists.getChildren().add(new ArtistPreviewVBox(artist, null));
@@ -85,6 +87,14 @@ public class UserAnalyticsController implements UIController {
         if(likemindedSongs.getChildren().isEmpty()){
             likemindedSongs.getParent().setVisible(false);
             likemindedSongs.getParent().setManaged(false);
+        }
+
+        for(ArtistPreview artist : coworkers){
+            coworkersHbox.getChildren().add(new ArtistPreviewVBox(artist, null));
+        }
+        if(coworkersHbox.getChildren().isEmpty()){
+            coworkersHbox.getParent().setVisible(false);
+            coworkersHbox.getParent().setManaged(false);
         }
 
     }
