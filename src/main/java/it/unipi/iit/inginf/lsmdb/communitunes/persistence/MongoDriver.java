@@ -192,7 +192,7 @@ class MongoDriver implements Closeable {
         return updateRes.getModifiedCount() != 0;
     }
 
-    public Map<String, List<Map<String, Object>>> getSuggestedSongs(){
+    public Map<String, List<Map<String, Object>>> getBestSongsForEachGenre(){
         HashMap<String, List<Map<String, Object>>> res = new HashMap<>();
 
         Document toProject = new Document("title", "$title")

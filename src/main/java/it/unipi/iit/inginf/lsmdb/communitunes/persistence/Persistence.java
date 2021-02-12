@@ -222,7 +222,7 @@ public interface Persistence {
      *
      * @return
      */
-    Map<String, List<SongPreview>> getSuggestedSongs();
+    Map<String, List<SongPreview>> getBestSongsForEachGenre();
 
     /**
      *
@@ -255,7 +255,7 @@ public interface Persistence {
      * @param user
      * @return
      */
-    List<SongPreview> getSuggestedSongs(User user);
+    List<SongPreview> getFollowedUsersLikedSongs(User user);
 
     /**
      *
@@ -264,7 +264,7 @@ public interface Persistence {
      * @param user
      * @return
      */
-    List<ArtistPreview> getSuggestedArtists(User user);
+    List<ArtistPreview> getArtistsFollowedByFriends(User user);
 
     /**
      *
@@ -273,7 +273,7 @@ public interface Persistence {
      * @param user
      * @return
      */
-    List<UserPreview> getSuggestedUsers(User user);
+    List<UserPreview> getUsersFollowedByFriends(User user);
 
     /**
      *
@@ -283,7 +283,7 @@ public interface Persistence {
      * @param user
      * @return
      */
-    Pair<List<UserPreview>, List<SongPreview>> getLikeMindedUsers(User user);
+    Pair<List<UserPreview>, List<SongPreview>> getLikeMindedUsersAndTheSongsTheyLike(User user);
 
     /**
      *
@@ -296,14 +296,6 @@ public interface Persistence {
      */
     List<UserPreview> getTopFans(Artist artist);
 
-    /**
-     *
-     * Get artists that worked with artist.
-     *
-     * @param artist
-     * @return
-     */
-    List<ArtistPreview> getColleagues(Artist artist);
 
     /**
      *
