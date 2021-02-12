@@ -413,7 +413,7 @@ class MongoDriver implements Closeable {
 
         BasicDBList list = new BasicDBList();
         list.add("$reviews");
-        list.add(nMax);
+        list.add(nMax * -1);
         Bson slice = new BasicDBObject("reviews", new BasicDBObject("$slice", list));
 
         Bson project = Aggregates.project(Projections.fields(include("reviews"), slice));
