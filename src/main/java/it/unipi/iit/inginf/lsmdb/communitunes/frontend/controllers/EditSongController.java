@@ -42,8 +42,10 @@ public class EditSongController implements UIController {
         else{
             String[] arrayLinks = link.getText().split(";");
             for(String s : arrayLinks){
-                String[] nameUrl = s.split(":");
-                song.Links.add(new Link(nameUrl[0], nameUrl[1]));
+                String[] nameUrl = s.split(":", 2);
+                if(nameUrl.length >= 2){
+                    song.Links.add(new Link(nameUrl[0], nameUrl[1]));
+                }
             }
         }
         if(image.getText() == null || "".equals(image.getText())){
@@ -90,5 +92,16 @@ public class EditSongController implements UIController {
         }
         link.setText(temp.toString());
         image.setText(song.Image);
+    }
+
+    public void deleteSong(ActionEvent actionEvent) {
+        if(dbManager.deleteSong(song)){
+            try {
+                manager.setContent(Path.ARTIST_PROFILE);
+            } catch (IOException e) {
+                // TODO: log
+                e.printStackTrace();
+            }
+        }
     }
 }

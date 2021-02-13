@@ -60,17 +60,6 @@ class MongoDriver implements Closeable {
         return usersCollection.find(eq("email", email)).first() != null;
     }
 
-    public boolean checkIfStageNameExists(String stageName){
-        return usersCollection.find(eq("stage_name", stageName)).first() != null;
-    }
-
-    public boolean checkIfRequestExists(String username){
-        Bson myCheck = match(exists("requestedStageName"));
-        Bson myMatch = match(eq("username", username));
-
-        return reportsCollection.aggregate(Arrays.asList(myCheck, myMatch)).first() != null;
-    }
-
     private String getIdFromUsername(String username){
         Document doc = usersCollection.find(Filters.eq("username", username)).first();
         return doc == null ? null : (String)doc.get("_id");
@@ -91,15 +80,14 @@ class MongoDriver implements Closeable {
         return deleteResult.wasAcknowledged() && deleteResult.getDeletedCount() >= 1;
     }
 
-    // TODO: check if a field is null. If it is, remove it from the document
-    public boolean updateUser(User newUser){
+    public boolean updateUser(String id, String password, String email, String country, LocalDate birthday, String firstName, String lastName, String image){
         Document query = new Document();
-        query.append("_id", new ObjectId(newUser.ID));
+        query.append("_id", new ObjectId(id));
         Document setData = new Document();
-        setData.append("password", newUser.Password).append("email", newUser.Email)
-                .append("country", newUser.Country).append("birthday", newUser.Birthday)
-                .append("first_name", newUser.FirstName).append("last_name", newUser.LastName)
-                .append("image", newUser.Image);
+        setData.append("password", password).append("email", email)
+                .append("country", country).append("birthday", birthday)
+                .append("first_name", firstName).append("last_name", lastName)
+                .append("image", image);
         Document update = new Document();
         update.append("$set", setData);
 
@@ -112,7 +100,7 @@ class MongoDriver implements Closeable {
         Document query = new Document();
         query.append("username", username);
         Document setData = new Document();
-        setData.append("stage_name", stageName);
+        setData.append("stageName", stageName);
         Document update = new Document();
         update.append("$set", setData);
 
@@ -125,27 +113,26 @@ class MongoDriver implements Closeable {
         // We don't check the number of deleted songs to understand if the query was performed correctly,
         // since we may have deleted a user without songs
     public boolean deleteArtist(String username) {
-        String id = getIdFromUsername(username);
-        DeleteResult songsDelete = songsCollection.deleteMany(eq("artistId", id));
+        DeleteResult songsDelete = songsCollection.deleteMany(eq("artist", username));
         DeleteResult deleteResult = usersCollection.deleteOne(eq("username", username));
         return deleteResult.wasAcknowledged() && songsDelete.wasAcknowledged() && deleteResult.getDeletedCount() >= 1;
     }
 
     // TODO: check if a field is null. If it is, remove it from the document
-    public boolean updateArtist(Artist newArtist){
+    public boolean updateArtist(String id, String password, String email, String country, LocalDate birthday, String firstName, String lastName, String image, String activity, String biography, String stageName, List<Link> links){
         Document query = new Document();
-        query.append("_id", new ObjectId(newArtist.ID));
+        query.append("_id", new ObjectId(id));
         Document setData = new Document();
         BasicDBList linkList = new BasicDBList();
         for (Link link:
-                newArtist.Links) {
+                links) {
             linkList.add(new BasicDBObject("name", link.name).append("link", link.url));
         }
-        setData.append("password", newArtist.Password).append("email", newArtist.Email)
-                .append("country", newArtist.Country).append("birthday", newArtist.Birthday)
-                .append("activity", newArtist.ActiveYears).append("image", newArtist.Image)
-                .append("biography", newArtist.Biography).append("stage_name", newArtist.StageName)
-                .append("first_name", newArtist.FirstName).append("last_name", newArtist.LastName)
+        setData.append("password", password).append("email", email)
+                .append("country", country).append("birthday", birthday)
+                .append("activity", activity).append("image", image)
+                .append("biography", biography).append("stageName", stageName)
+                .append("first_name", firstName).append("last_name", lastName)
                 .append("sites", linkList);
         Document update = new Document();
         update.append("$set", setData);
@@ -155,12 +142,27 @@ class MongoDriver implements Closeable {
         return updateRes.getModifiedCount() != 0;
     }
 
-    public String addSong(String artist, String duration, String title, String album){
+    public String addSong(String artist, String duration, String title, String album, String image, List<Link> links, List<String> genres){
         Document song = new Document();
+        BasicDBList linkList = new BasicDBList();
+        if(links != null){
+            for (Link link:
+                    links) {
+                linkList.add(new BasicDBObject("name", link.name).append("link", link.url));
+            }
+            song.append("links", linkList);
+        }
+        BasicDBList genreList = new BasicDBList();
+        if(genres != null){
+            genreList.addAll(genres);
+            song.append("genres", genreList);
+        }
         song.append("artist", artist);
-        song.append("name", title);
+        song.append("title", title);
         song.append("lenght", duration);
         song.append("album", album);
+        song.append("image", image);
+
         InsertOneResult insertOneResult = songsCollection.insertOne(song);
         return insertOneResult.getInsertedId() == null ? null : insertOneResult.getInsertedId().asObjectId().getValue().toString();
     }
@@ -181,20 +183,21 @@ class MongoDriver implements Closeable {
     }
 
     // TODO: check if a field is null. If it is, remove it from the document
-    public boolean updateSong(Song newSong){
+    public boolean updateSong(String id, String image, String album, List<String> genres, List<Link> links){
         Document query = new Document();
-        query.append("_id", new ObjectId(newSong.ID));
+        query.append("_id", new ObjectId(id));
         Document setData = new Document();
         BasicDBList linkList = new BasicDBList();
-        if(newSong.Links != null){
+        if(links != null){
             for (Link link:
-                    newSong.Links) {
+                    links) {
                 linkList.add(new BasicDBObject("name", link.name).append("link", link.url));
             }
         }
         setData.append("links", linkList)
-                .append("image", newSong.Image)
-                .append("genres", newSong.Genres);
+                .append("image", image)
+                .append("genres", genres)
+                .append("album", album);
         Document update = new Document();
         update.append("$set", setData);
 
@@ -287,7 +290,7 @@ class MongoDriver implements Closeable {
     public int checkCredentials(String username, String password){
         Document user = usersCollection.aggregate(Arrays.asList(match(and(eq("username", username), eq("password", password))), addFields(new Field("isArtist",
                 new Document("$cond", Arrays.asList(new Document("$ifNull", Arrays.asList("$stage_name", false)), true, false)))))).first();
-        if(user == null || user.getBoolean("isAdmin") != null){
+        if(user == null){
             return -1;
         }
         else if (user.getBoolean("isArtist")){
@@ -309,14 +312,6 @@ class MongoDriver implements Closeable {
         else {
             return true;
         }
-    }
-
-    public boolean addRequest(String username, String stageName){
-        Document song = new Document();
-        song.append("username", username);
-        song.append("requestedStageName", stageName);
-        InsertOneResult insertOneResult = reportsCollection.insertOne(song);
-        return insertOneResult.getInsertedId() != null;
     }
 
     public boolean deleteRequest(String username) {
@@ -345,7 +340,7 @@ class MongoDriver implements Closeable {
     public List<Triplet<String, Integer, HashMap<String, String>>> getReports(){
         List<Triplet<String,Integer,HashMap<String, String>>> res = new ArrayList<>();
 
-        Bson myCheck = match(exists("numReports"));
+        Bson myCheck = exists("numReports");
         Bson mySort = sort(descending("numReports"));
         Bson myLimit = limit(50);
 
@@ -365,7 +360,7 @@ class MongoDriver implements Closeable {
     public HashMap<String,String> getRequests(){
         HashMap<String,String> res = new HashMap<>();
 
-        Bson myCheck = match(exists("requestedStageName"));
+        Bson myCheck = exists("requestedStageName");
         Bson myLimit = limit(50);
 
         reportsCollection.aggregate(Arrays.asList(myCheck, myLimit)).forEach(doc->{
@@ -393,7 +388,7 @@ class MongoDriver implements Closeable {
     public List<HashMap<String, Object>> getSongs(String title){
         List<HashMap<String, Object>> res = new ArrayList<>();
 
-        Bson myCheck = match(regex("title", ".*" + title + ".*"));
+        Bson myCheck = regex("title", ".*" + title + ".*");
 
         BasicDBList list = new BasicDBList();
         list.add("$reviews");
@@ -416,16 +411,15 @@ class MongoDriver implements Closeable {
     public List<HashMap<String, Object>> getReviewsByUsername(String username){
         List<HashMap<String, Object>> res = new ArrayList<>();
 
-        Bson myMatch = match(eq("reviews.user", username));
+        Bson myMatch = eq("reviews.user", username);
         Bson myUnwind = unwind("$reviews");
-        Bson myProject = project(fields(include("reviews._id", "reviews.user", "reviews.text", "_id")));
+        Bson myProject = fields(excludeId(), include("reviews._id", "reviews.user", "reviews.text", "_id"));
 
         songsCollection.aggregate(Arrays.asList(myMatch, myUnwind, myMatch, myProject)).forEach(doc->{
             HashMap<String, Object> temp = new HashMap<>();
-            Document step = (Document) doc.get("reviews");
-            temp.put("id", step.getObjectId("_id").toString());
-            temp.put("user", step.getString("user"));
-            temp.put("text", step.getString("text"));
+            temp.put("id", doc.getObjectId("reviews._id").toString());
+            temp.put("user", doc.getString("reviews.user"));
+            temp.put("text", doc.getString("reviews.text"));
             temp.put("songID", doc.getObjectId("_id").toString());
             res.add(temp);
         });
@@ -577,7 +571,7 @@ class MongoDriver implements Closeable {
         artistValues.put("id", artist.getObjectId("_id").toString());
         artistValues.put("password", artist.get("password"));
         artistValues.put("birthday", artist.get("birthday"));
-        artistValues.put("stage_name", artist.get("stage_name"));
+        artistValues.put("stageName", artist.get("stage_name"));
         artistValues.put("biography", artist.get("biography"));
         artistValues.put("activity", artist.get("activity"));
         artistValues.put("country", artist.get("country"));

@@ -41,12 +41,12 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    public int addUser(String username) {
+    public int addUser(String username, String image) {
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
-                Result res = tx.run( "MERGE (u:User {username: $username}) RETURN ID(u)",
-                        parameters( "username", username));
+                Result res = tx.run( "MERGE (u:User {username: $username, image: $image}) RETURN ID(u)",
+                        parameters( "username", username, "image", image));
                 if (res.hasNext()) {
                     // TODO: probabilmente non serve ritornare l'ID
                     return res.single().get(0).asInt();
@@ -124,7 +124,7 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    public int addSong(String artist, String title, String songID, List<String> feats) {
+    public boolean addSong(String artist, String title, String songID, List<String> feats, String image) {
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
@@ -133,17 +133,21 @@ class Neo4jDriver implements Closeable {
                 parameters.put("title", title);
                 parameters.put("songID", songID);
                 parameters.put("feat", feats);
+                parameters.put("image", image);
                 Result res = tx.run( "MATCH (a:Artist) WHERE a.username = $username " +
-                                "MATCH (feat:Artist) WHERE feat.username in $feat " +
-                                "CREATE (s:Song {title: $title, songID: $songID})," +
-                                "(a)-[:PERFORMS {isMainArtist: true}]->(s)"  +
-                                "(feat)-[:PERFORMS {isMainArtist: false}]->(s) " +
+                                "CREATE (s:Song {title: $title, songID: $songID, image: $image}) " +
+                                "MERGE (a)-[:PERFORMS {isMainArtist: true}]->(s) "  +
                                 "RETURN ID(s)",
                       parameters);
                 if (res.hasNext()) {
-                    return res.single().get(0).asInt();
+                    tx.run( "MATCH (s:Song {songID: $songID}) " +
+                            "MATCH (feat:Artist) WHERE feat.username in $feat " +
+                            "MERGE (feat)-[:PERFORMS {isMainArtist: false}]->(s) " +
+                            "RETURN ID(s)",
+                            parameters);
+                    return true;
                 }
-                return -1;
+                return false;
             });
         }
     }
@@ -442,7 +446,7 @@ class Neo4jDriver implements Closeable {
                                 "MATCH (liker:User)-[:LIKES]->(s)\n" +
                                 "WHERE NOT (liker)-[:FOLLOWS]->(a)\n" +
                                 "WITH COUNT(DISTINCT liker) AS nonFollowerLikers, s, a\n" +
-                                "RETURN s {.songID, .image, .title, artist: a.username} ORDER BY nonFollowerLikers DESC LIMIT 6",
+                                "RETURN s {_id: s.songID, .image, .title, artist: a.username} ORDER BY nonFollowerLikers DESC LIMIT 6",
                         parameters("username", username));
                 while(res.hasNext()) {
                     Record r = res.next();

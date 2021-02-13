@@ -1,5 +1,6 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
+import it.unipi.iit.inginf.lsmdb.communitunes.authentication.Role;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
@@ -62,6 +63,11 @@ public class ArtistAnalytics implements UIController {
     }
 
     public void closeWindow(MouseEvent mouseEvent) throws IOException {
-        manager.setContent(Path.USER_PROFILE);
+        if(manager.context.getFocusedRole() == Role.Artist){
+            manager.setContent(Path.ARTIST_PROFILE);
+        }
+        else{
+            manager.setContent(Path.USER_PROFILE);
+        }
     }
 }

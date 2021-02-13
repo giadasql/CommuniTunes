@@ -91,6 +91,8 @@ public class UserProfileController implements UIController {
             userAnalytics.setManaged(true);
             followUnfollow.setVisible(false);
             followUnfollow.setManaged(false);
+            userAnalytics.setManaged(true);
+            userAnalytics.setVisible(true);
         }
         else{
             editProfile.setVisible(false);
@@ -99,6 +101,8 @@ public class UserProfileController implements UIController {
             userAnalytics.setManaged(false);
             followUnfollow.setVisible(true);
             followUnfollow.setManaged(true);
+            userAnalytics.setManaged(false);
+            userAnalytics.setVisible(false);
             if(dbManager.checkFollow(user, manager.context.getAuthenticatedUser())){
                 followUnfollow.setText("Unfollow");
                 followingFocusedUser = true;

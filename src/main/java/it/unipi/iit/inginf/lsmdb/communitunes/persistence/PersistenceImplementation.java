@@ -76,7 +76,7 @@ class PersistenceImplementation implements Persistence {
     public boolean addNewUser(User newUser) throws PersistenceInconsistencyException {
         String mongoID = mongo.addUser(newUser.Username, newUser.Email, newUser.Password);
         if(mongoID != null){
-            int neoID = neo4j.addUser(newUser.Username);
+            int neoID = neo4j.addUser(newUser.Username, newUser.Image);
             if(neoID != -1){
                 return true;
             }
@@ -102,7 +102,7 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean updateUser(User newUser) {
-        return mongo.updateUser(newUser) && neo4j.updateUser(newUser.Username, newUser.Image);
+        return mongo.updateUser(newUser.ID, newUser.Password, newUser.Email, newUser.Country, newUser.Birthday, newUser.FirstName, newUser.LastName, newUser.Image) && neo4j.updateUser(newUser.Username, newUser.Image);
     }
 
     @Override
@@ -137,16 +137,17 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean updateArtist(Artist newArtist) {
-        return mongo.updateArtist(newArtist) && neo4j.updateArtist(newArtist.Username, newArtist.StageName, newArtist.Image);
+        return mongo.updateArtist(newArtist.ID, newArtist.Password, newArtist.Email, newArtist.Country, newArtist.Birthday, newArtist.FirstName, newArtist.LastName, newArtist.Image, newArtist.ActiveYears, newArtist.Biography, newArtist.StageName, newArtist.Links) && neo4j.updateArtist(newArtist.Username, newArtist.StageName, newArtist.Image);
     }
 
-        // TODO: Forse conviene passare l'artista insieme alla canzone?
+
     @Override
     public boolean addSong(Song newSong) throws PersistenceInconsistencyException {
-        String mongoID = mongo.addSong(newSong.Artist.username, newSong.Duration, newSong.Title, newSong.Album);
+        String mongoID = mongo.addSong(newSong.Artist.username, newSong.Duration, newSong.Title, newSong.Album, newSong.Image, newSong.Links, newSong.Genres);
+        newSong.ID = mongoID;
         if(mongoID != null){
-            int neoID = neo4j.addSong(newSong.Artist.username, newSong.Title, newSong.ID, newSong.Featurings.stream().map(x -> x.username).collect(Collectors.toList()));
-            if(neoID != -1){
+            boolean success = neo4j.addSong(newSong.Artist.username, newSong.Title, newSong.ID, newSong.Featurings.stream().map(x -> x.username).collect(Collectors.toList()), newSong.Image);
+            if(success){
                 return true;
             }
             else{
@@ -172,7 +173,7 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean editSong(Song newSong) {
-        return mongo.updateSong(newSong) && neo4j.updateSong(newSong.ID, newSong.Title, newSong.Artist.username, newSong.Image);
+        return mongo.updateSong(newSong.ID, newSong.Image, newSong.Album, newSong.Genres, newSong.Links) && neo4j.updateSong(newSong.ID, newSong.Title, newSong.Artist.username, newSong.Image);
     }
 
     @Override
