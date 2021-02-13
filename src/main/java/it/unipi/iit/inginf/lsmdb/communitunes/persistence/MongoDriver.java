@@ -340,7 +340,7 @@ class MongoDriver implements Closeable {
     public List<Triplet<String, Integer, HashMap<String, String>>> getReports(){
         List<Triplet<String,Integer,HashMap<String, String>>> res = new ArrayList<>();
 
-        Bson myCheck = exists("numReports");
+        Bson myCheck = match(exists("numReports"));
         Bson mySort = sort(descending("numReports"));
         Bson myLimit = limit(50);
 
@@ -360,7 +360,7 @@ class MongoDriver implements Closeable {
     public HashMap<String,String> getRequests(){
         HashMap<String,String> res = new HashMap<>();
 
-        Bson myCheck = exists("requestedStageName");
+        Bson myCheck = match(exists("requestedStageName"));
         Bson myLimit = limit(50);
 
         reportsCollection.aggregate(Arrays.asList(myCheck, myLimit)).forEach(doc->{
@@ -388,7 +388,7 @@ class MongoDriver implements Closeable {
     public List<HashMap<String, Object>> getSongs(String title){
         List<HashMap<String, Object>> res = new ArrayList<>();
 
-        Bson myCheck = regex("title", ".*" + title + ".*");
+        Bson myCheck = match(regex("title", ".*" + title + ".*"));
 
         BasicDBList list = new BasicDBList();
         list.add("$reviews");
@@ -411,15 +411,16 @@ class MongoDriver implements Closeable {
     public List<HashMap<String, Object>> getReviewsByUsername(String username){
         List<HashMap<String, Object>> res = new ArrayList<>();
 
-        Bson myMatch = eq("reviews.user", username);
+        Bson myMatch = match(eq("reviews.user", username));
         Bson myUnwind = unwind("$reviews");
-        Bson myProject = fields(excludeId(), include("reviews._id", "reviews.user", "reviews.text", "_id"));
+        Bson myProject = project(fields(excludeId(), include("reviews._id", "reviews.user", "reviews.text", "_id")));
 
         songsCollection.aggregate(Arrays.asList(myMatch, myUnwind, myMatch, myProject)).forEach(doc->{
             HashMap<String, Object> temp = new HashMap<>();
-            temp.put("id", doc.getObjectId("reviews._id").toString());
-            temp.put("user", doc.getString("reviews.user"));
-            temp.put("text", doc.getString("reviews.text"));
+            Document step = (Document) doc.get("reviews");
+            temp.put("id", step.getObjectId("_id").toString());
+            temp.put("user", step.getString("user"));
+            temp.put("text", step.getString("text"));
             temp.put("songID", doc.getObjectId("_id").toString());
             res.add(temp);
         });
