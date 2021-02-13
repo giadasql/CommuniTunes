@@ -52,10 +52,10 @@ public class ReviewsController implements UIController {
         if(toShow.size() > 0){
             for(Review review : toShow){
                 if(review.User != null && manager.context.getAuthenticatedUser() != null && review.User.equals(manager.context.getAuthenticatedUser().Username)){
-                    reviewsBox.getChildren().add(new ReviewVBox(review, true));
+                    reviewsBox.getChildren().add(new ReviewVBox(review, true, false));
                 }
                 else{
-                    reviewsBox.getChildren().add(new ReviewVBox(review, false));
+                    reviewsBox.getChildren().add(new ReviewVBox(review, false, true));
                 }
             }
         }

@@ -171,6 +171,11 @@
                                     <Font name="Book Antiqua Bold" size="16.0" />
                                  </font>
                               </Button>
+                              <Text fx:id="reportText" fill="RED" layoutX="368.0" layoutY="236.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You reported the user." wrappingWidth="163.13671875">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Text>
                            </children>
                         </AnchorPane>
                      </children>

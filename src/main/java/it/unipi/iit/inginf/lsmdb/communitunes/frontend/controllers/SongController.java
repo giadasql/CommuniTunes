@@ -215,10 +215,10 @@ public class SongController implements UIController {
                  song.LoadedReviews) {
                 ReviewVBox reviewBox;
                 if(manager.context.getAuthenticatedUser().Username != null && review.User.equals(manager.context.getAuthenticatedUser().Username)){
-                    reviewBox = new ReviewVBox(review, true);
+                    reviewBox = new ReviewVBox(review, true, false);
                 }
                 else{
-                    reviewBox = new ReviewVBox(review, false);
+                    reviewBox = new ReviewVBox(review, false, true);
                 }
                 reviews.getChildren().add(reviewBox);
             }

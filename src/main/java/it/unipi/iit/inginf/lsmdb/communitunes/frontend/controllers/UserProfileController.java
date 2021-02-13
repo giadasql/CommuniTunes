@@ -56,6 +56,7 @@ public class UserProfileController implements UIController {
     public HBox followedBox;
     public HBox followerArtistsBox;
     public Button reportBtn;
+    public Text reportText;
 
     private User user;
     private LayoutManager manager;
@@ -127,6 +128,9 @@ public class UserProfileController implements UIController {
                 followingFocusedUser = false;
             }
         }
+
+        reportText.setVisible(false);
+
         // write info in the infoContainer
         if(user.FirstName != null){
             firstName.setText(user.FirstName);
@@ -258,6 +262,9 @@ public class UserProfileController implements UIController {
     }
 
     public void reportUser(MouseEvent mouseEvent) {
-        dbManager.reportUser(user);
+        if(dbManager.reportUser(user)){
+            reportText.setVisible(true);
+            reportBtn.setDisable(true);
+        }
     }
 }

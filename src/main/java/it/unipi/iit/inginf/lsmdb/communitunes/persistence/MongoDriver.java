@@ -684,18 +684,18 @@ class MongoDriver implements Closeable {
     }
 
     public boolean reportReview(String username, String id, String text) {
-        Bson match = match(eq("user", username));
-        Bson push = Updates.push("reviews", new BasicDBObject("_id", new ObjectId(id)).append("text", text));
+        Bson match = eq("user", username);
+        Bson push = Updates.addToSet("reviews", new BasicDBObject("_id", new ObjectId(id)).append("text", text));
         Bson increment = inc("numReports", 1);
 
         UpdateOptions options = new UpdateOptions().upsert(true);
 
-        UpdateResult result = reportsCollection.updateOne(match, Arrays.asList(push, increment), options);
+        UpdateResult result = reportsCollection.updateOne(match, Updates.combine(push, increment), options);
         return result.wasAcknowledged();
     }
 
     public boolean reportUser(String username) {
-        Bson match = match(eq("user", username));
+        Bson match = eq("user", username);
         Bson increment = inc("numReports", 1);
 
         UpdateOptions options = new UpdateOptions().upsert(true);

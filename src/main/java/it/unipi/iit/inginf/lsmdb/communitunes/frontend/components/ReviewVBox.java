@@ -23,8 +23,10 @@ import javafx.scene.text.Text;
 
 public class ReviewVBox extends VBox {
     private Review review;
+    private Text reportedReview;
+    private Button reportBtn;
 
-    public ReviewVBox(Review review, boolean showDeleteButton) {
+    public ReviewVBox(Review review, boolean showDeleteButton, boolean showReportBtn) {
         this.review = review;
         Line line = new Line();
         line.setStartX(0);
@@ -63,12 +65,28 @@ public class ReviewVBox extends VBox {
             headerHBox.getChildren().add(deleteBtn);
         }
         Text rating = new Text();
-        rating.setText("Rating: " + review.Rating + "/100");
+        rating.setText("Rating: " + review.Rating + " /100");
         rating.setFont(Font.font("Book Antiqua", FontWeight.BOLD, 20));
         rating.setFill(Color.WHITE);
         this.getChildren().add(headerHBox);
         this.getChildren().add(rating);
         if(review.Text != null){
+            if(showReportBtn){
+                reportedReview = new Text();
+                reportedReview.setText("You reported this review.");
+                reportedReview.setFill(Color.RED);
+                reportedReview.setFont(Font.font("Book Antiqua", 20));
+                reportBtn = new Button();
+                reportBtn.setCursor(Cursor.HAND);
+                reportBtn.setMaxHeight(25);
+                reportBtn.setMaxWidth(25);
+                reportBtn.setBackground(Background.EMPTY);
+                ImageView imageView = new ImageView(new Image(this.getClass().getResourceAsStream("/ui/img/report.png")));
+                reportBtn.setGraphic(imageView);
+                reportBtn.setOnMouseClicked(this::reportReview);
+                headerHBox.getChildren().addAll(reportBtn, reportedReview);
+                reportedReview.setVisible(false);
+            }
             Text commentLabel = new Text();
             Text comment = new Text();
             comment.setText(review.Text);
@@ -80,6 +98,13 @@ public class ReviewVBox extends VBox {
             commentLabel.setFont(Font.font("Book Antiqua", FontWeight.BOLD, 20));
             this.getChildren().add(commentLabel);
             this.getChildren().add(comment);
+        }
+    }
+
+    private void reportReview(MouseEvent mouseEvent) {
+        if(PersistenceFactory.CreatePersistence().reportReview(review)){
+            reportedReview.setVisible(true);
+            reportBtn.setDisable(true);
         }
     }
 
