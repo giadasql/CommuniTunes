@@ -83,7 +83,7 @@ class MongoDriver implements Closeable {
     public boolean updateUser(String id, String password, String email, String country, LocalDate birthday, String firstName, String lastName, String image){
         Document query = new Document();
         query.append("_id", new ObjectId(id));
-        Document setData = new Document();
+        BasicDBObject setData = new BasicDBObject();
         setData.append("password", password).append("email", email)
                 .append("country", country).append("birthday", birthday)
                 .append("first_name", firstName).append("last_name", lastName)
@@ -436,8 +436,7 @@ class MongoDriver implements Closeable {
         list.add(-15);
         Bson slice = new BasicDBObject("reviews", new BasicDBObject("$slice", list));
         Bson addField = Aggregates.addFields(new Field<>("avgRating", new BasicDBObject("$avg", "$reviews.rating")));
-        Bson project = Aggregates.project(Projections.fields(include("_id", "title", "image"), slice));
-
+        Bson project = Aggregates.project(Projections.fields(include("_id", "title", "length", "links", "album", "reviews", "genres", "image", "avgRating"), slice));
         Bson limit = limit(1);
 
         Document song = songsCollection.aggregate(Arrays.asList(match, limit, addField, project)).first();
@@ -484,6 +483,33 @@ class MongoDriver implements Closeable {
         BasicDBList list = new BasicDBList();
         list.add("$reviews");
         list.add(nMax * -1);
+        Bson slice = new BasicDBObject("reviews", new BasicDBObject("$slice", list));
+
+        Bson project = Aggregates.project(Projections.fields(include("reviews"), slice));
+
+        Bson limit = limit(1);
+
+        Document song = songsCollection.aggregate(Arrays.asList(match, limit, project)).first();
+        if(song != null){
+            for (Document reviewDoc: song.getList("reviews", Document.class)) {
+                Map<String, Object> reviewMap = getReviewMap(reviewDoc, song.getObjectId("_id").toString());
+                reviews.add(reviewMap);
+            }
+        }
+        return reviews;
+    }
+
+    public List<Map<String, Object>> getSongReviews(String songID, int startIndex, int count){
+        List<Map<String, Object>> reviews = new ArrayList<>();
+
+        Bson match = match((eq("_id", new ObjectId(songID))));
+
+        BasicDBList list = new BasicDBList();
+        list.add("$reviews");
+        list.add(startIndex);
+        list.add(startIndex + count);
+
+        Bson skip = skip(startIndex);
         Bson slice = new BasicDBObject("reviews", new BasicDBObject("$slice", list));
 
         Bson project = Aggregates.project(Projections.fields(include("reviews"), slice));

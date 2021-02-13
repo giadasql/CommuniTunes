@@ -245,6 +245,12 @@ public class SongController implements UIController {
     }
 
     public void seeAllReviews(MouseEvent mouseEvent) {
+        try {
+            manager.setContent(Path.REVIEWS);
+        } catch (IOException e) {
+            // TODO: log
+            e.printStackTrace();
+        }
     }
 
     public void goToEdit(MouseEvent mouseEvent) throws IOException {

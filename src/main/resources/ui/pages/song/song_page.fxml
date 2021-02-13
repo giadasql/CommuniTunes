@@ -214,7 +214,7 @@
                                              </font>
                                           </Label>
                                           <Line endX="880.0" endY="49.0" startX="26.0" startY="49.0" stroke="WHITE" />
-                                          <Button fx:id="seeAllReviews" layoutX="775.0" layoutY="16.0" minHeight="-Infinity" mnemonicParsing="false" onMouseClicked="#seeAllReviews" prefHeight="37.0" prefWidth="86.0" style="-fx-background-color: transparent; -fx-text-fill: white;" text="See all">
+                                          <Button layoutX="775.0" layoutY="16.0" minHeight="-Infinity" mnemonicParsing="false" onMouseClicked="#seeAllReviews" prefHeight="37.0" prefWidth="86.0" style="-fx-background-color: transparent; -fx-text-fill: white;" text="See all">
                                              <font>
                                                 <Font size="16.0" />
                                              </font>

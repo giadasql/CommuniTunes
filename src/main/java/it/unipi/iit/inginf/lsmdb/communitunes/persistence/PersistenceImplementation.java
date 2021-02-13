@@ -15,6 +15,7 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
@@ -529,6 +530,18 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
+    public List<Review> getReviews(String songID, int startIndex, int count) {
+        List<Review> toReturn = new ArrayList<>();
+        List<Map<String, Object>> reviewsData = new ArrayList<>(mongo.getSongReviews(songID, startIndex, count));
+        for (Map<String, Object> reviewData:
+                reviewsData) {
+            toReturn.add(buildReviewFromMap(reviewData));
+        }
+
+        return toReturn;
+    }
+
+    @Override
     public List<Review> getReviewsByUsername(String username){
         List<Review> res = new ArrayList<>();
         List<HashMap<String, Object>> reviewList = mongo.getReviewsByUsername(username);
@@ -586,7 +599,7 @@ class PersistenceImplementation implements Persistence {
 
     private User buildUserFromMap(Map<String, Object> userData){
         String email, password, country, image, firstName, lastName, username, id;
-        LocalDate birthday;
+        LocalDate birthday = null;
         ArrayList<ArtistPreview> artistFollowers = new ArrayList<>();
         ArrayList<ArtistPreview> artistFollowed = new ArrayList<>();
         ArrayList<SongPreview> likes = new ArrayList<>();
@@ -600,8 +613,11 @@ class PersistenceImplementation implements Persistence {
         firstName = (userData.get("firstName") instanceof String ? (String)userData.get("firstName") : null);
         lastName = (userData.get("lastName") instanceof String ? (String)userData.get("lastName") : null);
         username = (userData.get("username") instanceof String ? (String)userData.get("username") : null);
-        birthday = (userData.get("birthday") instanceof LocalDate ? (LocalDate) userData.get("birthday") : null);
         id = (userData.get("id") instanceof String ? (String) userData.get("id") : null);
+
+        if(userData.get("birthday") != null){
+                birthday = LocalDate.parse( new SimpleDateFormat("yyyy-MM-dd").format(userData.getOrDefault("birthday", null)) );
+        }
         
         Iterable<Map<String,Object>> followedArtistsList = (Iterable<Map<String,Object>>)userData.get("followedArtists");
         for (Map<String,Object> artistMap : followedArtistsList){
