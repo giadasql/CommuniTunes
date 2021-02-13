@@ -64,6 +64,8 @@ public class ArtistController implements UIController {
     public HBox followedBox;
     public HBox followerArtistsBox;
     public Button addSongBtn;
+    public Button reportBtn;
+    public Text reportText;
 
     private Artist artist;
     private LayoutManager manager;
@@ -109,6 +111,8 @@ public class ArtistController implements UIController {
             analyticsArtist.setManaged(true);
             addSongBtn.setVisible(true);
             addSongBtn.setManaged(true);
+            reportBtn.setManaged(false);
+            reportBtn.setVisible(false);
         }
         else {
             editProfile.setVisible(false);
@@ -128,6 +132,8 @@ public class ArtistController implements UIController {
                 followingFocusedUser = false;
             }
         }
+
+        reportText.setVisible(false);
 
         // write info in the infoContainer
         if(artist.FirstName != null){
@@ -317,6 +323,13 @@ public class ArtistController implements UIController {
                 followUnfollow.setText("Follow");
                 followingFocusedUser = false;
             }
+        }
+    }
+
+    public void reportUser(MouseEvent mouseEvent) {
+        if(dbManager.reportUser(artist)){
+            reportText.setVisible(true);
+            reportBtn.setDisable(true);
         }
     }
 }

@@ -226,8 +226,21 @@
                                           <Cursor fx:constant="HAND" />
                                        </cursor>
                                     </Button>
+                                    <Button fx:id="reportBtn" layoutX="553.0" layoutY="223.0" mnemonicParsing="false" onMouseClicked="#reportUser" prefHeight="35.0" prefWidth="95.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Report">
+                                       <cursor>
+                                          <Cursor fx:constant="HAND" />
+                                       </cursor>
+                                       <font>
+                                          <Font name="Book Antiqua Bold" size="16.0" />
+                                       </font>
+                                    </Button>
                                  </children>
                               </AnchorPane>
+                              <Text fx:id="reportText" fill="RED" layoutX="378.0" layoutY="246.0" strokeType="OUTSIDE" strokeWidth="0.0" text="You reported the artist" wrappingWidth="163.13671875">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Text>
                            </children>
                         </AnchorPane>
                      </children>
