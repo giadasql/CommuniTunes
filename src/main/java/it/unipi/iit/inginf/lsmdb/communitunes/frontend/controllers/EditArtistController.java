@@ -18,6 +18,8 @@ import javafx.scene.text.Text;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class EditArtistController implements UIController {
     public TextField email;
@@ -93,7 +95,8 @@ public class EditArtistController implements UIController {
             artist.Birthday = null;
         }
         else{
-            artist.Birthday = birthday.getValue();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            artist.Birthday = formatter.format(birthday.getValue());
         }
 
         if(biography.getText() == null || "".equals(biography.getText())){
@@ -133,7 +136,10 @@ public class EditArtistController implements UIController {
         country.setText(artist.Country);
         firstName.setText(artist.FirstName);
         lastName.setText(artist.LastName);
-        birthday.setValue(artist.Birthday);
+        if(artist.Birthday != null){
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            birthday.setValue(LocalDate.parse(artist.Birthday, formatter));
+        }
         image.setText(artist.Image);
         biography.setText(artist.Biography);
         activeYears.setText(artist.ActiveYears);

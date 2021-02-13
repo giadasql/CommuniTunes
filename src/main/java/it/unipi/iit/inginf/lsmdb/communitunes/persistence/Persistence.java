@@ -354,6 +354,10 @@ public interface Persistence {
      */
     List<Report> getReports();
 
+    boolean reportReview(Review review);
+
+    boolean reportUser(User user);
+
     /**
      *
      * Retrieve a list of requests made by users to upgrade their account

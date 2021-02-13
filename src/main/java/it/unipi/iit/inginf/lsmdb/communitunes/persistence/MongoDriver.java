@@ -80,7 +80,7 @@ class MongoDriver implements Closeable {
         return deleteResult.wasAcknowledged() && deleteResult.getDeletedCount() >= 1;
     }
 
-    public boolean updateUser(String id, String password, String email, String country, LocalDate birthday, String firstName, String lastName, String image){
+    public boolean updateUser(String id, String password, String email, String country, String birthday, String firstName, String lastName, String image){
         Document query = new Document();
         query.append("_id", new ObjectId(id));
         BasicDBObject setData = new BasicDBObject();
@@ -119,7 +119,7 @@ class MongoDriver implements Closeable {
     }
 
     // TODO: check if a field is null. If it is, remove it from the document
-    public boolean updateArtist(String id, String password, String email, String country, LocalDate birthday, String firstName, String lastName, String image, String activity, String biography, String stageName, List<Link> links){
+    public boolean updateArtist(String id, String password, String email, String country, String birthday, String firstName, String lastName, String image, String activity, String biography, String stageName, List<Link> links){
         Document query = new Document();
         query.append("_id", new ObjectId(id));
         Document setData = new Document();
@@ -650,7 +650,7 @@ class MongoDriver implements Closeable {
         user.append("requestedStageName", stageName);
         InsertOneResult insertOneResult = reportsCollection.insertOne(user);
         // TODO: probabilmente non serve ritornare l'ID
-        return insertOneResult.getInsertedId() == null ? false : true;
+        return insertOneResult.getInsertedId() != null;
     }
 
     @Override
@@ -681,5 +681,26 @@ class MongoDriver implements Closeable {
             resultList.add(entityMap);
         }
         return resultList;
+    }
+
+    public boolean reportReview(String username, String id, String text) {
+        Bson match = match(eq("user", username));
+        Bson push = Updates.push("reviews", new BasicDBObject("_id", new ObjectId(id)).append("text", text));
+        Bson increment = inc("numReports", 1);
+
+        UpdateOptions options = new UpdateOptions().upsert(true);
+
+        UpdateResult result = reportsCollection.updateOne(match, Arrays.asList(push, increment), options);
+        return result.wasAcknowledged();
+    }
+
+    public boolean reportUser(String username) {
+        Bson match = match(eq("user", username));
+        Bson increment = inc("numReports", 1);
+
+        UpdateOptions options = new UpdateOptions().upsert(true);
+
+        UpdateResult result = reportsCollection.updateOne(match, increment, options);
+        return result.wasAcknowledged();
     }
 }

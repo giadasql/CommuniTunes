@@ -18,6 +18,11 @@ import javafx.scene.text.Text;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 public class EditUserController implements UIController {
     public TextField email;
@@ -74,7 +79,8 @@ public class EditUserController implements UIController {
             user.Birthday = null;
         }
         else{
-            user.Birthday = birthday.getValue();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            user.Birthday = formatter.format(birthday.getValue());
         }
         if(dbManager.updateUser(user)){
             msg.setFill(Color.GREEN);
@@ -96,19 +102,21 @@ public class EditUserController implements UIController {
         user = manager.context.getAuthenticatedUser();
         dbManager = PersistenceFactory.CreatePersistence();
         authManager = AuthenticationFactory.CreateAuthenticationManager();
-        setDefaultValues();
     }
 
     public void closeEditWindow(MouseEvent mouseEvent) throws IOException {
         manager.setContent(Path.USER_PROFILE);
     }
 
-    private void setDefaultValues(){
+    private void setDefaultValues() {
         email.setText(user.Email);
         country.setText(user.Country);
         firstName.setText(user.FirstName);
         lastName.setText(user.LastName);
-        birthday.setValue(user.Birthday);
+        if(user.Birthday != null){
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            birthday.setValue(LocalDate.parse(user.Birthday, formatter));
+        }
         image.setText(user.Image);
         password.setText("");
     }

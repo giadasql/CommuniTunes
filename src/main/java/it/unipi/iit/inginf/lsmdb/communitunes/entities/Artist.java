@@ -25,7 +25,7 @@ public class Artist extends User {
         super(username, email, password);
     }
 
-    public Artist(String ID, String email, String username, String password, String country, String image, LocalDate birthday, String firstName, String lastName, List<SongPreview> loadedLikes, List<UserPreview> loadedFollowed, List<ArtistPreview> loadedArtistFollowed, List<UserPreview> loadedFollowers, List<ArtistPreview> loadedArtistFollowers, String stageName, String activeYears, String biography, List<Link> links, List<SongPreview> loadedSongs) {
+    public Artist(String ID, String email, String username, String password, String country, String image, String birthday, String firstName, String lastName, List<SongPreview> loadedLikes, List<UserPreview> loadedFollowed, List<ArtistPreview> loadedArtistFollowed, List<UserPreview> loadedFollowers, List<ArtistPreview> loadedArtistFollowers, String stageName, String activeYears, String biography, List<Link> links, List<SongPreview> loadedSongs) {
         super(ID, email, username, password, country, image, birthday, firstName, lastName, loadedLikes, loadedFollowed, loadedArtistFollowed, loadedFollowers, loadedArtistFollowers);
         StageName = stageName;
         ActiveYears = activeYears;

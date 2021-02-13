@@ -22,7 +22,7 @@ public class User extends Entity {
 
     public String Image;
 
-    public LocalDate Birthday;
+    public String Birthday;
 
     public String FirstName;
 
@@ -54,7 +54,7 @@ public class User extends Entity {
         Image = null;
     }
 
-    public User(String ID, String email, String username, String password, String country, String image, LocalDate birthday, String firstName, String lastName, List<SongPreview> loadedLikes, List<UserPreview> loadedFollowed, List<ArtistPreview> loadedArtistFollowed, List<UserPreview> loadedFollowers, List<ArtistPreview> loadedArtistFollowers) {
+    public User(String ID, String email, String username, String password, String country, String image, String birthday, String firstName, String lastName, List<SongPreview> loadedLikes, List<UserPreview> loadedFollowed, List<ArtistPreview> loadedArtistFollowed, List<UserPreview> loadedFollowers, List<ArtistPreview> loadedArtistFollowers) {
         super(ID);
         Email = email;
         Username = username;

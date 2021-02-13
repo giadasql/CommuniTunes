@@ -163,6 +163,14 @@
                                     </HBox>
                                  </children>
                               </VBox>
+                              <Button fx:id="reportBtn" layoutX="547.0" layoutY="214.0" mnemonicParsing="false" onMouseClicked="#reportUser" prefHeight="35.0" prefWidth="95.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Report">
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                                 <font>
+                                    <Font name="Book Antiqua Bold" size="16.0" />
+                                 </font>
+                              </Button>
                            </children>
                         </AnchorPane>
                      </children>

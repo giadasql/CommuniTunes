@@ -28,7 +28,6 @@ class PersistenceImplementation implements Persistence {
     private MongoDriver mongo;
     private Neo4jDriver neo4j;
 
-    private final List<String> SongConstructorParameters = new ArrayList<>(Arrays.asList("mainArtist", "duration", "title", "image", "album", "loadedReviews", "links", "genres", "featurings", "id"));
 
     public PersistenceImplementation() {
         String settingsFileName = "Settings.xml";
@@ -475,6 +474,16 @@ class PersistenceImplementation implements Persistence {
         return res;
     }
 
+    @Override
+    public boolean reportReview(Review review) {
+        return mongo.reportReview(review.User, review.ID, review.Text);
+    }
+
+    @Override
+    public boolean reportUser(User user) {
+        return mongo.reportUser(user.Username);
+    }
+
     public List<Request> getRequests(){
         HashMap<String, String> requests =  mongo.getRequests();
         List<Request> res = new ArrayList<>();
@@ -599,7 +608,7 @@ class PersistenceImplementation implements Persistence {
 
     private User buildUserFromMap(Map<String, Object> userData){
         String email, password, country, image, firstName, lastName, username, id;
-        LocalDate birthday = null;
+        String birthday = null;
         ArrayList<ArtistPreview> artistFollowers = new ArrayList<>();
         ArrayList<ArtistPreview> artistFollowed = new ArrayList<>();
         ArrayList<SongPreview> likes = new ArrayList<>();
@@ -613,11 +622,8 @@ class PersistenceImplementation implements Persistence {
         firstName = (userData.get("firstName") instanceof String ? (String)userData.get("firstName") : null);
         lastName = (userData.get("lastName") instanceof String ? (String)userData.get("lastName") : null);
         username = (userData.get("username") instanceof String ? (String)userData.get("username") : null);
+        birthday = (userData.get("birthday") instanceof String ? (String)userData.get("birthday") : null);
         id = (userData.get("id") instanceof String ? (String) userData.get("id") : null);
-
-        if(userData.get("birthday") != null){
-                birthday = LocalDate.parse( new SimpleDateFormat("yyyy-MM-dd").format(userData.getOrDefault("birthday", null)) );
-        }
         
         Iterable<Map<String,Object>> followedArtistsList = (Iterable<Map<String,Object>>)userData.get("followedArtists");
         for (Map<String,Object> artistMap : followedArtistsList){
@@ -660,7 +666,7 @@ class PersistenceImplementation implements Persistence {
 
     private Artist buildArtistFromMap( Map<String, Object> artistData){
         String email, password, country, image, firstName, lastName, username, id, stageName, biography, yearsActive;
-        LocalDate birthday;
+        String birthday;
         ArrayList<ArtistPreview> artistFollowers = new ArrayList<>();
         ArrayList<ArtistPreview> artistFollowed = new ArrayList<>();
         ArrayList<SongPreview> likes = new ArrayList<>();
@@ -676,7 +682,7 @@ class PersistenceImplementation implements Persistence {
         firstName = (artistData.get("firstName") instanceof String ? (String)artistData.get("firstName") : null);
         lastName = (artistData.get("lastName") instanceof String ? (String)artistData.get("lastName") : null);
         username = (artistData.get("username") instanceof String ? (String)artistData.get("username") : null);
-        birthday = (artistData.get("birthday") instanceof LocalDate ? (LocalDate) artistData.get("birthday") : null);
+        birthday = (artistData.get("birthday") instanceof String ? (String)artistData.get("birthday") : null);
         id = (artistData.get("id") instanceof String ? (String) artistData.get("id") : null);
         stageName = (artistData.get("stageName") instanceof String ? (String) artistData.get("stageName") : null);
         biography = (artistData.get("biography") instanceof String ? (String) artistData.get("biography") : null);

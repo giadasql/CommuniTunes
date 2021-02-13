@@ -55,6 +55,7 @@ public class UserProfileController implements UIController {
     public HBox followersBox;
     public HBox followedBox;
     public HBox followerArtistsBox;
+    public Button reportBtn;
 
     private User user;
     private LayoutManager manager;
@@ -105,6 +106,8 @@ public class UserProfileController implements UIController {
             followUnfollow.setManaged(false);
             userAnalytics.setManaged(true);
             userAnalytics.setVisible(true);
+            reportBtn.setManaged(false);
+            reportBtn.setVisible(false);
         }
         else{
             editProfile.setVisible(false);
@@ -252,5 +255,9 @@ public class UserProfileController implements UIController {
                 followingFocusedUser = false;
             }
         }
+    }
+
+    public void reportUser(MouseEvent mouseEvent) {
+        dbManager.reportUser(user);
     }
 }
