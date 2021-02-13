@@ -23,4 +23,5 @@ public class Path {
     public static final String FOLLOWED_ARTISTS = "ui/pages/followed_artists.fxml";
     public static final String FOLLOWER_ARTISTS = "ui/pages/follower_artists.fxml";
     public static final String REVIEWS = "ui/pages/song/reviews_page.fxml";
+    public static final String ARTIST_REQUEST_PAGE = "ui/pages/user/artist_request_page.fxml";
 }
