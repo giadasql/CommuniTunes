@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="534.0" prefWidth="900.0" styleClass="communitunes-bg" stylesheets="@../../style/style.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.RequestPage">
+   <children>
+      <VBox layoutX="109.0" layoutY="8.0" prefHeight="516.0" prefWidth="700.0">
+         <children>
+            <AnchorPane prefHeight="253.0" prefWidth="705.0">
+               <children>
+                  <Text fx:id="startingMessage" fill="WHITE" layoutY="96.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Thank you for applying! For the moment, please insert the stage name you would like to use! We'll contact you if anything is wrong!" textAlignment="CENTER" wrappingWidth="705.0">
+                     <font>
+                        <Font name="Dubai Light" size="29.0" />
+                     </font>
+                  </Text>
+                  <Text fx:id="finalMessage" fill="WHITE" layoutY="95.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="705.0">
+                     <font>
+                        <Font name="Dubai Light" size="29.0" />
+                     </font>
+                  </Text>
+               </children>
+            </AnchorPane>
+            <HBox prefHeight="36.0" prefWidth="700.0">
+               <children>
+                  <AnchorPane prefHeight="15.0" prefWidth="258.0" />
+                  <AnchorPane prefHeight="100.0" prefWidth="376.0" />
+               </children>
+            </HBox>
+            <HBox prefHeight="5.0" prefWidth="700.0">
+               <children>
+                  <AnchorPane prefHeight="200.0" prefWidth="703.0">
+                     <children>
+                        <Text fx:id="msg" fill="RED" layoutX="6.0" layoutY="40.0" strokeType="OUTSIDE" strokeWidth="0.0" textAlignment="CENTER" wrappingWidth="688.13671875">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                        </Text>
+                        <Label layoutX="88.0" layoutY="3.0" prefHeight="38.0" prefWidth="148.0" text="Stage Name" textAlignment="CENTER" textFill="WHITE">
+                           <font>
+                              <Font name="Book Antiqua Bold" size="26.0" />
+                           </font>
+                        </Label>
+                        <TextField fx:id="stageName" layoutX="387.0" layoutY="11.0" prefHeight="25.0" prefWidth="230.0">
+                           <cursor>
+                              <Cursor fx:constant="TEXT" />
+                           </cursor>
+                        </TextField>
+                     </children>
+                  </AnchorPane>
+               </children>
+            </HBox>
+            <HBox prefHeight="15.0" prefWidth="700.0" VBox.vgrow="ALWAYS" />
+            <HBox prefHeight="56.0" prefWidth="700.0">
+               <children>
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <AnchorPane layoutX="522.0" layoutY="7.0" prefHeight="55.0" prefWidth="129.0" />
+                        <Button layoutX="247.0" layoutY="7.0" mnemonicParsing="false" onMouseClicked="#sumbitRequest" prefHeight="35.0" prefWidth="190.0" stylesheets="@../../style/style.css" text="Submit">
+                           <styleClass>
+                              <String fx:value="hover-btn" />
+                              <String fx:value="hover-btn-yellow" />
+                           </styleClass>
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Button>
+                     </children></AnchorPane>
+                  <AnchorPane prefHeight="55.0" prefWidth="148.0" />
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <Button layoutX="845.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#closeWindow" prefHeight="25.0" prefWidth="28.0" style="-fx-background-color: transparent;">
+         <graphic>
+            <ImageView fitHeight="25.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../img/close-button.png" />
+               </image>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </ImageView>
+         </graphic>
+      </Button>
+   </children>
+   <cursor>
+      <Cursor fx:constant="HAND" />
+   </cursor>
+</AnchorPane>

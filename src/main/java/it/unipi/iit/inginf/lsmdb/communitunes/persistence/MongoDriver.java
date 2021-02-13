@@ -606,6 +606,26 @@ class MongoDriver implements Closeable {
         return songsCollection.countDocuments(criteria) > 0;
     }
 
+    public boolean checkIfStageNameExists(String stageName){
+        return usersCollection.find(eq("stage_name", stageName)).first() != null;
+    }
+
+    public boolean checkIfRequestExists(String username){
+        Bson myCheck = match(exists("requestedStageName"));
+        Bson myMatch = match(eq("username", username));
+
+        return reportsCollection.aggregate(Arrays.asList(myCheck, myMatch)).first() != null;
+    }
+
+    public boolean addRequest(String username, String stageName){
+        Document user = new Document();
+        user.append("username", username);
+        user.append("requestedStageName", stageName);
+        InsertOneResult insertOneResult = reportsCollection.insertOne(user);
+        // TODO: probabilmente non serve ritornare l'ID
+        return insertOneResult.getInsertedId() == null ? false : true;
+    }
+
     @Override
     public void close() {
         mongoClient.close();
