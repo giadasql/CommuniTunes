@@ -17,6 +17,8 @@ import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.SongPreviewClicked
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.UserPreviewClickedEvent;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
@@ -70,15 +72,25 @@ public class UserProfileController implements UIController {
         if(user.Image != null){
             try{
                 avatar = new Image(user.Image);
-                if (avatar.isError()) {
-                    avatar = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
-                }
+                avatar.errorProperty().addListener(new ChangeListener<Boolean>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean t1) {
+                        if(!aBoolean && t1){
+                            Image def = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
+                            avatarCircle.setFill(new ImagePattern(def));
+                        }
+                    }
+                });
                 avatarCircle.setFill(new ImagePattern(avatar));
             }
             catch(Exception exc) {
                 avatar = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
                 avatarCircle.setFill(new ImagePattern(avatar));
             }
+        }
+        else {
+            Image def = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
+            avatarCircle.setFill(new ImagePattern(def));
         }
 
         // check if the profile belongs to the user that is currently logged in

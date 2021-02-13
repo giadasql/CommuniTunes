@@ -86,6 +86,9 @@ public interface Persistence {
      */
     List<Review> getReviews(String songID, int nMax);
 
+
+    List<Review> getReviews(String songID, int startIndex, int count);
+
     /**
      *
      * @param username
