@@ -69,6 +69,10 @@ class PersistenceImplementation implements Persistence {
         return mongo.checkIfEmailExists(email);
     }
 
+    public boolean checkIfStageNameExists(String stageName) { return mongo.checkIfStageNameExists(stageName); }
+
+    public boolean checkIfRequestExists(String username) { return mongo.checkIfRequestExists(username); }
+
     public boolean addNewUser(User newUser) throws PersistenceInconsistencyException {
         String mongoID = mongo.addUser(newUser.Username, newUser.Email, newUser.Password);
         if(mongoID != null){
@@ -440,8 +444,11 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean checkAdminCredentials(String username, String password) {
-        return false;
+        return mongo.checkAdminCredentials(username, password);
     }
+
+    @Override
+    public boolean addRequest(Request request) { return mongo.addRequest(request.username, request.requestedStageName); }
 
     @Override
     public boolean deleteRequest(String username){

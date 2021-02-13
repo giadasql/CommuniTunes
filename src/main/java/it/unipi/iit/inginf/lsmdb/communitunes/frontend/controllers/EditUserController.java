@@ -112,4 +112,8 @@ public class EditUserController implements UIController {
         image.setText(user.Image);
         password.setText("");
     }
+
+    public void goToRequest() throws IOException {
+        manager.setContent(Path.ARTIST_REQUEST_PAGE);
+    }
 }

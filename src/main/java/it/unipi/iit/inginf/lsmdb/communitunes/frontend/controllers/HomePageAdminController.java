@@ -18,6 +18,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,16 +32,15 @@ public class HomePageAdminController implements UIController {
     public VBox reportBox;
     public VBox requestBox;
     public VBox searchBox;
-    public TextField message;
+    public Text message;
 
     private Persistence dbManager;
 
-    private static final Font FONT = new Font("Book Antiqua", 20.0);
+    private static final Font FONT = new Font("Book Antiqua", 14.0);
 
     public void init(){
         dbManager = PersistenceFactory.CreatePersistence();
         ArrayList<String> choices = new ArrayList<>();
-        choices.add("User");
         choices.add("Song");
         choices.add("Comment");
         searchMenu.setItems(FXCollections.observableArrayList(choices));
@@ -140,10 +140,10 @@ public class HomePageAdminController implements UIController {
             requestBox.getChildren().add(requestPane);
         }
 
-        reportBox.getParent().setVisible(true);
-        reportBox.getParent().setManaged(true);
-        requestBox.getParent().setVisible(false);
-        requestBox.getParent().setManaged(false);
+        reportBox.setVisible(true);
+        reportBox.setManaged(true);
+        requestBox.setVisible(false);
+        requestBox.setManaged(false);
 
     }
 
@@ -193,8 +193,8 @@ public class HomePageAdminController implements UIController {
     public AnchorPane buildCommentPane(String username, String commentId, String comment){
         AnchorPane pane = new AnchorPane();
         Button deleteButton = new Button("Delete");
-        TextField usernameField = new TextField(username);
-        TextField commentField = new TextField("Comment:   " + comment);
+        Text usernameField = new Text(username);
+        Text commentField = new Text("Comment:   " + comment);
         deleteButton.getStyleClass().add("admin-btn");
         deleteButton.setOnMouseClicked((event)-> {
             if(dbManager.deleteComment(commentId)){
@@ -211,6 +211,11 @@ public class HomePageAdminController implements UIController {
         commentField.setLayoutX(79);
         commentField.setLayoutY(56);
         commentField.setFont(FONT);
+        commentField.setStyle("-fx-text-fill: black");
+        if(comment == null){
+            commentField.setVisible(false);
+            commentField.setManaged(false);
+        }
 
         pane.getChildren().addAll(deleteButton, usernameField, commentField);
 
@@ -268,7 +273,8 @@ public class HomePageAdminController implements UIController {
 
     public void printMissingValueMessage(){
         searchBox.getChildren().clear();
-        message.setText("There are missing fields, please compile them to search!");
+        message = new Text("There are missing fields, please compile them to search!");
         message.setStyle("-fx-text-fill: red");
+        searchBox.getChildren().add(message);
     }
 }

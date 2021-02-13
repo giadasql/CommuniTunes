@@ -236,6 +236,5 @@ public class UserProfileController implements UIController {
                 followingFocusedUser = false;
             }
         }
-
     }
 }

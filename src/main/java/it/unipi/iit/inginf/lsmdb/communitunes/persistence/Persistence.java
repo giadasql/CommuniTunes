@@ -32,6 +32,20 @@ public interface Persistence {
 
     /**
      *
+     * @param stageName
+     * @return
+     */
+    boolean checkIfStageNameExists(String stageName);
+
+    /**
+     *
+     * @param username
+     * @return
+     */
+    boolean checkIfRequestExists(String username);
+
+    /**
+     *
      * @param username
      * @return
      */
@@ -345,6 +359,13 @@ public interface Persistence {
      * @return
      */
     List<Request> getRequests();
+
+    /**
+     *
+     * @param request
+     * @return
+     */
+    boolean addRequest(Request request);
 
     /**
      *
