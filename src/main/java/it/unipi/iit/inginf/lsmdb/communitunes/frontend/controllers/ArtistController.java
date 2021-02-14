@@ -31,6 +31,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ArtistController implements UIController {
@@ -66,6 +67,8 @@ public class ArtistController implements UIController {
     public Button addSongBtn;
     public Button reportBtn;
     public Text reportText;
+    public Text bestAlbum;
+    public Text worstAlbum;
 
     private Artist artist;
     private LayoutManager manager;
@@ -142,6 +145,26 @@ public class ArtistController implements UIController {
         }
 
         reportText.setVisible(false);
+
+        Map<String, String> bestAndWorst = dbManager.getBestAndWorstAlbum(artist);
+        if(bestAndWorst != null){
+            String best = bestAndWorst.get("best");
+            if(best != null){
+                bestAlbum.setText(best);
+            }
+            else{
+                bestAlbum.setVisible(false);
+                bestAlbum.setManaged(false);
+            }
+            String worst = bestAndWorst.get("worst");
+            if(worst != null){
+                worstAlbum.setText(worst);
+            }
+            else{
+                worstAlbum.setVisible(false);
+                worstAlbum.setManaged(false);
+            }
+        }
 
         // write info in the infoContainer
         if(artist.FirstName != null){
