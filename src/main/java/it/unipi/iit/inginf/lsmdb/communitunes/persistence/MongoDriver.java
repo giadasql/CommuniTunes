@@ -225,14 +225,14 @@ class MongoDriver implements Closeable {
                 .append("_id", "$_id")
                 .append("image", "$image");
 
-        AggregateIterable<Document> result = songsCollection.aggregate(Arrays.asList(match(exists("reviews.14", true)),
+        AggregateIterable<Document> result = songsCollection.aggregate(Arrays.asList(
                 addFields(new Field<>("reviews",
                 new Document("$filter",
                         new Document("input", "$reviews")
                                 .append("as", "review")
                                 .append("cond",
                                         new Document("$and", Arrays.asList(new Document("$gt", Arrays.asList(new java.util.Date(), "$$review.posted")),
-                                                new Document("$lte", Arrays.asList(LocalDate.now().minusDays(30), "$$review.posted")))))))), addFields(new Field<>("avg_rating",
+                                                new Document("$lte", Arrays.asList(LocalDate.now().minusDays(30), "$$review.posted")))))))), match(exists("reviews.14", true)), addFields(new Field<>("avg_rating",
                 new Document("$avg", "$reviews.rating"))), match(ne("avg_rating",
                 new BsonNull())), sort(descending("avg_rating")), unwind("$genres",
                 new UnwindOptions().preserveNullAndEmptyArrays(false)), group("$genres", Accumulators.push("songs", toProject)), addFields(new Field<>("songs",
