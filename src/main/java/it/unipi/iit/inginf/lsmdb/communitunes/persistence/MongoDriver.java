@@ -225,22 +225,23 @@ class MongoDriver implements Closeable {
                 .append("_id", "$_id")
                 .append("image", "$image");
 
-        AggregateIterable<Document> result = songsCollection.aggregate(Arrays.asList(addFields(new Field("reviews",
+        AggregateIterable<Document> result = songsCollection.aggregate(Arrays.asList(match(exists("reviews.14", true)),
+                addFields(new Field<>("reviews",
                 new Document("$filter",
                         new Document("input", "$reviews")
                                 .append("as", "review")
                                 .append("cond",
                                         new Document("$and", Arrays.asList(new Document("$gt", Arrays.asList(new java.util.Date(), "$$review.posted")),
-                                                new Document("$lte", Arrays.asList(LocalDate.now().minusDays(30), "$$review.posted")))))))), addFields(new Field("avg_rating",
+                                                new Document("$lte", Arrays.asList(LocalDate.now().minusDays(30), "$$review.posted")))))))), addFields(new Field<>("avg_rating",
                 new Document("$avg", "$reviews.rating"))), match(ne("avg_rating",
                 new BsonNull())), sort(descending("avg_rating")), unwind("$genres",
-                new UnwindOptions().preserveNullAndEmptyArrays(false)), group("$genres", Accumulators.push("songs", toProject)), addFields(new Field("songs",
+                new UnwindOptions().preserveNullAndEmptyArrays(false)), group("$genres", Accumulators.push("songs", toProject)), addFields(new Field<>("songs",
                 new Document("$slice", Arrays.asList("$songs", 6L)))))).allowDiskUse(true);
         for (Document resultDoc :
         result){
             String genre = resultDoc.getString("_id");
             List<Map<String, Object>> songMaps = new ArrayList<>();
-            List<Document> songs = (ArrayList<Document>)resultDoc.get("songs");
+            List<Document> songs = (ArrayList<Document>)resultDoc.getList("songs", Document.class);
             for (Document song : songs){
                 songMaps.add(getEntityMap(song, Arrays.asList("title", "artist", "_id", "image")));
             }
@@ -252,12 +253,15 @@ class MongoDriver implements Closeable {
     public HashMap<String, String> getBestAndWorstAlbum(String username){
         HashMap<String, String> res = new HashMap<>();
 
-        Document query = songsCollection.aggregate(Arrays.asList(match(eq("artist", username)), addFields(new Field("avg_song_rating",
+        Document query = songsCollection.aggregate(Arrays.asList(match(exists("reviews.14", true)),
+                match(eq("artist", username)), addFields(new Field<>("avg_song_rating",
                 new Document("$avg", "$reviews.rating"))), match(ne("avg_song_rating",
                 new BsonNull())), group("$album", avg("avg_album_rating", "$avg_song_rating")), sort(descending("avg_album_rating")), group("Album stats", first("best_album", "$_id"), last("worst_album", "$_id")))).first();
 
-        res.put("best", query.getString("best_album"));
-        res.put("worst", query.getString("worst_album"));
+        if (query != null) {
+            res.put("best", query.getString("best_album"));
+            res.put("worst", query.getString("worst_album"));
+        }
 
         return res;
     }
@@ -268,10 +272,11 @@ class MongoDriver implements Closeable {
         Bson group_id = new BasicDBObject("genre", "$genres")
                 .append("artist", "$artist");
 
-        songsCollection.aggregate(Arrays.asList(addFields(new Field("avg_song_rating",
+        songsCollection.aggregate(Arrays.asList(match(exists("reviews.14", true)),
+                addFields(new Field<>("avg_song_rating",
                 new Document("$avg", "$reviews.rating"))), unwind("$genres",
                 new UnwindOptions().preserveNullAndEmptyArrays(false)), group(group_id, sum("songs_count", 1L), avg("songs_avg_rating", "$avg_song_rating")), match(ne("songs_avg_rating",
-                new BsonNull())), addFields(new Field("points",
+                new BsonNull())), addFields(new Field<>("points",
                 new Document("$sum", Arrays.asList(new Document("$multiply", Arrays.asList("$songs_count", 0.3d)),
                         new Document("$multiply", Arrays.asList("$songs_avg_rating", 0.7d)))))), sort(descending("points")),
                         group("$_id.genre", first("best_artist", "$_id.artist"))))
@@ -284,7 +289,7 @@ class MongoDriver implements Closeable {
     }
 
     public int checkCredentials(String username, String password){
-        Document user = usersCollection.aggregate(Arrays.asList(match(and(eq("username", username), eq("password", password))), addFields(new Field("isArtist",
+        Document user = usersCollection.aggregate(Arrays.asList(match(and(eq("username", username), eq("password", password))), addFields(new Field<>("isArtist",
                 new Document("$cond", Arrays.asList(new Document("$ifNull", Arrays.asList("$stage_name", false)), true, false)))))).first();
         if(user == null){
             return -1;

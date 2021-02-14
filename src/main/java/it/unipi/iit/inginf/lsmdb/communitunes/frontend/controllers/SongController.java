@@ -123,12 +123,12 @@ public class SongController implements UIController {
                 try{
                     Image img = new Image(song.Image);
                     if (img.isError()) {
-                        img = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
+                        img = new Image(this.getClass().getResourceAsStream("/ui/img/song_default.png"));
                     }
                     songImg.setFill(new ImagePattern(img));
                 }
                 catch(Exception exc) {
-                    Image img = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
+                    Image img = new Image(this.getClass().getResourceAsStream("/ui/img/song_default.png"));
                     songImg.setFill(new ImagePattern(img));
                 }
             }

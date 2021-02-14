@@ -88,7 +88,7 @@ public abstract class PreviewVBox extends VBox {
     static final EventType<Event> PREVIEW_CLICKED = new EventType<>(Event.ANY, "PREVIEW_CLICKED");
 
     public void setDefaultImage(){
-        Image image = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
+        Image image = new Image(this.getClass().getResourceAsStream("/ui/img/user_default.png"));
         imageView.setImage(image);
     }
 }
