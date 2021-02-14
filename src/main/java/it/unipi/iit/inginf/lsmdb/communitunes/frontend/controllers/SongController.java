@@ -64,36 +64,42 @@ public class SongController implements UIController {
         song = manager.context.getFocusedSong();
         
         if(song != null){
-            User authUser = manager.context.getAuthenticatedUser();
-            if(dbManager.checkLike(authUser, song)){
-                likeSong.setText("Dislike");
-                userLikesSong = true;
-            }
-            else{
-                likeSong.setText("Like");
-                userLikesSong = false;
+            if(!manager.context.inAdminPanel) {
+                User authUser = manager.context.getAuthenticatedUser();
+                if (dbManager.checkLike(authUser, song)) {
+                    likeSong.setText("Dislike");
+                    userLikesSong = true;
+                } else {
+                    likeSong.setText("Like");
+                    userLikesSong = false;
+                }
             }
 
             if(song.Artist != null){
-                Artist authArtist = manager.context.getAuthenticatedArtist();
-                if(authArtist != null && (song.Artist.username != null && song.Artist.username.equals(authArtist.Username))){
-                    // the song belongs to the artist watching the page
-                    likeSong.setManaged(false);
-                    likeSong.setVisible(false);
-                    writeReview.setManaged(false);
-                    writeReview.setVisible(false);
+                if(!manager.context.inAdminPanel){
+                    Artist authArtist = manager.context.getAuthenticatedArtist();
+                    if(authArtist != null && (song.Artist.username != null && song.Artist.username.equals(authArtist.Username))){
+                        // the song belongs to the artist watching the page
+                        likeSong.setManaged(false);
+                        likeSong.setVisible(false);
+                        writeReview.setManaged(false);
+                        writeReview.setVisible(false);
+                    }
+                    else{
+                        editSong.setVisible(false);
+                        editSong.setManaged(false);
+                    }
+                    if(dbManager.checkIfUserReviewedSong(manager.context.getAuthenticatedUser(), song)){
+                        writeReview.setManaged(false);
+                        writeReview.setVisible(false);
+                    }
                 }
                 else{
+                    likeSong.setVisible(false);
                     editSong.setVisible(false);
-                    editSong.setManaged(false);
+                    writeReview.setVisible(false);
                 }
             }
-
-            if(dbManager.checkIfUserReviewedSong(manager.context.getAuthenticatedUser(), song)){
-                writeReview.setManaged(false);
-                writeReview.setVisible(false);
-            }
-
             if(song.Title != null){
                 if(song.Title.length() >= 60){
                     songTitle.setText(song.Title.substring(0, 100) + "...");
@@ -214,11 +220,16 @@ public class SongController implements UIController {
             for (Review review:
                  song.LoadedReviews) {
                 ReviewVBox reviewBox;
-                if(manager.context.getAuthenticatedUser().Username != null && review.User.equals(manager.context.getAuthenticatedUser().Username)){
-                    reviewBox = new ReviewVBox(review, true, false);
+                if(!manager.context.inAdminPanel){
+                    if(manager.context.getAuthenticatedUser().Username != null && review.User.equals(manager.context.getAuthenticatedUser().Username)){
+                        reviewBox = new ReviewVBox(review, true, false);
+                    }
+                    else{
+                        reviewBox = new ReviewVBox(review, false, true);
+                    }
                 }
                 else{
-                    reviewBox = new ReviewVBox(review, false, true);
+                    reviewBox = new ReviewVBox(review, false, false);
                 }
                 reviews.getChildren().add(reviewBox);
             }

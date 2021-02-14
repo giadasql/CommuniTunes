@@ -205,6 +205,7 @@ public interface Persistence {
      * @return
      */
     boolean deleteSong(Song song);
+    boolean deleteSong(String songID);
 
     /**
      *
@@ -234,6 +235,13 @@ public interface Persistence {
      * @return
      */
     boolean editReview(Review review);
+
+    boolean userIsArtist(String username);
+
+    List<ArtistPreview> searchArtistByName(String name, int startIndex, int limit);
+    List<SongPreview> searchSongByTitle(String name, int startIndex, int limit);
+    List<UserPreview> searchUserByUsername(String name, int startIndex, int limit);
+    List<ArtistPreview> searchArtistsByUsername(String name, int startIndex, int limit);
 
     /**
      *

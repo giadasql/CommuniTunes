@@ -29,14 +29,17 @@ public class AdminReviewView extends VBox {
         line.setStartY(0);
         line.setEndX(150);
         line.setEndY(0);
+        line.setFill(Color.WHITE);
         this.getChildren().add(line);
         Button deleteReview = new Button();
         deleteReview.setText("Delete Review");
         deleteReview.setCursor(Cursor.HAND);
         deleteReview.setOnMouseClicked(this::deleteReview);
         Text username = new Text(user);
+        username.setFill(Color.WHITE);
         username.setFont(Font.font("System", FontWeight.BOLD, 12));
         Text comment = new Text(text);
+        comment.setFill(Color.WHITE);
         this.getChildren().addAll(username, comment, deleteReview);
     }
 

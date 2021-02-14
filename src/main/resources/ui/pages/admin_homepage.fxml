@@ -2,18 +2,13 @@
 
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.text.Text?>
 
-<ScrollPane minHeight="534.0" minWidth="-Infinity" prefWidth="900.0" style="-fx-background-color: #001a4d;" stylesheets="@../style/style.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.HomePageAdminController">
+<ScrollPane minHeight="600.0" minWidth="-Infinity" prefWidth="900.0" style="-fx-background-color: #001a4d;" stylesheets="@../style/style.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.HomePageAdminController">
    <content>
       <VBox>
          <children>
@@ -25,7 +20,12 @@
                            <children>
                               <ScrollPane layoutX="19.0" layoutY="68.0" prefHeight="431.0" prefWidth="406.0">
                                  <content>
-                                    <VBox fx:id="reportBox" prefHeight="428.0" prefWidth="401.0" spacing="10.0" />
+                                    <VBox>
+                                       <children>
+                                          <VBox fx:id="reportBox" prefHeight="428.0" prefWidth="401.0" spacing="10.0" />
+                                          <VBox fx:id="requestBox" prefHeight="428.0" prefWidth="401.0" />
+                                       </children>
+                                    </VBox>
                                  </content>
                               </ScrollPane>
                               <Button layoutX="19.0" layoutY="33.0" mnemonicParsing="false" onMouseClicked="#showReports" prefHeight="35.0" prefWidth="204.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Reports">
@@ -38,36 +38,29 @@
                                     <Font size="16.0" />
                                  </font>
                               </Button>
-                              <ScrollPane layoutX="19.0" layoutY="68.0" prefHeight="431.0" prefWidth="406.0" visible="false">
-                                 <content>
-                                    <VBox fx:id="requestBox" prefHeight="428.0" prefWidth="401.0" />
-                                 </content>
-                              </ScrollPane>
                            </children>
                         </AnchorPane>
-                        <AnchorPane prefHeight="527.0" prefWidth="443.0">
+                        <AnchorPane prefHeight="491.0" prefWidth="443.0">
                            <children>
-                              <ScrollPane layoutX="19.0" layoutY="69.0" prefHeight="431.0" prefWidth="406.0">
-                                 <content>
-                                    <VBox fx:id="searchBox" prefHeight="428.0" prefWidth="401.0" />
-                                 </content>
-                              </ScrollPane>
-                              <Text fill="WHITE" layoutX="19.0" layoutY="56.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Search for:">
-                                 <font>
-                                    <Font size="18.0" />
-                                 </font>
-                              </Text>
-                              <ChoiceBox fx:id="searchMenu" layoutX="113.0" layoutY="37.0" prefHeight="25.0" prefWidth="127.0" />
-                              <TextField fx:id="searchText" layoutX="250.0" layoutY="37.0" prefHeight="25.0" prefWidth="136.0" />
-                              <ImageView fitHeight="27.0" fitWidth="27.0" layoutX="398.0" layoutY="36.0" onMouseClicked="#searchItem" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@../img/magnifier.png" />
-                                 </image>
-                              </ImageView>
+                              <VBox layoutX="19.0" layoutY="32.0" prefHeight="468.0" prefWidth="406.0">
+                                 <children>
+                                    <AnchorPane fx:id="searchContainer" prefHeight="38.0" prefWidth="406.0" />
+                                    <ScrollPane prefHeight="431.0" prefWidth="406.0" style="-fx-background-color: transparent; -fx-border-color: white;">
+                                       <content>
+                                          <VBox fx:id="searchBox" prefHeight="428.0" prefWidth="401.0" style="-fx-background-color: transparent;" />
+                                       </content>
+                                    </ScrollPane>
+                                 </children>
+                              </VBox>
                            </children>
                         </AnchorPane>
                      </children>
                   </HBox>
+               </children>
+            </AnchorPane>
+            <AnchorPane prefHeight="0.0" prefWidth="893.0">
+               <children>
+                  <Button layoutX="421.0" layoutY="13.0" mnemonicParsing="false" onMouseClicked="#logout" styleClass="hover-btn" stylesheets="@../style/style.css" text="Logout" />
                </children>
             </AnchorPane>
          </children>

@@ -3,6 +3,7 @@ package it.unipi.iit.inginf.lsmdb.communitunes.frontend.context;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.HomePageAdminController;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.LayoutController;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.UIController;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
@@ -27,6 +28,7 @@ public class LayoutManager {
     private Scene layoutScene = null;
     public final ApplicationContext context = new ApplicationContext();
     public final Persistence dbManager;
+    private HomePageAdminController adminController;
 
     LayoutManager() {
         FXMLLoader layoutLoader = getLoader(Path.GENERAL_LAYOUT);
@@ -60,7 +62,25 @@ public class LayoutManager {
         controller.init();
     }
 
+    public void showAdminPage(String adminPagePath) throws IOException {
+        context.inAdminPanel = true;
+        layoutVisible = false;
+        FXMLLoader adminLoader = getLoader(adminPagePath);
+
+        primary.setScene(
+                new Scene(adminLoader.load(), 900, 600)
+        );
+
+        adminController = adminLoader.getController();
+        adminController.init();
+    }
+
     public void setContent(String resource) throws IOException {
+        if(context.inAdminPanel){
+            adminController.setContent(resource);
+            return;
+        }
+
         if(!layoutVisible){
             primary.setScene( layoutScene);
             layoutController.init();

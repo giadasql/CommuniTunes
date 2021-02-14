@@ -4,6 +4,8 @@ import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.ArtistPreviewClickedEvent;
+import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
+import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -29,6 +31,15 @@ public class ArtistPreviewVBox extends PreviewVBox {
         }
         else{
             this.addEventHandler(ARTIST_PREVIEW_CLICKED, this::defaultAction);
+        }
+    }
+
+    @Override
+    protected void delete(MouseEvent mouseEvent) {
+        Persistence dbManager = PersistenceFactory.CreatePersistence();
+        if(dbManager.deleteUser(preview.username)){
+            this.setVisible(false);
+            this.setManaged(false);
         }
     }
 

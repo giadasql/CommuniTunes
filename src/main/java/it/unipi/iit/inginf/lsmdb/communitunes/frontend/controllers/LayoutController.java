@@ -43,6 +43,8 @@ public class LayoutController implements UIController {
 
     public void logoutHandler( ) throws IOException {
         manager.context.setAuthenticatedUser(null);
+        manager.context.setAuthenticatedArtist(null);
+        manager.context.inAdminPanel = false;
         manager.showAuthenticationPage(Path.LOGIN);
     }
 

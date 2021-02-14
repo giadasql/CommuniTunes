@@ -8,16 +8,20 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.*;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
 import org.bson.*;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.javatuples.Triplet;
+
+import javax.print.Doc;
 
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Projections.*;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Accumulators.*;
 
+import static com.mongodb.client.model.Sorts.ascending;
 import static com.mongodb.client.model.Sorts.descending;
 import static com.mongodb.client.model.Updates.*;
 
@@ -57,10 +61,6 @@ class MongoDriver implements Closeable {
         return usersCollection.find(eq("email", email)).first() != null;
     }
 
-    private String getIdFromUsername(String username){
-        Document doc = usersCollection.find(Filters.eq("username", username)).first();
-        return doc == null ? null : (String)doc.get("_id");
-    }
 
     public String addUser(String username, String email, String psw) {
         Document user = new Document();
@@ -93,7 +93,7 @@ class MongoDriver implements Closeable {
         return updateRes.getModifiedCount() != 0;
     }
 
-    public String addArtist(String username, String stageName){
+    public boolean addArtist(String username, String stageName){
         Document query = new Document();
         query.append("username", username);
         Document setData = new Document();
@@ -102,9 +102,8 @@ class MongoDriver implements Closeable {
         update.append("$set", setData);
 
         UpdateResult updateRes = usersCollection.updateOne(query, update);
-        String id = getIdFromUsername(username);
 
-        return updateRes.getModifiedCount() == 0 ? null : id;
+        return updateRes.getModifiedCount() != 0;
     }
 
         // We don't check the number of deleted songs to understand if the query was performed correctly,
@@ -128,7 +127,7 @@ class MongoDriver implements Closeable {
         setData.append("password", password).append("email", email)
                 .append("country", country).append("birthday", birthday)
                 .append("activity", activity).append("image", image)
-                .append("biography", biography).append("stageName", stageName)
+                .append("biography", biography).append("stage_name", stageName)
                 .append("first_name", firstName).append("last_name", lastName)
                 .append("sites", linkList);
         Document update = new Document();
@@ -318,7 +317,7 @@ class MongoDriver implements Closeable {
     }
 
     public boolean deleteReport(String username) {
-        Bson filter = and(eq("username", username), exists("numReports"));
+        Bson filter = and(eq("user", username), exists("numReports"));
         DeleteResult deleteResult = reportsCollection.deleteOne(filter);
         return deleteResult.wasAcknowledged() && deleteResult.getDeletedCount() >= 1;
     }
@@ -360,14 +359,18 @@ class MongoDriver implements Closeable {
         return res;
     }
 
-    public HashMap<String,String> getRequests(){
-        HashMap<String,String> res = new HashMap<>();
+    public List<HashMap<String,String>> getRequests(){
+        List<HashMap<String,String>> res = new ArrayList<>();
 
         Bson myCheck = match(exists("requestedStageName"));
         Bson myLimit = limit(50);
 
         reportsCollection.aggregate(Arrays.asList(myCheck, myLimit)).forEach(doc->{
-            res.put(doc.getString("username"), doc.getString("requestedStageName"));
+            HashMap<String, String> requestMap = new HashMap<>();
+            requestMap.put("username", doc.getString("username"));
+            requestMap.put("requestedStageName", doc.getString("requestedStageName"));
+            requestMap.put("id", doc.getObjectId("_id").toString());
+            res.add(requestMap);
         });
         return res;
     }
@@ -705,4 +708,85 @@ class MongoDriver implements Closeable {
         UpdateResult result = reportsCollection.updateOne(match, increment, options);
         return result.wasAcknowledged();
     }
+
+    public boolean userIsArtist(String username) {
+        Bson match = match(eq("user", username));
+        Bson project = addFields(new Field<>("is_artist", new Document("$cond",
+                new Document("if",
+                        new Document("$ifNull", Arrays.asList("$stage_name", false)))
+                        .append("then", true)
+                        .append("else", false))));
+
+        Document res = usersCollection.aggregate(Arrays.asList(match, project)).first();
+        if (res != null && !res.isEmpty() && res.getBoolean("is_artist")){
+            return true;
+        }
+        return false;
+    }
+
+    public List<HashMap<String, Object>> getArtistByName(String name, int startIndex, int limit) {
+        List<HashMap<String, Object>> toReturn = new ArrayList<>();
+        List<Bson> aggregation = Arrays.asList(match(text(name)), addFields(new Field<>("score",
+                new Document("$meta", "textScore"))), sort(descending("score")), skip(startIndex), limit(limit),
+                project(fields(include("username", "image"), excludeId())));
+        AggregateIterable<Document> result = usersCollection.aggregate(aggregation);
+        for (Document doc:
+             result) {
+            HashMap<String, Object> artistMap = new HashMap<>();
+            artistMap.put("username", doc.getString("username"));
+            artistMap.put("image", doc.getString("image"));
+            toReturn.add(artistMap);
+        }
+        return toReturn;
+    }
+
+    public List<HashMap<String, Object>> getSongByTitle(String title, int startIndex, int limit) {
+        List<HashMap<String, Object>> toReturn = new ArrayList<>();
+        List<Bson> aggregation = Arrays.asList(match(text(title)), addFields(new Field<>("score",
+                        new Document("$meta", "textScore"))), sort(descending("score")), skip(startIndex), limit(limit),
+                project(fields(include("title", "image"))));
+        AggregateIterable<Document> result = songsCollection.aggregate(aggregation);
+        for (Document doc:
+                result) {
+            HashMap<String, Object> songMap = new HashMap<>();
+            songMap.put("title", doc.getString("title"));
+            songMap.put("image", doc.getString("image"));
+            songMap.put("_id", doc.getObjectId("_id").toString());
+            toReturn.add(songMap);
+        }
+        return toReturn;
+    }
+
+    public List<HashMap<String, Object>> searchUserByUsername(String name, int startIndex, int limit) {
+        List<Bson> aggregation = Arrays.asList(match(and(regex("username", ".*"+ name +".*"), eq("stage_name", new BsonNull()))), addFields(new Field<>("username_len",
+                new Document("$strLenCP", "$username"))), sort(ascending("username_len")), skip(startIndex), limit(limit),
+                project(fields(include("username", "image"), excludeId())));
+        AggregateIterable<Document> result = usersCollection.aggregate(aggregation);
+        List<HashMap<String, Object>> toReturn = new ArrayList<>();
+        for (Document doc:
+                result) {
+            HashMap<String, Object> userMap = new HashMap<>();
+            userMap.put("username", doc.getString("username"));
+            userMap.put("image", doc.getString("image"));
+            toReturn.add(userMap);
+        }
+        return toReturn;
+    }
+
+    public List<HashMap<String, Object>> searchArtistByUsername(String name, int startIndex, int limit) {
+        List<Bson> aggregation = Arrays.asList(match(and(regex("username", ".*"+ name +".*"), ne("stage_name", new BsonNull()))), addFields(new Field<>("username_len",
+                        new Document("$strLenCP", "$username"))), sort(ascending("username_len")), skip(startIndex), limit(limit),
+                project(fields(include("username", "image"), excludeId())));
+        AggregateIterable<Document> result = usersCollection.aggregate(aggregation);
+        List<HashMap<String, Object>> toReturn = new ArrayList<>();
+        for (Document doc:
+                result) {
+            HashMap<String, Object> artistMap = new HashMap<>();
+            artistMap.put("username", doc.getString("username"));
+            artistMap.put("image", doc.getString("image"));
+            toReturn.add(artistMap);
+        }
+        return toReturn;
+    }
+
 }

@@ -7,6 +7,8 @@ import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.ArtistPreviewClickedEvent;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.UserPreviewClickedEvent;
+import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
+import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
@@ -41,6 +43,15 @@ public class UserPreviewVBox extends PreviewVBox {
     }
 
     static final EventType<UserPreviewClickedEvent> USER_PREVIEW_CLICKED = new EventType<>(PREVIEW_CLICKED, "USER_PREVIEW_CLICKED");
+
+    @Override
+    protected void delete(MouseEvent mouseEvent) {
+        Persistence dbManager = PersistenceFactory.CreatePersistence();
+        if(dbManager.deleteUser(preview.username)){
+            this.setVisible(false);
+            this.setManaged(false);
+        }
+    }
 
     @Override
     protected void onMouseClicked(MouseEvent mouseEvent){

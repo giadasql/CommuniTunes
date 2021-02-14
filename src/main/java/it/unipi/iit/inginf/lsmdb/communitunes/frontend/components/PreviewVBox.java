@@ -7,6 +7,7 @@ import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -19,6 +20,7 @@ import javafx.scene.text.TextAlignment;
 public abstract class PreviewVBox extends VBox {
     protected ImageView imageView;
     protected Text text;
+    protected Button deleteBtn;
 
     public PreviewVBox(String img, String name) {
         super.setWidth(125);
@@ -71,6 +73,15 @@ public abstract class PreviewVBox extends VBox {
         imageView.setCursor(Cursor.HAND);
         text.setCursor(Cursor.HAND);
     }
+
+    public PreviewVBox addDeleteBtn(){
+        deleteBtn = new Button("Delete");
+        deleteBtn.setOnMouseClicked(this::delete);
+        this.getChildren().add(deleteBtn);
+        return this;
+    }
+
+    protected abstract void delete(MouseEvent mouseEvent);
 
     protected abstract void onMouseClicked(MouseEvent mouseEvent);
 

@@ -59,7 +59,7 @@ public class AuthenticationController implements UIController {
             AuthResult result = authManager.adminLogin(username.getText(), password.getText());
             if(result.Success){
                 errorMsg.setText("");
-                manager.setContent(Path.HOMEPAGE_ADMIN);
+                manager.showAdminPage(Path.HOMEPAGE_ADMIN);
             }
             else{
                 errorMsg.setText(result.ErrorMsg);

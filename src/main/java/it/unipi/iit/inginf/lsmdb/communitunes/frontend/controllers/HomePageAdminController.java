@@ -4,30 +4,34 @@ import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationManag
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.*;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.AdminReviewView;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ArtistPreviewVBox;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ReportView;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.SongPreviewVBox;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.*;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.ShowUserReviewsEvent;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.SongPreviewClickedEvent;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.UserDeletedEvent;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.*;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceInconsistencyException;
 import javafx.collections.FXCollections;
 import javafx.event.Event;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.VBox;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,9 +46,12 @@ public class HomePageAdminController implements UIController {
     public VBox searchBox;
     public Text message;
     public AnchorPane reportPane;
-    public AnchorPane requestPane;
+    public ScrollPane requestPane;
+    public Stage otherStage = new Stage();
 
     public String showingCommentsOf;
+    public VBox searchVbox;
+    public AnchorPane searchContainer;
 
     private Persistence dbManager;
 
@@ -52,54 +59,56 @@ public class HomePageAdminController implements UIController {
 
     public void init(){
         dbManager = PersistenceFactory.CreatePersistence();
-        ArrayList<String> choices = new ArrayList<>();
-        choices.add("Song");
-        choices.add("Comment");
-        searchMenu.setItems(FXCollections.observableArrayList(choices));
+
         List<Report> reportList = dbManager.getReports();
         List<Request> requestList = dbManager.getRequests();
+        SearchBar bar = new SearchBar();
+        this.searchContainer.getChildren().add(0, bar);
+        bar.addEventHandler(SearchBar.FOUND_ARTISTS_EVENT, this::showArtistsPreviews);
+        bar.addEventHandler(SearchBar.FOUND_SONGS_EVENT, this::showSongsPreviews);
+        bar.addEventHandler(SearchBar.FOUND_USERS_EVENT, this::showUsersPreviews);
+        bar.addEventHandler(SearchBar.FOUND_REVIEWS_EVENT, this::showReviews);
         for(Report report : reportList){
             reportBox.getChildren().add(new ReportView(report));
             reportBox.addEventHandler(ReportView.USER_DELETED_EVENT, this::userDeleted);
             reportBox.addEventHandler(ReportView.SHOW_USER_REVIEWS_EVENT, this::showComments);
+            reportBox.addEventHandler(ReportView.REPORT_DELETED_EVENT, this::reportDeleted);
+            reportBox.addEventHandler(ReportView.SEE_USER_PROFILE_CLICKED, this::seeUserProfile);
         }
 
         for(Request request : requestList){
-            requestPane = new AnchorPane();
+            VBox req = new VBox();
+            HBox buttonshbox = new HBox();
             Button upgradeButton = new Button("Upgrade");
             Button cancelButton = new Button("Cancel");
-            TextField username = new TextField(request.username);
+            buttonshbox.getChildren().addAll(upgradeButton, cancelButton);
+            Text username = new Text("User: " + request.username);
             upgradeButton.getStyleClass().add("admin-btn");
             cancelButton.getStyleClass().add("admin-btn");
+            Text stageName = new Text("Requested Stage Name: " + request.requestedStageName);
             upgradeButton.setOnMouseClicked((event)-> {
                 if(addArtist(request.username, request.requestedStageName)) {
-                    requestPane.setVisible(false);
-                    requestPane.setManaged(false);
+                    req.setVisible(false);
+                    req.setManaged(false);
                 }
             });
             cancelButton.setOnMouseClicked((event)->{
                 if(deleteRequest(request.username)){
-                    requestPane.setVisible(false);
-                    requestPane.setManaged(false);
+                    req.setVisible(false);
+                    req.setManaged(false);
                 }
             });
 
-            requestPane.setPrefHeight(95);
-            requestPane.setPrefWidth(401);
-            username.setLayoutX(27);
-            username.setLayoutY(31);
+            req.setPrefHeight(95);
+            req.setPrefWidth(401);
             username.setFont(FONT);
             upgradeButton.setPrefHeight(37);
             upgradeButton.setPrefWidth(96);
-            upgradeButton.setLayoutX(205);
-            upgradeButton.setLayoutY(6);
             cancelButton.setPrefHeight(37);
             cancelButton.setPrefWidth(96);
-            cancelButton.setLayoutX(301);
-            cancelButton.setLayoutY(6);
 
-            requestPane.getChildren().addAll(cancelButton, upgradeButton, username);
-            requestBox.getChildren().add(requestPane);
+            req.getChildren().addAll(username, stageName, buttonshbox);
+            requestBox.getChildren().add(req);
         }
 
         reportBox.setVisible(true);
@@ -107,6 +116,71 @@ public class HomePageAdminController implements UIController {
         requestBox.setVisible(false);
         requestBox.setManaged(false);
 
+    }
+
+    private void seeUserProfile(SeeUserProfileClicked event) {
+        String username = event.username;
+        if(dbManager.userIsArtist(username)){
+            Artist toFocus = dbManager.getArtist(username);
+            LayoutManagerFactory.getManager().context.setFocusedArtist(toFocus);
+            setContent(Path.ARTIST_PROFILE);
+        }
+        else{
+            User toFocus = dbManager.getUser(username);
+            LayoutManagerFactory.getManager().context.setFocusedUser(toFocus);
+            setContent(Path.USER_PROFILE);
+        }
+    }
+
+    public void setContent(String resource){
+        FXMLLoader loader = getLoader(resource);
+        try {
+            Parent node = loader.load();
+            UIController controller = loader.getController();
+            controller.init();
+            otherStage.setTitle("Explore");
+            otherStage.setScene(new Scene(node, 900, 537));
+            otherStage.show();
+        } catch (IOException e) {
+            // TODO: log
+            e.printStackTrace();
+        }
+    }
+
+    public void showArtistsPreviews(FoundArtistsEvent event){
+        searchBox.getChildren().clear();
+        for (ArtistPreview preview:
+             event.foundArtists) {
+            searchBox.getChildren().add(new ArtistPreviewVBox(preview, null).addDeleteBtn());
+        }
+    }
+
+    public void showSongsPreviews(FoundSongsEvent event){
+        searchBox.getChildren().clear();
+        for (SongPreview preview:
+                event.foundSongs) {
+            searchBox.getChildren().add(new SongPreviewVBox(preview, null).addDeleteBtn());
+        }
+    }
+
+    public void showUsersPreviews(FoundUsersEvent event){
+        searchBox.getChildren().clear();
+        for (UserPreview preview:
+                event.foundUsers) {
+            searchBox.getChildren().add(new UserPreviewVBox(preview, null).addDeleteBtn());
+        }
+    }
+
+    private FXMLLoader getLoader(String resourcePath){
+        return new FXMLLoader(
+                getClass().getClassLoader().getResource(
+                        resourcePath
+                )
+        );
+    }
+
+    private void reportDeleted(ReportDeletedEvent event) {
+        reportBox.getChildren().remove(event.reportView);
     }
 
     private void userDeleted(UserDeletedEvent event) {
@@ -128,8 +202,13 @@ public class HomePageAdminController implements UIController {
         }
     }
 
-    public boolean deleteReport(String username){
-        return dbManager.deleteReport(username);
+    public void showReviews(FoundReviewsEvent event){
+        searchBox.getChildren().clear();
+        showingCommentsOf = event.user;
+        List<Review> reviews = event.reviewList;
+        for(Review review : reviews){
+            searchBox.getChildren().add(new AdminReviewView(event.user, review.ID, review.Text, review.Song));
+        }
     }
 
     public boolean addArtist(String username, String stageName){
@@ -147,70 +226,29 @@ public class HomePageAdminController implements UIController {
     }
 
     public void showReports(){
-        reportBox.getParent().setVisible(true);
-        reportBox.getParent().setManaged(true);
-        requestBox.getParent().setVisible(false);
-        requestBox.getParent().setManaged(false);
+        reportBox.setVisible(true);
+        reportBox.setManaged(true);
+        requestBox.setVisible(false);
+        requestBox.setManaged(false);
     }
 
     public void showRequests(){
-        reportBox.getParent().setVisible(false);
-        reportBox.getParent().setManaged(false);
-        requestBox.getParent().setVisible(true);
-        requestBox.getParent().setManaged(true);
+        reportBox.setVisible(false);
+        reportBox.setManaged(false);
+        requestBox.setVisible(true);
+        requestBox.setManaged(true);
     }
 
-    public void searchItem(){
-        if(searchMenu.getValue() == null || searchText.getText() == null){
-            printMissingValueMessage();
-            return;
+    public void logout(MouseEvent mouseEvent) {
+        LayoutManager manager = LayoutManagerFactory.getManager();
+        manager.context.setAuthenticatedUser(null);
+        manager.context.setAuthenticatedArtist(null);
+        manager.context.inAdminPanel = false;
+        try {
+            manager.showAuthenticationPage(Path.LOGIN);
+        } catch (IOException e) {
+            // TODO: log
+            e.printStackTrace();
         }
-        else if(searchMenu.getValue().toString().equals("Song")){
-            if(searchText.getText().equals("")){
-                printMissingValueMessage();
-                return;
-            }
-            searchBox.getChildren().clear();
-            insertSongPreview(searchText.getText());
-        }else if(searchMenu.getValue().toString().equals("Comment")){
-            if(searchText.getText().equals("")){
-                printMissingValueMessage();
-                return;
-            }
-            searchBox.getChildren().clear();
-            getReviewsByUsername(searchText.getText());
-        }else{
-            printMissingValueMessage();
-            return;
-        }
-    }
-
-    public void insertSongPreview(String title){
-        List<SongPreview> songs = dbManager.getSongs(title);
-        for(SongPreview song : songs){
-            searchBox.getChildren().add(new SongPreviewVBox(song, this::retrieveAndShowComments));
-        }
-    }
-
-    public void retrieveAndShowComments(SongPreviewClickedEvent event) {
-        searchBox.getChildren().clear();
-        List<Review> comments = dbManager.getReviews(event.preview.ID, 50);
-        for(Review comment : comments){
-            searchBox.getChildren().add(new AdminReviewView(comment.User, comment.ID, comment.Text, comment.Song));
-        }
-    }
-
-    public void getReviewsByUsername(String username){
-        List<Review> reviews = dbManager.getReviewsByUsername(username);
-        for(Review comment : reviews){
-            searchBox.getChildren().add(new AdminReviewView(comment.User, comment.ID, comment.Text, comment.Song));
-        }
-    }
-
-    public void printMissingValueMessage(){
-        searchBox.getChildren().clear();
-        message = new Text("There are missing fields, please compile them to search!");
-        message.setStyle("-fx-text-fill: red");
-        searchBox.getChildren().add(message);
     }
 }

@@ -123,14 +123,22 @@ public class ArtistController implements UIController {
             analyticsArtist.setManaged(false);
             addSongBtn.setVisible(false);
             addSongBtn.setManaged(false);
-            if(dbManager.checkFollow(artist, manager.context.getAuthenticatedUser())){
-                followUnfollow.setText("Unfollow");
-                followingFocusedUser = true;
+            if(!manager.context.inAdminPanel){
+                if(dbManager.checkFollow(artist, manager.context.getAuthenticatedUser())){
+                    followUnfollow.setText("Unfollow");
+                    followingFocusedUser = true;
+                }
+                else{
+                    followUnfollow.setText("Follow");
+                    followingFocusedUser = false;
+                }
             }
             else{
-                followUnfollow.setText("Follow");
-                followingFocusedUser = false;
+                followUnfollow.setVisible(false);
+                editProfile.setVisible(false);
+                reportBtn.setVisible(false);
             }
+
         }
 
         reportText.setVisible(false);

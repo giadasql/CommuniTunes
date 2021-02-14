@@ -52,7 +52,7 @@ public class RequestPage implements UIController {
         else{
             finalMessage.setVisible(true);
             finalMessage.setManaged(true);
-            if(dbManager.addRequest(new Request(user.Username, stageName.getText()))){
+            if(dbManager.addRequest(new Request(null, user.Username, stageName.getText()))){
                 finalMessage.setText("Request correctly inserted! We'll give you news as soon as possible!");
             }
             else{

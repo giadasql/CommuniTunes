@@ -152,14 +152,13 @@ class Neo4jDriver implements Closeable {
         }
     }
 
-    public boolean deleteSong(String artist, String title){
+    public boolean deleteSong(String songID){
         try ( Session session = driver.session())
         {
             return session.writeTransaction(tx -> {
                 HashMap<String, Object> parameters = new HashMap<String, Object>();
-                parameters.put("username", artist);
-                parameters.put("title", title);
-                Result res = tx.run( "MATCH (a:Artist { username: $username })-[:PERFORMS {isMainArtist: true}]->(s:Song {title: $title})" +
+                parameters.put("songID", songID);
+                Result res = tx.run( "MATCH (s:Song {songID: $songID})" +
                         "DETACH DELETE s RETURN count(s)", parameters);
                 return (res.single().get(0).asInt() >= 1);
             });
@@ -503,7 +502,7 @@ class Neo4jDriver implements Closeable {
                         "OPTIONAL MATCH (followerArtist:Artist)-[:FOLLOWS]->(a)\n" +
                         "WITH COLLECT(DISTINCT (followerArtist {.username, .image, .stageName}))[0..6] AS FollowerArtists, FollowedArtists, Follower, Followed, a\n" +
                         "OPTIONAL MATCH (a)-[:PERFORMS {isMainArtist: true}]->(s:Song)\n" +
-                        "WITH COLLECT(DISTINCT({id: s.songID, title: s.title, image: s.image, artist: a.username}))[0..6] AS Songs, FollowerArtists, FollowedArtists, Follower, Followed, a\n" +
+                        "WITH COLLECT(DISTINCT( s {id: s.songID, title: s.title, image: s.image, artist: a.username}))[0..6] AS Songs, FollowerArtists, FollowedArtists, Follower, Followed, a\n" +
                         "OPTIONAL MATCH (a)-[:LIKES]->(s:Song)<-[:PERFORMS {isMainArtist: true}]-(performer:Artist)\n" +
                         "RETURN Followed, Follower, FollowedArtists, FollowerArtists, Songs, COLLECT(DISTINCT( s { .title, .image, id: s.songID, artist: performer.username}))[0..6] AS LikedSongs", parameters("username", username));
                 if(res != null && res.hasNext()){

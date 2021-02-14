@@ -21,217 +21,223 @@
          <children>
             <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefWidth="883.0">
                <children>
-                  <HBox layoutX="-4.0" layoutY="18.0" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="240.0" prefWidth="885.0">
+                  <VBox layoutX="-4.0" layoutY="18.0">
                      <children>
-                        <VBox minHeight="-Infinity" prefHeight="240.0" prefWidth="223.0">
+                        <HBox maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="240.0" prefWidth="885.0">
                            <children>
-                              <AnchorPane>
+                              <VBox minHeight="-Infinity" prefHeight="240.0" prefWidth="223.0">
                                  <children>
-                                    <Rectangle fx:id="songImg" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="160.0" layoutX="35.0" layoutY="3.0" stroke="BLACK" strokeType="INSIDE" width="160.0" />
+                                    <AnchorPane>
+                                       <children>
+                                          <Rectangle fx:id="songImg" arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="160.0" layoutX="35.0" layoutY="3.0" stroke="BLACK" strokeType="INSIDE" width="160.0" />
+                                       </children>
+                                    </AnchorPane>
+                                    <AnchorPane prefHeight="50.0" prefWidth="231.0">
+                                       <children>
+                                          <Button fx:id="likeSong" layoutX="64.0" layoutY="6.0" mnemonicParsing="false" onMouseClicked="#likeDislikeSong" prefHeight="35.0" prefWidth="95.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Like">
+                                             <font>
+                                                <Font size="16.0" />
+                                             </font>
+                                             <cursor>
+                                                <Cursor fx:constant="HAND" />
+                                             </cursor>
+                                          </Button>
+                                          <Button fx:id="editSong" layoutX="64.0" layoutY="6.0" mnemonicParsing="false" onMouseClicked="#goToEdit" prefHeight="35.0" prefWidth="95.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Edit">
+                                             <font>
+                                                <Font size="16.0" />
+                                             </font>
+                                             <cursor>
+                                                <Cursor fx:constant="HAND" />
+                                             </cursor>
+                                          </Button>
+                                       </children>
+                                    </AnchorPane>
+                                 </children>
+                              </VBox>
+                              <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="250.0" prefWidth="589.0">
+                                 <children>
+                                    <VBox layoutX="11.0" layoutY="40.0" prefHeight="184.0" prefWidth="572.0">
+                                       <children>
+                                          <HBox prefHeight="25.0" prefWidth="641.0">
+                                             <children>
+                                                <Label prefHeight="23.0" prefWidth="137.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="By:">
+                                                   <font>
+                                                      <Font size="20.0" />
+                                                   </font>
+                                                </Label>
+                                                <Text fx:id="artistName" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Author" wrappingWidth="450.0">
+                                                   <font>
+                                                      <Font name="Book Antiqua" size="20.0" />
+                                                   </font>
+                                                </Text>
+                                             </children>
+                                          </HBox>
+                                          <HBox>
+                                             <children>
+                                                <Label prefHeight="37.0" prefWidth="118.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="Feat:">
+                                                   <font>
+                                                      <Font size="20.0" />
+                                                   </font>
+                                                </Label>
+                                                <VBox fx:id="feat" prefHeight="61.0" prefWidth="248.0" />
+                                             </children>
+                                          </HBox>
+                                          <HBox prefHeight="25.0" prefWidth="641.0">
+                                             <children>
+                                                <Label prefHeight="23.0" prefWidth="137.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="Likes:">
+                                                   <font>
+                                                      <Font size="20.0" />
+                                                   </font>
+                                                </Label>
+                                                <Text fx:id="likesNumber" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="likes" wrappingWidth="450.0">
+                                                   <font>
+                                                      <Font name="Book Antiqua" size="20.0" />
+                                                   </font>
+                                                </Text>
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets top="4.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                          <HBox>
+                                             <children>
+                                                <Label prefHeight="23.0" prefWidth="180.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="Rating">
+                                                   <font>
+                                                      <Font size="20.0" />
+                                                   </font>
+                                                </Label>
+                                                <Text fx:id="avgRating" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="99/100" wrappingWidth="450.0">
+                                                   <font>
+                                                      <Font name="Book Antiqua" size="20.0" />
+                                                   </font>
+                                                </Text>
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets top="4.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                          <HBox>
+                                             <children>
+                                                <Label prefHeight="23.0" prefWidth="137.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="Album:">
+                                                   <font>
+                                                      <Font size="20.0" />
+                                                   </font>
+                                                </Label>
+                                                <Text fx:id="albumName" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="AlbumName" wrappingWidth="450.0">
+                                                   <font>
+                                                      <Font name="Book Antiqua" size="20.0" />
+                                                   </font>
+                                                </Text>
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets top="5.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                          <HBox>
+                                             <children>
+                                                <Label prefHeight="37.0" prefWidth="118.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="Links:">
+                                                   <font>
+                                                      <Font size="20.0" />
+                                                   </font>
+                                                </Label>
+                                                <VBox fx:id="links" prefHeight="61.0" prefWidth="248.0" />
+                                             </children>
+                                          </HBox>
+                                          <HBox>
+                                             <children>
+                                                <Label prefHeight="37.0" prefWidth="118.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="Genres:">
+                                                   <font>
+                                                      <Font size="20.0" />
+                                                   </font>
+                                                </Label>
+                                                <HBox fx:id="genres" prefHeight="23.0" prefWidth="413.0" />
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets top="6.0" />
+                                             </VBox.margin>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                    <Text fx:id="songTitle" fill="WHITE" layoutX="8.0" layoutY="21.0" strokeType="OUTSIDE" strokeWidth="0.0" text="TITLE OF THE SONG" wrappingWidth="578.0">
+                                       <font>
+                                          <Font name="Book Antiqua Bold" size="20.0" />
+                                       </font>
+                                    </Text>
                                  </children>
                               </AnchorPane>
-                              <AnchorPane prefHeight="50.0" prefWidth="231.0">
+                           </children>
+                        </HBox>
+                        <VBox prefHeight="444.0" prefWidth="883.0">
+                           <children>
+                              <AnchorPane prefHeight="292.0" prefWidth="883.0">
                                  <children>
-                                    <Button fx:id="likeSong" layoutX="64.0" layoutY="6.0" mnemonicParsing="false" onMouseClicked="#likeDislikeSong" prefHeight="35.0" prefWidth="95.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Like">
-                                       <font>
-                                          <Font size="16.0" />
-                                       </font>
-                                       <cursor>
-                                          <Cursor fx:constant="HAND" />
-                                       </cursor>
-                                    </Button>
-                                    <Button fx:id="editSong" layoutX="64.0" layoutY="6.0" mnemonicParsing="false" onMouseClicked="#goToEdit" prefHeight="35.0" prefWidth="95.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Edit">
-                                       <font>
-                                          <Font size="16.0" />
-                                       </font>
-                                       <cursor>
-                                          <Cursor fx:constant="HAND" />
-                                       </cursor>
-                                    </Button>
+                                    <VBox layoutX="1.0" prefWidth="880.0">
+                                       <children>
+                                          <AnchorPane fx:id="writeReview" prefHeight="142.0" prefWidth="881.0">
+                                             <children>
+                                                <Label layoutX="35.0" layoutY="3.0" prefHeight="23.0" prefWidth="159.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="Leave a comment!">
+                                                   <font>
+                                                      <Font size="20.0" />
+                                                   </font>
+                                                </Label>
+                                                <Slider fx:id="ratingSlider" blockIncrement="1.0" layoutX="208.0" layoutY="7.0" prefHeight="14.0" prefWidth="261.0" value="50.0">
+                                                   <cursor>
+                                                      <Cursor fx:constant="HAND" />
+                                                   </cursor>
+                                                </Slider>
+                                                <Text fx:id="currentRating" fill="WHITE" layoutX="487.0" layoutY="22.0" strokeType="OUTSIDE" strokeWidth="0.0" text="50" wrappingWidth="46.34375">
+                                                   <font>
+                                                      <Font size="20.0" />
+                                                   </font>
+                                                </Text>
+                                                <TextArea fx:id="reviewComment" layoutX="34.0" layoutY="26.0" prefHeight="67.0" prefWidth="843.0">
+                                                   <cursor>
+                                                      <Cursor fx:constant="TEXT" />
+                                                   </cursor>
+                                                </TextArea>
+                                                <Button fx:id="rateButton" layoutX="782.0" layoutY="98.0" mnemonicParsing="false" onMouseClicked="#insertReview" prefHeight="34.0" prefWidth="74.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Rate!">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                   <cursor>
+                                                      <Cursor fx:constant="HAND" />
+                                                   </cursor>
+                                                </Button>
+                                                <Text fill="WHITE" layoutX="514.0" layoutY="22.0" strokeType="OUTSIDE" strokeWidth="0.0" text="/100">
+                                                   <font>
+                                                      <Font size="20.0" />
+                                                   </font>
+                                                </Text>
+                                             </children>
+                                          </AnchorPane>
+                                          <AnchorPane maxWidth="-Infinity" prefHeight="200.0" prefWidth="841.0">
+                                             <children>
+                                                <Label layoutX="26.0" layoutY="19.0" prefHeight="23.0" prefWidth="137.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="Reviews">
+                                                   <font>
+                                                      <Font size="20.0" />
+                                                   </font>
+                                                </Label>
+                                                <Line endX="880.0" endY="49.0" startX="26.0" startY="49.0" stroke="WHITE" />
+                                                <Button layoutX="775.0" layoutY="16.0" minHeight="-Infinity" mnemonicParsing="false" onMouseClicked="#seeAllReviews" prefHeight="37.0" prefWidth="86.0" style="-fx-background-color: transparent; -fx-text-fill: white;" text="See all">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                   <cursor>
+                                                      <Cursor fx:constant="HAND" />
+                                                   </cursor>
+                                                </Button>
+                                                <VBox fx:id="reviews" layoutX="27.0" layoutY="70.0" prefHeight="130.0" prefWidth="828.0" spacing="35.0" />
+                                             </children>
+                                             <VBox.margin>
+                                                <Insets />
+                                             </VBox.margin>
+                                          </AnchorPane>
+                                       </children>
+                                    </VBox>
                                  </children>
                               </AnchorPane>
                            </children>
                         </VBox>
-                        <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="250.0" prefWidth="589.0">
-                           <children>
-                              <VBox layoutX="11.0" layoutY="40.0" prefHeight="184.0" prefWidth="572.0">
-                                 <children>
-                                    <HBox prefHeight="25.0" prefWidth="641.0">
-                                       <children>
-                                          <Label prefHeight="23.0" prefWidth="137.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="By:">
-                                             <font>
-                                                <Font size="20.0" />
-                                             </font>
-                                          </Label>
-                                          <Text fx:id="artistName" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Author" wrappingWidth="450.0">
-                                             <font>
-                                                <Font name="Book Antiqua" size="20.0" />
-                                             </font>
-                                          </Text>
-                                       </children>
-                                    </HBox>
-                                    <HBox>
-                                       <children>
-                                          <Label prefHeight="37.0" prefWidth="118.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="Feat:">
-                                             <font>
-                                                <Font size="20.0" />
-                                             </font>
-                                          </Label>
-                                          <VBox fx:id="feat" prefHeight="61.0" prefWidth="248.0" />
-                                       </children>
-                                    </HBox>
-                                    <HBox prefHeight="25.0" prefWidth="641.0">
-                                       <children>
-                                          <Label prefHeight="23.0" prefWidth="137.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="Likes:">
-                                             <font>
-                                                <Font size="20.0" />
-                                             </font>
-                                          </Label>
-                                          <Text fx:id="likesNumber" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="likes" wrappingWidth="450.0">
-                                             <font>
-                                                <Font name="Book Antiqua" size="20.0" />
-                                             </font>
-                                          </Text>
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets top="4.0" />
-                                       </VBox.margin>
-                                    </HBox>
-                                    <HBox>
-                                       <children>
-                                          <Label prefHeight="23.0" prefWidth="180.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="Rating">
-                                             <font>
-                                                <Font size="20.0" />
-                                             </font>
-                                          </Label>
-                                          <Text fx:id="avgRating" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="99/100" wrappingWidth="450.0">
-                                             <font>
-                                                <Font name="Book Antiqua" size="20.0" />
-                                             </font>
-                                          </Text>
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets top="4.0" />
-                                       </VBox.margin>
-                                    </HBox>
-                                    <HBox>
-                                       <children>
-                                          <Label prefHeight="23.0" prefWidth="137.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="Album:">
-                                             <font>
-                                                <Font size="20.0" />
-                                             </font>
-                                          </Label>
-                                          <Text fx:id="albumName" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="AlbumName" wrappingWidth="450.0">
-                                             <font>
-                                                <Font name="Book Antiqua" size="20.0" />
-                                             </font>
-                                          </Text>
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets top="5.0" />
-                                       </VBox.margin>
-                                    </HBox>
-                                    <HBox>
-                                       <children>
-                                          <Label prefHeight="37.0" prefWidth="118.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="Links:">
-                                             <font>
-                                                <Font size="20.0" />
-                                             </font>
-                                          </Label>
-                                          <VBox fx:id="links" prefHeight="61.0" prefWidth="248.0" />
-                                       </children>
-                                    </HBox>
-                                    <HBox>
-                                       <children>
-                                          <Label prefHeight="37.0" prefWidth="118.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="Genres:">
-                                             <font>
-                                                <Font size="20.0" />
-                                             </font>
-                                          </Label>
-                                          <HBox fx:id="genres" prefHeight="23.0" prefWidth="413.0" />
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets top="6.0" />
-                                       </VBox.margin>
-                                    </HBox>
-                                 </children>
-                              </VBox>
-                              <Text fx:id="songTitle" fill="WHITE" layoutX="8.0" layoutY="21.0" strokeType="OUTSIDE" strokeWidth="0.0" text="TITLE OF THE SONG" wrappingWidth="578.0">
-                                 <font>
-                                    <Font name="Book Antiqua Bold" size="20.0" />
-                                 </font>
-                              </Text>
-                           </children>
-                        </AnchorPane>
-                     </children>
-                  </HBox>
-                  <VBox layoutX="-1.0" layoutY="270.0" prefHeight="444.0" prefWidth="883.0">
-                     <children>
-                        <AnchorPane prefHeight="292.0" prefWidth="883.0">
-                           <children>
-                              <VBox layoutX="1.0" prefWidth="880.0">
-                                 <children>
-                                    <AnchorPane fx:id="writeReview" prefHeight="142.0" prefWidth="881.0">
-                                       <children>
-                                          <Label layoutX="35.0" layoutY="3.0" prefHeight="23.0" prefWidth="159.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="Leave a comment!">
-                                             <font>
-                                                <Font size="20.0" />
-                                             </font>
-                                          </Label>
-                                          <Slider fx:id="ratingSlider" blockIncrement="1.0" layoutX="208.0" layoutY="7.0" prefHeight="14.0" prefWidth="261.0" value="50.0">
-                                             <cursor>
-                                                <Cursor fx:constant="HAND" />
-                                             </cursor></Slider>
-                                          <Text fx:id="currentRating" fill="WHITE" layoutX="487.0" layoutY="22.0" strokeType="OUTSIDE" strokeWidth="0.0" text="50" wrappingWidth="46.34375">
-                                             <font>
-                                                <Font size="20.0" />
-                                             </font>
-                                          </Text>
-                                          <TextArea fx:id="reviewComment" layoutX="34.0" layoutY="26.0" prefHeight="67.0" prefWidth="843.0">
-                                             <cursor>
-                                                <Cursor fx:constant="TEXT" />
-                                             </cursor></TextArea>
-                                          <Button fx:id="rateButton" layoutX="782.0" layoutY="98.0" mnemonicParsing="false" onMouseClicked="#insertReview" prefHeight="34.0" prefWidth="74.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Rate!">
-                                             <font>
-                                                <Font size="16.0" />
-                                             </font>
-                                             <cursor>
-                                                <Cursor fx:constant="HAND" />
-                                             </cursor>
-                                          </Button>
-                                          <Text fill="WHITE" layoutX="514.0" layoutY="22.0" strokeType="OUTSIDE" strokeWidth="0.0" text="/100">
-                                             <font>
-                                                <Font size="20.0" />
-                                             </font>
-                                          </Text>
-                                       </children>
-                                    </AnchorPane>
-                                    <AnchorPane maxWidth="-Infinity" prefHeight="200.0" prefWidth="841.0">
-                                       <children>
-                                          <Label layoutX="26.0" layoutY="19.0" prefHeight="23.0" prefWidth="137.0" styleClass="user-info-label" stylesheets="@../../style/style.css" text="Reviews">
-                                             <font>
-                                                <Font size="20.0" />
-                                             </font>
-                                          </Label>
-                                          <Line endX="880.0" endY="49.0" startX="26.0" startY="49.0" stroke="WHITE" />
-                                          <Button layoutX="775.0" layoutY="16.0" minHeight="-Infinity" mnemonicParsing="false" onMouseClicked="#seeAllReviews" prefHeight="37.0" prefWidth="86.0" style="-fx-background-color: transparent; -fx-text-fill: white;" text="See all">
-                                             <font>
-                                                <Font size="16.0" />
-                                             </font>
-                                             <cursor>
-                                                <Cursor fx:constant="HAND" />
-                                             </cursor>
-                                          </Button>
-                                          <VBox fx:id="reviews" layoutX="27.0" layoutY="70.0" prefHeight="130.0" prefWidth="828.0" spacing="35.0" />
-                                       </children>
-                                       <VBox.margin>
-                                          <Insets />
-                                       </VBox.margin>
-                                    </AnchorPane>
-                                 </children>
-                              </VBox>
-                           </children>
-                        </AnchorPane>
                      </children>
                   </VBox>
                </children>

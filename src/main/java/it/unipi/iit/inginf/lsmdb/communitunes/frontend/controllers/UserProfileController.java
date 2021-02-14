@@ -119,13 +119,20 @@ public class UserProfileController implements UIController {
             followUnfollow.setManaged(true);
             userAnalytics.setManaged(false);
             userAnalytics.setVisible(false);
-            if(dbManager.checkFollow(user, manager.context.getAuthenticatedUser())){
-                followUnfollow.setText("Unfollow");
-                followingFocusedUser = true;
+            if(!manager.context.inAdminPanel){
+                if(dbManager.checkFollow(user, manager.context.getAuthenticatedUser())){
+                    followUnfollow.setText("Unfollow");
+                    followingFocusedUser = true;
+                }
+                else{
+                    followUnfollow.setText("Follow");
+                    followingFocusedUser = false;
+                }
             }
             else{
-                followUnfollow.setText("Follow");
-                followingFocusedUser = false;
+                followUnfollow.setVisible(false);
+                editProfile.setVisible(false);
+                reportBtn.setVisible(false);
             }
         }
 

@@ -5,6 +5,8 @@ import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.ArtistPreviewClickedEvent;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.SongPreviewClickedEvent;
+import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
+import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -40,6 +42,15 @@ public class SongPreviewVBox extends PreviewVBox {
     protected void defaultAction(SongPreviewClickedEvent event) {
         LayoutManager manager = LayoutManagerFactory.getManager();
         manager.goToSongPage(preview.ID);
+    }
+
+    @Override
+    protected void delete(MouseEvent mouseEvent) {
+        Persistence dbManager = PersistenceFactory.CreatePersistence();
+        if(dbManager.deleteSong(preview.ID)){
+            this.setVisible(false);
+            this.setManaged(false);
+        }
     }
 
     @Override

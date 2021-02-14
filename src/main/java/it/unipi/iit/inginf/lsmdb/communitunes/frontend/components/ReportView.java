@@ -2,9 +2,8 @@ package it.unipi.iit.inginf.lsmdb.communitunes.frontend.components;
 
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Report;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Review;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.ShowUserReviewsEvent;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.SongPreviewClickedEvent;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.UserDeletedEvent;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.*;
+import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
 import javafx.event.Event;
 import javafx.event.EventType;
@@ -38,12 +37,14 @@ public class ReportView extends VBox {
         totReportsHBox.getChildren().addAll(reported, tot, times);
         HBox buttonsHBox = new HBox();
         Button deleteReportBtn = new Button("Delete Report");
+        deleteReportBtn.setOnMouseClicked(this::reportDeleted);
         deleteReportBtn.setCursor(Cursor.HAND);
         Button seeReviewsBtn = new Button("See Reviews");
         seeReviewsBtn.setOnMouseClicked(this::showReviews);
         seeReviewsBtn.setCursor(Cursor.HAND);
         Button seeProfileBtn = new Button("See Profile");
         seeProfileBtn.setCursor(Cursor.HAND);
+        seeProfileBtn.setOnMouseClicked(this::seeUserProfileClicked);
         Button deleteUserBtn = new Button("DeleteUser");
         deleteUserBtn.setOnMouseClicked(this::deleteUser);
         deleteUserBtn.setCursor(Cursor.HAND);
@@ -55,12 +56,29 @@ public class ReportView extends VBox {
         this.setSpacing(3);
     }
 
+    private void seeUserProfileClicked(MouseEvent mouseEvent) {
+        SeeUserProfileClicked  seeUserProfileClicked = new SeeUserProfileClicked(SEE_USER_PROFILE_CLICKED, report.reportedUser);
+        fireEvent(seeUserProfileClicked);
+    }
+
+    private void reportDeleted(MouseEvent mouseEvent) {
+        if(PersistenceFactory.CreatePersistence().deleteReport(report.reportedUser)){
+            ReportDeletedEvent reportDeletedEvent = new ReportDeletedEvent(REPORT_DELETED_EVENT, report, this);
+            fireEvent(reportDeletedEvent);
+        }
+    }
+
     public static final EventType<Event> REPORT_EVENT = new EventType<>(Event.ANY, "REPORT_EVENT");
     public static final EventType<UserDeletedEvent> USER_DELETED_EVENT = new EventType<>(REPORT_EVENT, "USER_DELETED_EVENT");
     public static final EventType<ShowUserReviewsEvent> SHOW_USER_REVIEWS_EVENT = new EventType<>(REPORT_EVENT, "SHOW_USER_REVIEWS_EVENT");
+    public static final EventType<ReportDeletedEvent> REPORT_DELETED_EVENT = new EventType<>(REPORT_EVENT, "REPORT_DELETED_EVENT");
+    public static final EventType<SeeUserProfileClicked> SEE_USER_PROFILE_CLICKED = new EventType<>(REPORT_EVENT, "SEE_USER_PROFILE_CLICKED");
 
     private void deleteUser(MouseEvent event){
-        if(PersistenceFactory.CreatePersistence().deleteUser(report.reportedUser)){
+        Persistence dbManager = PersistenceFactory.CreatePersistence();
+        if(dbManager.deleteUser(report.reportedUser)){
+            dbManager.deleteReport(report.reportedUser);
+            dbManager.deleteRequest(report.reportedUser);
             UserDeletedEvent userDeletedEvent = new UserDeletedEvent(USER_DELETED_EVENT, this.report.reportedUser, this);
             this.fireEvent(userDeletedEvent);
         }
@@ -70,5 +88,6 @@ public class ReportView extends VBox {
         ShowUserReviewsEvent showUserReviewsEvent = new ShowUserReviewsEvent(SHOW_USER_REVIEWS_EVENT, report);
         this.fireEvent(showUserReviewsEvent);
     }
+
 
 }
