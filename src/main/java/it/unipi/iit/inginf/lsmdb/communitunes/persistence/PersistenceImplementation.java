@@ -609,18 +609,6 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<SongPreview> getSongs(String title){
-        List<SongPreview> res = new ArrayList<>();
-        List<HashMap<String,Object>> songList = mongo.getSongs(title);
-
-        for(HashMap<String, Object> song : songList){
-            res.add(buildSongPreviewFromMap(song));
-        }
-
-        return res;
-    }
-
-    @Override
     public List<ArtistPreview> getArtistPreviews(List<String> usernames) {
         List<ArtistPreview> artistPreviews = new ArrayList<>();
         List<Map<String, Object>> artists = mongo.getArtistsWithFields("username", usernames, Arrays.asList("username", "image"));

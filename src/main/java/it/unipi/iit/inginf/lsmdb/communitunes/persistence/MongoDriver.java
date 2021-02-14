@@ -391,29 +391,6 @@ class MongoDriver implements Closeable {
         return null;
     }
 
-    public List<HashMap<String, Object>> getSongs(String title){
-        List<HashMap<String, Object>> res = new ArrayList<>();
-
-        Bson myCheck = match(regex("title", ".*" + title + ".*"));
-
-        BasicDBList list = new BasicDBList();
-        list.add("$reviews");
-        list.add(-15);
-        Bson slice = new BasicDBObject("reviews", new BasicDBObject("$slice", list));
-        Bson addField = Aggregates.addFields(new Field<>("avgRating", new BasicDBObject("$avg", "$reviews.rating")));
-        Bson project = Aggregates.project(Projections.fields(include("_id", "title", "artist", "image"), slice));
-
-        songsCollection.aggregate(Arrays.asList(myCheck, addField, project)).forEach(doc->{
-            HashMap<String, Object> temp = new HashMap<>();
-            temp.put("_id", doc.getObjectId("_id").toString());
-            temp.put("title", doc.getString("title"));
-            temp.put("artist", doc.getString("artist"));
-            temp.put("image", doc.getString("image"));
-            res.add(temp);
-        });
-        return res;
-    }
-
     public List<HashMap<String, Object>> getReviewsByUsername(String username){
         List<HashMap<String, Object>> res = new ArrayList<>();
 

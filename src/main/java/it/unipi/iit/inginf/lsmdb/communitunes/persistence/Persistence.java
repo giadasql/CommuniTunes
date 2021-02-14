@@ -413,16 +413,6 @@ public interface Persistence {
 
     /**
      *
-     * Retrieve the preview of all the songs that contains the string title
-     * in their title.
-     *
-     * @param title
-     * @return
-     */
-    List<SongPreview> getSongs(String title);
-
-    /**
-     *
      * Retrieve all the reviews made by a user.
      *
      * @param username
