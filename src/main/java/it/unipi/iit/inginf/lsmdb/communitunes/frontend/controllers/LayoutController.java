@@ -64,6 +64,7 @@ public class LayoutController implements UIController {
         resultsVbox.setStyle("-fx-background-color:  #001a4d;");
         searchResultsPane = new HBox();
         searchResultsPane.setAlignment(Pos.CENTER);
+        searchResultsPane.getChildren().add(resultsVbox);
         this.manager = LayoutManagerFactory.getManager();
     }
 
@@ -75,6 +76,7 @@ public class LayoutController implements UIController {
         manager.context.setAuthenticatedUser(null);
         manager.context.setAuthenticatedArtist(null);
         manager.context.inAdminPanel = false;
+        searchBarHbox.getChildren().clear();
         manager.showAuthenticationPage(Path.LOGIN);
     }
 
@@ -112,7 +114,6 @@ public class LayoutController implements UIController {
                 event.foundArtists) {
             resultsVbox.getChildren().add(new ArtistPreviewVBox(preview, null));
         }
-        searchResultsPane.getChildren().add(resultsVbox);
         setContent(searchResultsPane);
     }
 
@@ -122,7 +123,6 @@ public class LayoutController implements UIController {
                 event.foundSongs) {
             resultsVbox.getChildren().add(new SongPreviewVBox(preview, null));
         }
-        searchResultsPane.getChildren().add(resultsVbox);
         setContent(searchResultsPane);
     }
 
@@ -132,7 +132,6 @@ public class LayoutController implements UIController {
                 event.foundUsers) {
             resultsVbox.getChildren().add(new UserPreviewVBox(preview, null));
         }
-        searchResultsPane.getChildren().add(resultsVbox);
         setContent(searchResultsPane);
     }
 }
