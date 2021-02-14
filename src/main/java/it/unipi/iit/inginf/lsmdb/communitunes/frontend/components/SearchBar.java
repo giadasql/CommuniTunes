@@ -37,10 +37,18 @@ public class SearchBar extends HBox {
     private final ChoiceBox<String> choiceBox;
     private final TextField textField;
 
-    public SearchBar() {
-        Text searchFor = new Text("Search: ");
-        searchFor.setFont(new Font("System", 18));
-        searchFor.setFill(Color.WHITE);
+    public SearchBar(){
+        this(0, 136, true, true);
+    }
+
+    public SearchBar(int textFieldH, int textFieldW, boolean showText, boolean showReviews) {
+        if(showText){
+            Text searchFor = new Text("Search: ");
+            searchFor.setFont(new Font("System", 18));
+            searchFor.setFill(Color.WHITE);
+            this.getChildren().add(searchFor);
+        }
+
 
         choiceBox = new ChoiceBox<String>();
         ArrayList<String> choices = new ArrayList<>();
@@ -48,23 +56,31 @@ public class SearchBar extends HBox {
         choices.add("Users (Username)");
         choices.add("Artists (Username)");
         choices.add("Stage Name");
-        choices.add("Reviews");
+        if(showReviews){
+            choices.add("Reviews");
+        }
+        choiceBox.setStyle("-fx-background-color: white; -fx-border-color: white; -fx-text-fill: white; -fx-font-family: \"Book Antiqua\";");
         choiceBox.setItems(FXCollections.observableArrayList(choices));
         choiceBox.setValue("Songs");
 
         textField = new TextField();
-        textField.prefWidth(136);
+        textField.minWidth(textFieldW);
+        textField.setMinWidth(textFieldW);
 
         Button searchBtn = new Button();
         searchBtn.setCursor(Cursor.HAND);
         searchBtn.setMaxHeight(35);
         searchBtn.setMaxWidth(35);
+        if(textFieldH != 0){
+            choiceBox.setMinHeight(textFieldH);
+            textField.setMinHeight(textFieldH);
+        }
         searchBtn.setBackground(Background.EMPTY);
         ImageView imageView = new ImageView(new Image(this.getClass().getResourceAsStream("/ui/img/magnifier.png")));
         searchBtn.setGraphic(imageView);
         searchBtn.setOnMouseClicked(this::search);
         textField.setOnKeyPressed(this::search);
-        this.getChildren().addAll(Arrays.asList(searchFor, choiceBox, textField, searchBtn));
+        this.getChildren().addAll(Arrays.asList(choiceBox, textField, searchBtn));
     }
 
     private void search(KeyEvent keyEvent) {

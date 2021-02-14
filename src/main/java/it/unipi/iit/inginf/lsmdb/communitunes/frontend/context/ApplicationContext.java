@@ -8,7 +8,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import javafx.application.HostServices;
 
 public class ApplicationContext {
-    public boolean inAdminPanel;
+    public boolean inAdminPanel = false;
     private User authenticatedUser;
     private User focusedUser;
     private Artist focusedArtist;
