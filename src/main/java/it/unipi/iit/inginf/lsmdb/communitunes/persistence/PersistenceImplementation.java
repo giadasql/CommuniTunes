@@ -76,7 +76,7 @@ class PersistenceImplementation implements Persistence {
     public boolean addNewUser(User newUser) throws PersistenceInconsistencyException {
         String mongoID = mongo.addUser(newUser.Username, newUser.Email, newUser.Password);
         if(mongoID != null){
-            int neoID = neo4j.addUser(newUser.Username, newUser.Image);
+            int neoID = neo4j.addUser(newUser.Username);
             if(neoID != -1){
                 return true;
             }
@@ -95,9 +95,14 @@ class PersistenceImplementation implements Persistence {
     }
 
     public boolean deleteUser(User user){
-        boolean neo4jDelete = neo4j.deleteUser(user.Username);
-        boolean mongoDelete = mongo.deleteUser(user.Username);
-        return (mongoDelete && neo4jDelete && deleteReviews(user.Username));
+        return deleteUser(user.Username);
+    }
+
+    @Override
+    public boolean deleteUser(String username) {
+        boolean neo4jDelete = neo4j.deleteUser(username);
+        boolean mongoDelete = mongo.deleteUser(username);
+        return (mongoDelete && neo4jDelete && deleteReviews(username));
     }
 
     @Override
@@ -188,7 +193,12 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean deleteReview(Review review) {
-        return mongo.deleteReview(review.Song, review.ID);
+        return deleteReview(review.ID, review.Song);
+    }
+
+    @Override
+    public boolean deleteReview(String reviewID, String song) {
+        return mongo.deleteReview(song, reviewID);
     }
 
     @Override
@@ -466,17 +476,17 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<Report> getReports(){
-        List<Triplet<String, Integer, HashMap<String, String>>> reports =  mongo.getReports();
+        List<Triplet<String, Integer, List<HashMap<String, String>>>> reports =  mongo.getReports();
         List<Report> res = new ArrayList<>();
-        for(Triplet t : reports){
-            res.add(new Report(t.getValue0().toString(), (Integer)t.getValue1(), (HashMap<String, String>)t.getValue2()));
+        for(Triplet<String, Integer, List<HashMap<String, String>>> t : reports){
+            res.add(new Report(t.getValue0(), t.getValue1(), t.getValue2()));
         }
         return res;
     }
 
     @Override
     public boolean reportReview(Review review) {
-        return mongo.reportReview(review.User, review.ID, review.Text);
+        return mongo.reportReview(review.User, review.ID, review.Text, review.Song);
     }
 
     @Override

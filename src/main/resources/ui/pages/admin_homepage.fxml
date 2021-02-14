@@ -21,11 +21,11 @@
                <children>
                   <HBox prefHeight="527.0" prefWidth="893.0">
                      <children>
-                        <AnchorPane prefHeight="527.0" prefWidth="443.0">
+                        <AnchorPane fx:id="reportPane" prefHeight="527.0" prefWidth="443.0">
                            <children>
                               <ScrollPane layoutX="19.0" layoutY="68.0" prefHeight="431.0" prefWidth="406.0">
                                  <content>
-                                    <VBox fx:id="reportBox" prefHeight="428.0" prefWidth="401.0" />
+                                    <VBox fx:id="reportBox" prefHeight="428.0" prefWidth="401.0" spacing="10.0" />
                                  </content>
                               </ScrollPane>
                               <Button layoutX="19.0" layoutY="33.0" mnemonicParsing="false" onMouseClicked="#showReports" prefHeight="35.0" prefWidth="204.0" style="-fx-border-color: white;" styleClass="hover-btn" text="Reports">

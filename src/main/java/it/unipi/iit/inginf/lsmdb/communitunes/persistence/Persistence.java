@@ -51,6 +51,7 @@ public interface Persistence {
      */
     boolean deleteReviews(String username);
 
+
     /**
      * @param username
      * @param password
@@ -159,6 +160,7 @@ public interface Persistence {
      * @return
      */
     boolean deleteUser(User user);
+    boolean deleteUser(String username);
 
     /**
      *
@@ -224,6 +226,7 @@ public interface Persistence {
      * @return
      */
     boolean deleteReview(Review review);
+    boolean deleteReview(String reviewID, String song);
 
     /**
      *
@@ -423,4 +426,6 @@ public interface Persistence {
      *
      */
     void close();
+
+
 }

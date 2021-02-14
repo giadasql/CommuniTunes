@@ -64,7 +64,7 @@ public class SongController implements UIController {
         song = manager.context.getFocusedSong();
         
         if(song != null){
-            User authUser = manager.context.getFocusedUser();
+            User authUser = manager.context.getAuthenticatedUser();
             if(dbManager.checkLike(authUser, song)){
                 likeSong.setText("Dislike");
                 userLikesSong = true;

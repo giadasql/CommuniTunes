@@ -7,10 +7,7 @@ import com.mongodb.client.model.*;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.Link;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
+import it.unipi.iit.inginf.lsmdb.communitunes.entities.*;
 import org.bson.*;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -175,7 +172,7 @@ class MongoDriver implements Closeable {
     public boolean deleteReviews(String username){
         BasicDBObject query = new BasicDBObject();
         BasicDBObject fields = new BasicDBObject("reviews",
-                new BasicDBObject( "username", username));
+                new BasicDBObject( "user", username));
         BasicDBObject update = new BasicDBObject("$pull",fields);
 
         UpdateResult updateRes = songsCollection.updateMany( query, update );
@@ -337,21 +334,27 @@ class MongoDriver implements Closeable {
                 && deleteResultReport.getDeletedCount() == 1 && deleteResultReview.getDeletedCount() == 1;
     }
 
-    public List<Triplet<String, Integer, HashMap<String, String>>> getReports(){
-        List<Triplet<String,Integer,HashMap<String, String>>> res = new ArrayList<>();
-
+    public List<Triplet<String, Integer, List<HashMap<String, String>>>> getReports(){
+        List<Triplet<String,Integer,List<HashMap<String, String>>>> res = new ArrayList<>();
+        List<HashMap<String, String>> reviews = new ArrayList<>();
         Bson myCheck = match(exists("numReports"));
         Bson mySort = sort(descending("numReports"));
         Bson myLimit = limit(50);
 
         reportsCollection.aggregate(Arrays.asList(myCheck, mySort, myLimit)).forEach(doc->{
-            HashMap<String, String> comments = new HashMap<>();
-            List<Document> commentsList = doc.getList("comments", Document.class);
+            List<Document> commentsList = doc.getList("reviews", Document.class, new ArrayList<>());
             for(Document comment : commentsList){
-                comments.put(comment.getString("_id"), comment.getString("review"));
+                HashMap<String, String> review = new HashMap<>();
+                review.put("_id", comment.getObjectId("_id").toString());
+                review.put("user", comment.getString("user"));
+                if(comment.containsKey("song")){
+                    review.put("song", comment.getObjectId("song").toString());
+                }
+                review.put("text", comment.getString("text"));
+                reviews.add(review);
             }
 
-            res.add(new Triplet(doc.getString("username"), doc.getInteger("numReports"), comments));
+            res.add(new Triplet<>(doc.getString("user"), doc.getInteger("numReports"), reviews));
         });
 
         return res;
@@ -683,11 +686,10 @@ class MongoDriver implements Closeable {
         return resultList;
     }
 
-    public boolean reportReview(String username, String id, String text) {
+    public boolean reportReview(String username, String id, String text, String song) {
         Bson match = eq("user", username);
-        Bson push = Updates.addToSet("reviews", new BasicDBObject("_id", new ObjectId(id)).append("text", text));
+        Bson push = Updates.addToSet("reviews", new BasicDBObject("_id", new ObjectId(id)).append("text", text).append("song", new ObjectId(song)));
         Bson increment = inc("numReports", 1);
-
         UpdateOptions options = new UpdateOptions().upsert(true);
 
         UpdateResult result = reportsCollection.updateOne(match, Updates.combine(push, increment), options);

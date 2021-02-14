@@ -4,22 +4,30 @@ import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationManag
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.*;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.AdminReviewView;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ArtistPreviewVBox;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ReportView;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.SongPreviewVBox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.ShowUserReviewsEvent;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.SongPreviewClickedEvent;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.UserDeletedEvent;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceInconsistencyException;
 import javafx.collections.FXCollections;
+import javafx.event.Event;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,12 +35,16 @@ import java.util.Map;
 
 public class HomePageAdminController implements UIController {
 
-    public ChoiceBox searchMenu;
+    public ChoiceBox<String> searchMenu;
     public TextField searchText;
     public VBox reportBox;
     public VBox requestBox;
     public VBox searchBox;
     public Text message;
+    public AnchorPane reportPane;
+    public AnchorPane requestPane;
+
+    public String showingCommentsOf;
 
     private Persistence dbManager;
 
@@ -46,64 +58,14 @@ public class HomePageAdminController implements UIController {
         searchMenu.setItems(FXCollections.observableArrayList(choices));
         List<Report> reportList = dbManager.getReports();
         List<Request> requestList = dbManager.getRequests();
-
         for(Report report : reportList){
-            AnchorPane reportPane = new AnchorPane();
-            Button banButton = new Button("Ban");
-            Button commentsButton = new Button("Comments");
-            Button cancelButton = new Button("Cancel");
-            TextField username = new TextField(report.reportedUser);
-            TextField reportNumber = new TextField("Number of reports:   " + report.numReports);
-            banButton.getStyleClass().add("admin-btn");
-            commentsButton.getStyleClass().add("admin-btn");
-            cancelButton.getStyleClass().add("admin-btn");
-            banButton.setOnMouseClicked((event)-> {
-                if(deleteUser(report.reportedUser)){
-                    reportPane.setVisible(false);
-                    reportPane.setManaged(false);
-                    if(report.reportedUser.equals(searchText.getText()) && searchMenu.getValue().toString().equals("User")){
-                        searchBox.getChildren().clear();
-                    }
-                }
-            });
-
-            commentsButton.setOnMouseClicked((event)->{
-                showComments(report.reportedUser, report.comments);
-            });
-            cancelButton.setOnMouseClicked((event)->{
-                if(deleteReport(report.reportedUser)){
-                    reportPane.setVisible(false);
-                    reportPane.setManaged(false);
-                }
-            });
-
-            reportPane.setPrefHeight(95);
-            reportPane.setPrefWidth(401);
-            username.setLayoutX(27);
-            username.setLayoutY(31);
-            username.setFont(FONT);
-            reportNumber.setLayoutX(27);
-            reportNumber.setLayoutY(68);
-            reportNumber.setFont(FONT);
-            banButton.setPrefHeight(37);
-            banButton.setPrefWidth(84);
-            banButton.setLayoutX(310);
-            banButton.setLayoutY(6);
-            commentsButton.setPrefHeight(37);
-            commentsButton.setPrefWidth(105);
-            commentsButton.setLayoutX(207);
-            commentsButton.setLayoutY(6);
-            cancelButton.setPrefHeight(37);
-            cancelButton.setPrefWidth(58);
-            cancelButton.setLayoutX(149);
-            cancelButton.setLayoutY(6);
-
-            reportPane.getChildren().addAll(cancelButton, banButton, reportNumber, username, commentsButton);
-
-            reportBox.getChildren().add(reportPane);
+            reportBox.getChildren().add(new ReportView(report));
+            reportBox.addEventHandler(ReportView.USER_DELETED_EVENT, this::userDeleted);
+            reportBox.addEventHandler(ReportView.SHOW_USER_REVIEWS_EVENT, this::showComments);
         }
+
         for(Request request : requestList){
-            AnchorPane requestPane = new AnchorPane();
+            requestPane = new AnchorPane();
             Button upgradeButton = new Button("Upgrade");
             Button cancelButton = new Button("Cancel");
             TextField username = new TextField(request.username);
@@ -147,19 +109,27 @@ public class HomePageAdminController implements UIController {
 
     }
 
-    public void showComments(String username, HashMap<String, String> comments){
+    private void userDeleted(UserDeletedEvent event) {
+        reportBox.getChildren().remove(event.view);
+        if(showingCommentsOf != null && showingCommentsOf.equals(event.username)){
+            searchBox.getChildren().clear();
+        }
+        else if(event.username.equals(searchText.getText()) && searchMenu.getValue().toString().equals("User")){
+            searchBox.getChildren().clear();
+        }
+    }
+
+    public void showComments(ShowUserReviewsEvent event){
         searchBox.getChildren().clear();
-        for(Map.Entry<String, String> entry : comments.entrySet()){
-            searchBox.getChildren().add(buildCommentPane(username, entry.getKey(), entry.getValue()));
+        showingCommentsOf = event.report.reportedUser;
+        List<Review> reviews = dbManager.getReviewsByUsername(showingCommentsOf);
+        for(Review review : reviews){
+            searchBox.getChildren().add(new AdminReviewView(event.report.reportedUser, review.ID, review.Text, review.Song));
         }
     }
 
     public boolean deleteReport(String username){
         return dbManager.deleteReport(username);
-    }
-
-    public boolean deleteUser(String username){
-        return dbManager.deleteUser(new User(username, null, null));
     }
 
     public boolean addArtist(String username, String stageName){
@@ -188,38 +158,6 @@ public class HomePageAdminController implements UIController {
         reportBox.getParent().setManaged(false);
         requestBox.getParent().setVisible(true);
         requestBox.getParent().setManaged(true);
-    }
-
-    public AnchorPane buildCommentPane(String username, String commentId, String comment){
-        AnchorPane pane = new AnchorPane();
-        Button deleteButton = new Button("Delete");
-        Text usernameField = new Text(username);
-        Text commentField = new Text("Comment:   " + comment);
-        deleteButton.getStyleClass().add("admin-btn");
-        deleteButton.setOnMouseClicked((event)-> {
-            if(dbManager.deleteComment(commentId)){
-                pane.setVisible(false);
-                pane.setManaged(false);
-            }
-        });
-
-        pane.setPrefHeight(75);
-        pane.setPrefWidth(401);
-        usernameField.setLayoutX(0);
-        usernameField.setLayoutY(21);
-        usernameField.setFont(FONT);
-        commentField.setLayoutX(79);
-        commentField.setLayoutY(56);
-        commentField.setFont(FONT);
-        commentField.setStyle("-fx-text-fill: black");
-        if(comment == null){
-            commentField.setVisible(false);
-            commentField.setManaged(false);
-        }
-
-        pane.getChildren().addAll(deleteButton, usernameField, commentField);
-
-        return pane;
     }
 
     public void searchItem(){
@@ -258,16 +196,14 @@ public class HomePageAdminController implements UIController {
         searchBox.getChildren().clear();
         List<Review> comments = dbManager.getReviews(event.preview.ID, 50);
         for(Review comment : comments){
-            AnchorPane commentPane = buildCommentPane(comment.User, comment.ID, comment.Text);
-            searchBox.getChildren().add(commentPane);
+            searchBox.getChildren().add(new AdminReviewView(comment.User, comment.ID, comment.Text, comment.Song));
         }
     }
 
     public void getReviewsByUsername(String username){
         List<Review> reviews = dbManager.getReviewsByUsername(username);
         for(Review comment : reviews){
-            AnchorPane commentPane = buildCommentPane(comment.User, comment.ID, comment.Text);
-            searchBox.getChildren().add(commentPane);
+            searchBox.getChildren().add(new AdminReviewView(comment.User, comment.ID, comment.Text, comment.Song));
         }
     }
 
