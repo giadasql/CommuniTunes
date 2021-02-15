@@ -1,6 +1,6 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.entities.previews;
 
-public class UserPreview implements Preview {
+public class UserPreview {
 
     public UserPreview(String username, String image) {
         this.username = username;
@@ -10,8 +10,4 @@ public class UserPreview implements Preview {
     public String username;
     public String image;
 
-    @Override
-    public String getIdentifier() {
-        return this.username;
-    }
 }

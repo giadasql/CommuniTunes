@@ -1,12 +1,7 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.entities.previews;
 
-public class ArtistPreview extends UserPreview implements Preview{
+public class ArtistPreview extends UserPreview {
     public ArtistPreview(String username, String image) {
         super(username, image);
-    }
-
-    @Override
-    public String getIdentifier() {
-        return this.username;
     }
 }

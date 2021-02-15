@@ -6,7 +6,7 @@ import org.javatuples.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SongPreview implements Preview{
+public class SongPreview {
 
     public SongPreview(String ID, String artistUsername, String title, String image) {
         this.ID = ID;
@@ -22,10 +22,5 @@ public class SongPreview implements Preview{
     public String Title;
 
     public String Image;
-
-    @Override
-    public String getIdentifier() {
-        return this.ID;
-    }
 
 }
