@@ -117,13 +117,6 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean deleteArtist(Artist artist) {
-        boolean neo4jDelete = neo4j.deleteArtist(artist.Username);
-        boolean mongoDelete = mongo.deleteArtist(artist.Username);
-        return (mongoDelete && neo4jDelete && deleteReviews(artist.Username));
-    }
-
-    @Override
     public boolean updateArtist(Artist newArtist) {
         return mongo.updateArtist(newArtist.ID, newArtist.Password, newArtist.Email, newArtist.Country, newArtist.Birthday, newArtist.FirstName, newArtist.LastName, newArtist.Image, newArtist.ActiveYears, newArtist.Biography, newArtist.StageName, newArtist.Links) && neo4j.updateArtist(newArtist.Username, newArtist.StageName, newArtist.Image);
     }
@@ -187,11 +180,6 @@ class PersistenceImplementation implements Persistence {
     @Override
     public boolean deleteReview(String reviewID, String song) {
         return mongo.deleteReview(song, reviewID);
-    }
-
-    @Override
-    public boolean editReview(Review newReview) {
-        return mongo.updateReview(newReview.ID, newReview.Rating, newReview.Text);
     }
 
     @Override
@@ -574,18 +562,6 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<Review> getReviews(String songID, int nMax) {
-        List<Review> toReturn = new ArrayList<>();
-        List<Map<String, Object>> reviewsData = new ArrayList<>(mongo.getSongReviews(songID, nMax));
-        for (Map<String, Object> reviewData:
-             reviewsData) {
-            toReturn.add(buildReviewFromMap(reviewData));
-        }
-
-        return toReturn;
-    }
-
-    @Override
     public List<Review> getReviews(String songID, int startIndex, int count) {
         List<Review> toReturn = new ArrayList<>();
         List<Map<String, Object>> reviewsData = new ArrayList<>(mongo.getSongReviews(songID, startIndex, count));
@@ -617,28 +593,6 @@ class PersistenceImplementation implements Persistence {
             artistPreviews.add(buildArtistPreviewFromMap(artist));
         }
         return artistPreviews;
-    }
-
-    @Override
-    public List<UserPreview> getUserPreviews(List<String> usernames) {
-        List<UserPreview> userPreviews = new ArrayList<>();
-        List<Map<String, Object>> users = mongo.getUsersWithFields("username", usernames, Arrays.asList("username", "image"));
-        for (Map<String, Object> user:
-             users) {
-            userPreviews.add(buildUserPreviewFromMap(user));
-        }
-        return userPreviews;
-    }
-
-    @Override
-    public List<SongPreview> getSongPreviews(List<String> ids) {
-        List<SongPreview> songPreviews = new ArrayList<>();
-        List<Map<String, Object>> songs = mongo.getSongsWithFields("_id", ids, Arrays.asList("_id", "image", "artist", "title"));
-        for (Map<String, Object> song:
-                songs) {
-            songPreviews.add(buildSongPreviewFromMap(song));
-        }
-        return songPreviews;
     }
 
     private User buildUserFromMap(Map<String, Object> userData){

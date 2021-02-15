@@ -459,30 +459,6 @@ class MongoDriver implements Closeable {
         return null;
     }
 
-    public List<Map<String, Object>> getSongReviews(String songID, int nMax){
-        List<Map<String, Object>> reviews = new ArrayList<>();
-
-        Bson match = match((eq("_id", new ObjectId(songID))));
-
-        BasicDBList list = new BasicDBList();
-        list.add("$reviews");
-        list.add(nMax * -1);
-        Bson slice = new BasicDBObject("reviews", new BasicDBObject("$slice", list));
-
-        Bson project = Aggregates.project(Projections.fields(include("reviews"), slice));
-
-        Bson limit = limit(1);
-
-        Document song = songsCollection.aggregate(Arrays.asList(match, limit, project)).first();
-        if(song != null){
-            for (Document reviewDoc: song.getList("reviews", Document.class)) {
-                Map<String, Object> reviewMap = getReviewMap(reviewDoc, song.getObjectId("_id").toString());
-                reviews.add(reviewMap);
-            }
-        }
-        return reviews;
-    }
-
     public List<Map<String, Object>> getSongReviews(String songID, int startIndex, int count){
         List<Map<String, Object>> reviews = new ArrayList<>();
 

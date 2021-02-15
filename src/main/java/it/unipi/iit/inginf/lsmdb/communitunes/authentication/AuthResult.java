@@ -1,7 +1,5 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.authentication;
 
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
-
 public class AuthResult {
 
     public String Authenticated = null;
