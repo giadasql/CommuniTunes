@@ -15,7 +15,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 
 import java.io.IOException;
 
@@ -36,19 +35,19 @@ public class AuthenticationController implements UIController {
     @FXML
     public void loginEventHandler(ActionEvent event) throws IOException {
         if (authManager != null && manager != null){
-            AuthResult result = authManager.Login(username.getText(), password.getText());
-            if(result.Success){
+            AuthResult result = authManager.login(username.getText(), password.getText());
+            if(result.success){
                 errorMsg.setText("");
                 if(result.role == Role.Artist){
-                    manager.context.setAuthenticatedArtist(dbManager.getArtist(result.Authenticated));
+                    manager.context.setAuthenticatedArtist(dbManager.getArtist(result.authenticated));
                 }
                 else if(result.role == Role.User){
-                    manager.context.setAuthenticatedUser(dbManager.getUser(result.Authenticated));
+                    manager.context.setAuthenticatedUser(dbManager.getUser(result.authenticated));
                 }
                 manager.setContent(Path.HOMEPAGE);
             }
             else{
-                errorMsg.setText(result.ErrorMsg);
+                errorMsg.setText(result.errorMsg);
             }
         }
     }
@@ -57,12 +56,12 @@ public class AuthenticationController implements UIController {
     public void adminLoginEventHandler(ActionEvent event) throws IOException {
         if (authManager != null && manager != null){
             AuthResult result = authManager.adminLogin(username.getText(), password.getText());
-            if(result.Success){
+            if(result.success){
                 errorMsg.setText("");
                 manager.showAdminPage(Path.HOMEPAGE_ADMIN);
             }
             else{
-                errorMsg.setText(result.ErrorMsg);
+                errorMsg.setText(result.errorMsg);
             }
         }
     }
@@ -78,14 +77,14 @@ public class AuthenticationController implements UIController {
     @FXML
     public void registerEventHandler(ActionEvent actionEvent) throws PersistenceInconsistencyException, IOException {
         if (authManager != null && manager != null){
-            AuthResult result = authManager.Register(username.getText(), email.getText(), password.getText());
-            if (result.Success){
+            AuthResult result = authManager.register(username.getText(), email.getText(), password.getText());
+            if (result.success){
                 errorMsg.setText("");
-                manager.context.setAuthenticatedUser(dbManager.getUser(result.Authenticated));
+                manager.context.setAuthenticatedUser(dbManager.getUser(result.authenticated));
                 manager.setContent(Path.HOMEPAGE);
             }
             else{
-                errorMsg.setText(result.ErrorMsg);
+                errorMsg.setText(result.errorMsg);
             }
         }
     }

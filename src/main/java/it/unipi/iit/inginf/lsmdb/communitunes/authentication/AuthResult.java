@@ -2,19 +2,19 @@ package it.unipi.iit.inginf.lsmdb.communitunes.authentication;
 
 public class AuthResult {
 
-    public String Authenticated = null;
-    public boolean Success;
-    public String ErrorMsg = null;
+    public String authenticated = null;
+    public boolean success;
+    public String errorMsg = null;
     public Role role;
 
     public AuthResult(String authenticated, boolean success, Role role, String errorMsg){
-        Success = success;
+        this.success = success;
         this.role = role;
         if(success){
-            Authenticated = authenticated;
+            this.authenticated = authenticated;
         }
         else{
-            ErrorMsg = errorMsg;
+            this.errorMsg = errorMsg;
         }
     }
 }

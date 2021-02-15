@@ -3,9 +3,7 @@ package it.unipi.iit.inginf.lsmdb.communitunes.authentication;
 
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceInconsistencyException;
 
-/**
- *
- */
+
 public interface AuthenticationManager {
 
     /**
@@ -17,7 +15,7 @@ public interface AuthenticationManager {
      * @param psw String representing the password connected to the username passed by the user.
      * @return The result of the authentication process in form of an AuthResult object.
      */
-    AuthResult Login(String username, String psw);
+    AuthResult login(String username, String psw);
 
     /**
      *
@@ -41,7 +39,7 @@ public interface AuthenticationManager {
      * @return The result of the registration process in form of an AuthResult object.
      * @throws PersistenceInconsistencyException In case of error when saving the information.
      */
-    AuthResult Register(String username, String email, String psw) throws PersistenceInconsistencyException;
+    AuthResult register(String username, String email, String psw) throws PersistenceInconsistencyException;
 
     String securePassword(String password);
 }
