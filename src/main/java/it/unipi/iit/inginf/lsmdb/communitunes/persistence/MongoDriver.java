@@ -8,13 +8,10 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.*;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
 import org.bson.*;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.javatuples.Triplet;
-
-import javax.print.Doc;
 
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Projections.*;
@@ -106,14 +103,6 @@ class MongoDriver implements Closeable {
         return updateRes.getModifiedCount() != 0;
     }
 
-        // We don't check the number of deleted songs to understand if the query was performed correctly,
-        // since we may have deleted a user without songs
-    public boolean deleteArtist(String username) {
-        DeleteResult songsDelete = songsCollection.deleteMany(eq("artist", username));
-        DeleteResult deleteResult = usersCollection.deleteOne(eq("username", username));
-        return deleteResult.wasAcknowledged() && songsDelete.wasAcknowledged() && deleteResult.getDeletedCount() >= 1;
-    }
-
     // TODO: check if a field is null. If it is, remove it from the document
     public boolean updateArtist(String id, String password, String email, String country, String birthday, String firstName, String lastName, String image, String activity, String biography, String stageName, List<Link> links){
         Document query = new Document();
@@ -194,20 +183,6 @@ class MongoDriver implements Closeable {
                 .append("image", image)
                 .append("genres", genres)
                 .append("album", album);
-        Document update = new Document();
-        update.append("$set", setData);
-
-        UpdateResult updateRes = songsCollection.updateOne(query, update);
-
-        return updateRes.getModifiedCount() != 0;
-    }
-
-        // TODO: Controllare che prenda l'_id della review e non quello della canzone
-    public boolean updateReview(String id, int rating, String text){
-        Document query = new Document();
-        query.append("reviews._id", new ObjectId(id));
-        Document setData = new Document();
-        setData.append("rating", rating).append("text", text);
         Document update = new Document();
         update.append("$set", setData);
 

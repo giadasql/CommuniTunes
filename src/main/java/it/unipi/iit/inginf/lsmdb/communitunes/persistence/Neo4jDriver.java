@@ -1,9 +1,5 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.persistence;
 
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
-import org.javatuples.Pair;
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 import java.io.Closeable;
@@ -94,17 +90,6 @@ class Neo4jDriver implements Closeable {
                     return res.single().get(0).asInt();
                 }
                 return -1;
-            });
-        }
-    }
-
-    public boolean deleteArtist(String username){
-        try ( Session session = driver.session())
-        {
-            return session.writeTransaction(tx -> {
-                Result res = tx.run( "MATCH (a:Artist { username: $username })-[:PERFORMS {isMainArtist: true}]->(s:Song)" +
-                        "DETACH DELETE s, a RETURN count(a)", parameters("username", username));
-                return (res.single().get(0).asInt() >= 1);
             });
         }
     }

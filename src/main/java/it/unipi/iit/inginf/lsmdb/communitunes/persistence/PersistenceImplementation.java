@@ -15,8 +15,6 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -92,10 +90,6 @@ class PersistenceImplementation implements Persistence {
         else{
             return false;
         }
-    }
-
-    public boolean deleteUser(User user){
-        return deleteUser(user.Username);
     }
 
     @Override
