@@ -2,6 +2,8 @@ package it.unipi.iit.inginf.lsmdb.communitunes.frontend.components;
 
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.previews.ArtistPreviewVBox;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.previews.SongPreviewVBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;

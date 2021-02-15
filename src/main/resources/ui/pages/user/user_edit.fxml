@@ -15,7 +15,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="534.0" prefWidth="900.0" styleClass="communitunes-bg" stylesheets="@../../style/style.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.EditUserController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="534.0" prefWidth="900.0" styleClass="communitunes-bg" stylesheets="@../../style/style.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.user.EditUserController">
    <children>
       <VBox layoutX="109.0" layoutY="8.0" prefHeight="516.0" prefWidth="700.0">
          <children>
