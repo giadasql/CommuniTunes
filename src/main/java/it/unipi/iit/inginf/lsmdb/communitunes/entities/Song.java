@@ -1,73 +1,52 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.entities;
 
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
-import org.javatuples.Pair;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class Song extends Entity {
 
-    public ArtistPreview Artist;
+    public ArtistPreview artist;
 
-    public String Duration;
+    public String duration;
 
-    public String Title;
+    public String title;
 
-    public String Image;
+    public String image;
 
-    public String Album;
+    public String album;
 
-    public List<Review> LoadedReviews = new ArrayList<>();
+    public List<Review> reviews = new ArrayList<>();
 
-    public List<it.unipi.iit.inginf.lsmdb.communitunes.entities.Link> Links;
+    public List<it.unipi.iit.inginf.lsmdb.communitunes.entities.Link> links;
 
-    public List<String> Genres = new ArrayList<>();
+    public List<String> genres = new ArrayList<>();
 
-    public List<ArtistPreview> Featurings = new ArrayList<>();
+    public List<ArtistPreview> featList = new ArrayList<>();
 
-    public int Likes;
+    public int likes;
 
-    public double AvgRating;
+    public double avgRating;
 
     public Song(String title){
         super(null);
-        this.Title = title;
+        this.title = title;
     }
 
-    public Song(String ID, ArtistPreview artist, String duration, String title, String image, String album, List<Review> loadedReviews, List<Link> links, List<String> genres, List<ArtistPreview> featurings, int likes, double avgRating) {
+    public Song(String ID, ArtistPreview artist, String duration, String title, String image, String album, List<Review> reviews, List<Link> links, List<String> genres, List<ArtistPreview> featList, int likes, double avgRating) {
         super(ID);
-        Artist = artist;
-        Duration = duration;
-        Title = title;
-        Image = image;
-        Album = album;
-        LoadedReviews = loadedReviews;
-        Links = links;
-        Genres = genres;
-        Featurings = featurings;
-        Likes = likes;
-        AvgRating = avgRating;
+        this.artist = artist;
+        this.duration = duration;
+        this.title = title;
+        this.image = image;
+        this.album = album;
+        this.reviews = reviews;
+        this.links = links;
+        this.genres = genres;
+        this.featList = featList;
+        this.likes = likes;
+        this.avgRating = avgRating;
     }
-
-//    @Override
-//    public boolean equals(Object o){
-//        if(o == this){
-//            return true;
-//        }
-//        if(!(o instanceof Song)){
-//            return false;
-//        }
-//        Song song = (Song)o;
-//        Collections.sort(Genres);
-//        Collections.sort(song.Genres);
-//        Collections.sort(Featurings);
-//        Collections.sort(song.Featurings);
-//
-//        return Link.equals(song.Link) && Image.equals(song.Image) &&
-//                Genres.equals(song.Genres) && Featurings.equals(song.Featurings);
-//    }
 }
 

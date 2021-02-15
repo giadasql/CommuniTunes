@@ -44,7 +44,7 @@ public class RequestPage implements UIController {
             finalMessage.setVisible(true);
             finalMessage.setManaged(true);
             finalMessage.setText("It appears that the stage name you choose is already in use.\nPlease choose a different stage name.");
-        }else if (dbManager.checkIfRequestExists(user.Username)){
+        }else if (dbManager.checkIfRequestExists(user.username)){
             finalMessage.setVisible(true);
             finalMessage.setManaged(true);
             finalMessage.setText("You have already a pending request, we'll let you know our decision soon!");
@@ -52,7 +52,7 @@ public class RequestPage implements UIController {
         else{
             finalMessage.setVisible(true);
             finalMessage.setManaged(true);
-            if(dbManager.addRequest(new Request(null, user.Username, stageName.getText()))){
+            if(dbManager.addRequest(new Request(null, user.username, stageName.getText()))){
                 finalMessage.setText("Request correctly inserted! We'll give you news as soon as possible!");
             }
             else{

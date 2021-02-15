@@ -18,11 +18,8 @@ import javafx.scene.text.Text;
 import org.apache.commons.validator.routines.EmailValidator;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 public class EditUserController implements UIController {
     public TextField email;
@@ -47,40 +44,40 @@ public class EditUserController implements UIController {
             return;
         }
         if(!password.getText().equals("")){
-            user.Password = authManager.securePassword(password.getText());
+            user.password = authManager.securePassword(password.getText());
         }
         msg.setText("");
-        user.Email = email.getText();
+        user.string = email.getText();
         if(country.getText() == null || "".equals(country.getText())){
-            user.Country = null;
+            user.country = null;
         }
         else{
-            user.Country = country.getText();
+            user.country = country.getText();
         }
         if(image.getText() == null || "".equals(image.getText())){
-            user.Image = null;
+            user.image = null;
         }
         else{
-            user.Image = image.getText();
+            user.image = image.getText();
         }
         if(firstName.getText() == null || "".equals(firstName.getText())){
-            user.FirstName = null;
+            user.firstName = null;
         }
         else{
-            user.FirstName = firstName.getText();
+            user.firstName = firstName.getText();
         }
         if(lastName.getText() == null || "".equals(lastName.getText())){
-            user.LastName = null;
+            user.lastName = null;
         }
         else{
-            user.LastName = lastName.getText();
+            user.lastName = lastName.getText();
         }
         if(birthday.getValue() == null){
-            user.Birthday = null;
+            user.birthday = null;
         }
         else{
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            user.Birthday = formatter.format(birthday.getValue());
+            user.birthday = formatter.format(birthday.getValue());
         }
         if(dbManager.updateUser(user)){
             msg.setFill(Color.GREEN);
@@ -109,15 +106,15 @@ public class EditUserController implements UIController {
     }
 
     private void setDefaultValues() {
-        email.setText(user.Email);
-        country.setText(user.Country);
-        firstName.setText(user.FirstName);
-        lastName.setText(user.LastName);
-        if(user.Birthday != null){
+        email.setText(user.string);
+        country.setText(user.country);
+        firstName.setText(user.firstName);
+        lastName.setText(user.lastName);
+        if(user.birthday != null){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            birthday.setValue(LocalDate.parse(user.Birthday, formatter));
+            birthday.setValue(LocalDate.parse(user.birthday, formatter));
         }
-        image.setText(user.Image);
+        image.setText(user.image);
         password.setText("");
     }
 

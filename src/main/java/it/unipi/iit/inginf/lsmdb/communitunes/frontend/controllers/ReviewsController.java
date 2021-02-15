@@ -1,10 +1,7 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Review;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ListHbox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ReviewVBox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
@@ -16,10 +13,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
-import org.javatuples.Pair;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ReviewsController implements UIController {
@@ -39,7 +34,7 @@ public class ReviewsController implements UIController {
         manager = LayoutManagerFactory.getManager();
         song = manager.context.getFocusedSong();
         dbManager = PersistenceFactory.CreatePersistence();
-        showPreviews(dbManager.getReviews(song.ID, startIndex, count));
+        showPreviews(dbManager.getReviews(song.id, startIndex, count));
     }
 
 
@@ -51,7 +46,7 @@ public class ReviewsController implements UIController {
         }
         if(toShow.size() > 0){
             for(Review review : toShow){
-                if(review.User != null && manager.context.getAuthenticatedUser() != null && review.User.equals(manager.context.getAuthenticatedUser().Username)){
+                if(review.user != null && manager.context.getAuthenticatedUser() != null && review.user.equals(manager.context.getAuthenticatedUser().username)){
                     reviewsBox.getChildren().add(new ReviewVBox(review, true, false));
                 }
                 else{
@@ -73,7 +68,7 @@ public class ReviewsController implements UIController {
 
     public void nextPage(ActionEvent actionEvent) {
         startIndex = startIndex + count;
-        List<Review> newReviews = dbManager.getReviews(song.ID, startIndex, count);
+        List<Review> newReviews = dbManager.getReviews(song.id, startIndex, count);
         if(!newReviews.isEmpty()){
 
             showPreviews(newReviews);
@@ -89,7 +84,7 @@ public class ReviewsController implements UIController {
     public void prevPage(ActionEvent actionEvent) {
         if(startIndex >= count){
             startIndex = startIndex - count;
-            List<Review> newReviews = dbManager.getReviews(song.ID, startIndex, count);
+            List<Review> newReviews = dbManager.getReviews(song.id, startIndex, count);
             showPreviews(newReviews);
             nextPageBtn.setDisable(false);
         }

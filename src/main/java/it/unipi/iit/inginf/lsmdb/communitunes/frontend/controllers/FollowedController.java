@@ -19,7 +19,6 @@ import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class FollowedController implements UIController {
@@ -44,7 +43,7 @@ public class FollowedController implements UIController {
         dbManager = PersistenceFactory.CreatePersistence();
         authManager = AuthenticationFactory.CreateAuthenticationManager();
 
-        List<UserPreview> followedUsers = dbManager.getFollowedUsers(user.Username, startIndex, count);
+        List<UserPreview> followedUsers = dbManager.getFollowedUsers(user.username, startIndex, count);
         prevPageBtn.setDisable(true);
         showPreviews(followedUsers);
     }
@@ -79,7 +78,7 @@ public class FollowedController implements UIController {
 
     public void nextPage(ActionEvent actionEvent) {
         startIndex = startIndex + count;
-        List<UserPreview> newPreviews = dbManager.getFollowedUsers(user.Username, startIndex, count);
+        List<UserPreview> newPreviews = dbManager.getFollowedUsers(user.username, startIndex, count);
         if(!newPreviews.isEmpty()){
             showPreviews(newPreviews);
             prevPageBtn.setDisable(false);
@@ -93,7 +92,7 @@ public class FollowedController implements UIController {
     public void prevPage(ActionEvent actionEvent) {
         if(startIndex >= count){
             startIndex = startIndex - count;
-            List<UserPreview> newPreviews = dbManager.getFollowedUsers(user.Username, startIndex, count);
+            List<UserPreview> newPreviews = dbManager.getFollowedUsers(user.username, startIndex, count);
             showPreviews(newPreviews);
             nextPageBtn.setDisable(false);
         }

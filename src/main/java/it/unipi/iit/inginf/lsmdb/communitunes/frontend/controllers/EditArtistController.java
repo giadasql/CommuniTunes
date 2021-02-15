@@ -63,61 +63,61 @@ public class EditArtistController implements UIController {
             return;
         }
         if(!password.getText().equals("")){
-            artist.Password = authManager.securePassword(password.getText());
+            artist.password = authManager.securePassword(password.getText());
         }
         msg.setText("");
-        artist.Email = email.getText();
+        artist.string = email.getText();
         if(country.getText() == null || "".equals(country.getText())){
-            artist.Country = null;
+            artist.country = null;
         }
         else{
-            artist.Country = country.getText();
+            artist.country = country.getText();
         }
         if(image.getText() == null || "".equals(image.getText())){
-            artist.Image = null;
+            artist.image = null;
         }
         else{
-            artist.Image = image.getText();
+            artist.image = image.getText();
         }
         if(firstName.getText() == null || "".equals(firstName.getText())){
-            artist.FirstName = null;
+            artist.firstName = null;
         }
         else{
-            artist.FirstName = firstName.getText();
+            artist.firstName = firstName.getText();
         }
         if(lastName.getText() == null || "".equals(lastName.getText())){
-            artist.LastName = null;
+            artist.lastName = null;
         }
         else{
-            artist.LastName = lastName.getText();
+            artist.lastName = lastName.getText();
         }
         if(birthday.getValue() == null){
-            artist.Birthday = null;
+            artist.birthday = null;
         }
         else{
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            artist.Birthday = formatter.format(birthday.getValue());
+            artist.birthday = formatter.format(birthday.getValue());
         }
 
         if(biography.getText() == null || "".equals(biography.getText())){
-            artist.Biography = null;
+            artist.biography = null;
         }
         else{
-            artist.Biography = biography.getText();
+            artist.biography = biography.getText();
         }
 
         if(activeYears.getText() == null || "".equals(activeYears.getText())){
-            artist.ActiveYears = null;
+            artist.activeYears = null;
         }
         else{
-            artist.ActiveYears = activeYears.getText();
+            artist.activeYears = activeYears.getText();
         }
 
         if(stageName.getText() == null || "".equals(stageName.getText())){
-            artist.StageName = null;
+            artist.stageName = null;
         }
         else{
-            artist.StageName = stageName.getText();
+            artist.stageName = stageName.getText();
         }
 
 
@@ -132,18 +132,18 @@ public class EditArtistController implements UIController {
     }
 
     private void setDefaultValues(){
-        email.setText(artist.Email);
-        country.setText(artist.Country);
-        firstName.setText(artist.FirstName);
-        lastName.setText(artist.LastName);
-        if(artist.Birthday != null){
+        email.setText(artist.string);
+        country.setText(artist.country);
+        firstName.setText(artist.firstName);
+        lastName.setText(artist.lastName);
+        if(artist.birthday != null){
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            birthday.setValue(LocalDate.parse(artist.Birthday, formatter));
+            birthday.setValue(LocalDate.parse(artist.birthday, formatter));
         }
-        image.setText(artist.Image);
-        biography.setText(artist.Biography);
-        activeYears.setText(artist.ActiveYears);
-        stageName.setText(artist.StageName);
+        image.setText(artist.image);
+        biography.setText(artist.biography);
+        activeYears.setText(artist.activeYears);
+        stageName.setText(artist.stageName);
         password.setText("");
     }
 }

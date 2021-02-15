@@ -72,18 +72,18 @@ class PersistenceImplementation implements Persistence {
     public boolean checkIfRequestExists(String username) { return mongo.checkIfRequestExists(username); }
 
     public boolean addNewUser(User newUser) throws PersistenceInconsistencyException {
-        String mongoID = mongo.addUser(newUser.Username, newUser.Email, newUser.Password);
+        String mongoID = mongo.addUser(newUser.username, newUser.string, newUser.password);
         if(mongoID != null){
-            int neoID = neo4j.addUser(newUser.Username);
+            int neoID = neo4j.addUser(newUser.username);
             if(neoID != -1){
                 return true;
             }
             else{
-                if(mongo.deleteUser(newUser.Username)){
+                if(mongo.deleteUser(newUser.username)){
                     return false;
                 }
                 else{
-                    throw new PersistenceInconsistencyException("User " + newUser.Username + " was not correctly added, but due to unexpected errors the user might be present in the database. This my cause inconsistencies.");
+                    throw new PersistenceInconsistencyException("User " + newUser.username + " was not correctly added, but due to unexpected errors the user might be present in the database. This my cause inconsistencies.");
                 }
             }
         }
@@ -101,36 +101,36 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean updateUser(User newUser) {
-        return mongo.updateUser(newUser.ID, newUser.Password, newUser.Email, newUser.Country, newUser.Birthday, newUser.FirstName, newUser.LastName, newUser.Image) && neo4j.updateUser(newUser.Username, newUser.Image);
+        return mongo.updateUser(newUser.id, newUser.password, newUser.string, newUser.country, newUser.birthday, newUser.firstName, newUser.lastName, newUser.image) && neo4j.updateUser(newUser.username, newUser.image);
     }
 
     @Override
     public boolean addArtist(Artist newArtist, String stageName) {
-        newArtist.StageName = stageName;
-        return mongo.addArtist(newArtist.Username, stageName);
+        newArtist.stageName = stageName;
+        return mongo.addArtist(newArtist.username, stageName);
     }
 
     @Override
     public boolean updateArtist(Artist newArtist) {
-        return mongo.updateArtist(newArtist.ID, newArtist.Password, newArtist.Email, newArtist.Country, newArtist.Birthday, newArtist.FirstName, newArtist.LastName, newArtist.Image, newArtist.ActiveYears, newArtist.Biography, newArtist.StageName, newArtist.Links) && neo4j.updateArtist(newArtist.Username, newArtist.StageName, newArtist.Image);
+        return mongo.updateArtist(newArtist.id, newArtist.password, newArtist.string, newArtist.country, newArtist.birthday, newArtist.firstName, newArtist.lastName, newArtist.image, newArtist.activeYears, newArtist.biography, newArtist.stageName, newArtist.links) && neo4j.updateArtist(newArtist.username, newArtist.stageName, newArtist.image);
     }
 
 
     @Override
     public boolean addSong(Song newSong) throws PersistenceInconsistencyException {
-        String mongoID = mongo.addSong(newSong.Artist.username, newSong.Duration, newSong.Title, newSong.Album, newSong.Image, newSong.Links, newSong.Genres);
-        newSong.ID = mongoID;
+        String mongoID = mongo.addSong(newSong.artist.username, newSong.duration, newSong.title, newSong.album, newSong.image, newSong.links, newSong.genres);
+        newSong.id = mongoID;
         if(mongoID != null){
-            boolean success = neo4j.addSong(newSong.Artist.username, newSong.Title, newSong.ID, newSong.Featurings.stream().map(x -> x.username).collect(Collectors.toList()), newSong.Image);
+            boolean success = neo4j.addSong(newSong.artist.username, newSong.title, newSong.id, newSong.featList.stream().map(x -> x.username).collect(Collectors.toList()), newSong.image);
             if(success){
                 return true;
             }
             else{
-                if(mongo.deleteSong(newSong.ID)){
+                if(mongo.deleteSong(newSong.id)){
                     return false;
                 }
                 else{
-                    throw new PersistenceInconsistencyException("Song " + newSong.Title + " was not correctly added, but due to unexpected errors the song might be present in the database, causing an inconsistency.");
+                    throw new PersistenceInconsistencyException("Song " + newSong.title + " was not correctly added, but due to unexpected errors the song might be present in the database, causing an inconsistency.");
                 }
             }
         }
@@ -141,7 +141,7 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean deleteSong(Song song) {
-        return deleteSong(song.ID);
+        return deleteSong(song.id);
     }
 
     @Override
@@ -153,14 +153,14 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean editSong(Song newSong) {
-        return mongo.updateSong(newSong.ID, newSong.Image, newSong.Album, newSong.Genres, newSong.Links) && neo4j.updateSong(newSong.ID, newSong.Title, newSong.Artist.username, newSong.Image);
+        return mongo.updateSong(newSong.id, newSong.image, newSong.album, newSong.genres, newSong.links) && neo4j.updateSong(newSong.id, newSong.title, newSong.artist.username, newSong.image);
     }
 
     @Override
     public boolean addReview(Review review) {
-        String insertedId = mongo.addReview(review.User, review.Rating, review.Text, review.Song);
+        String insertedId = mongo.addReview(review.user, review.rating, review.text, review.song);
         if(insertedId != null){
-            review.ID = insertedId;
+            review.id = insertedId;
             return true;
         }
         return false;
@@ -168,7 +168,7 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean deleteReview(Review review) {
-        return deleteReview(review.ID, review.Song);
+        return deleteReview(review.id, review.song);
     }
 
     @Override
@@ -294,7 +294,7 @@ class PersistenceImplementation implements Persistence {
     @Override
     public List<SongPreview> getFollowedUsersLikedSongs(User user) {
         List<SongPreview> result = new  ArrayList<>();
-        List<Map<String, Object>> songs = neo4j.getFollowedUsersLikedSongs(user.Username);
+        List<Map<String, Object>> songs = neo4j.getFollowedUsersLikedSongs(user.username);
         for (Map<String, Object> song:
                 songs) {
             result.add(buildSongPreviewFromMap(song));
@@ -304,13 +304,13 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public HashMap<String, String> getBestAndWorstAlbum(Artist artist){
-        return mongo.getBestAndWorstAlbum(artist.Username);
+        return mongo.getBestAndWorstAlbum(artist.username);
     }
 
     @Override
     public List<ArtistPreview> getCoworkersOfFollowedArtists(User user) {
         List<ArtistPreview> result = new  ArrayList<>();
-        List<Map<String, Object>> artists = neo4j.getCoworkersOfFollowedArtists(user.Username);
+        List<Map<String, Object>> artists = neo4j.getCoworkersOfFollowedArtists(user.username);
         for (Map<String, Object> artist:
                 artists) {
             result.add(buildArtistPreviewFromMap(artist));
@@ -358,7 +358,7 @@ class PersistenceImplementation implements Persistence {
     @Override
     public List<ArtistPreview> getArtistsFollowedByFriends(User user) {
         List<ArtistPreview> result = new  ArrayList<>();
-        List<Map<String, Object>> artists = neo4j.getArtistsFollowedByFriends(user.Username);
+        List<Map<String, Object>> artists = neo4j.getArtistsFollowedByFriends(user.username);
         for (Map<String, Object> artist:
                 artists) {
             result.add(buildArtistPreviewFromMap(artist));
@@ -369,7 +369,7 @@ class PersistenceImplementation implements Persistence {
     @Override
     public List<UserPreview> getUsersFollowedByFriends(User user) {
         List<UserPreview> result = new  ArrayList<>();
-        List<Map<String, Object>> users = neo4j.getUsersFollowedByFriends(user.Username);
+        List<Map<String, Object>> users = neo4j.getUsersFollowedByFriends(user.username);
         for (Map<String, Object> suggestion:
                 users) {
             result.add(buildUserPreviewFromMap(suggestion));
@@ -381,7 +381,7 @@ class PersistenceImplementation implements Persistence {
     public Pair<List<UserPreview>, List<SongPreview>> getLikeMindedUsersAndTheSongsTheyLike(User user){
         List<UserPreview> suggestedUsers = new  ArrayList<>();
         List<SongPreview> suggestedSongs = new  ArrayList<>();
-        Map<String, List<Map<String, Object>>> suggestions = neo4j.getLikeMindedUsersAndTheSongsTheyLike(user.Username);
+        Map<String, List<Map<String, Object>>> suggestions = neo4j.getLikeMindedUsersAndTheSongsTheyLike(user.username);
         for (Map<String, Object> suggestion:
                 suggestions.getOrDefault("users", new ArrayList<>())) {
             suggestedUsers.add(buildUserPreviewFromMap(suggestion));
@@ -397,7 +397,7 @@ class PersistenceImplementation implements Persistence {
     @Override
     public List<UserPreview> getTopFans(Artist artist){
         List<UserPreview> result = new  ArrayList<>();
-        List<Map<String, Object>> users = neo4j.getTopFans(artist.Username);
+        List<Map<String, Object>> users = neo4j.getTopFans(artist.username);
         for (Map<String, Object> suggestion:
                 users) {
             result.add(buildUserPreviewFromMap(suggestion));
@@ -408,7 +408,7 @@ class PersistenceImplementation implements Persistence {
     @Override
     public List<ArtistPreview> getSimilarArtists(Artist artist){
         List<ArtistPreview> result = new  ArrayList<>();
-        List<Map<String, Object>> artists = neo4j.getSimilarArtists(artist.Username);
+        List<Map<String, Object>> artists = neo4j.getSimilarArtists(artist.username);
         for (Map<String, Object> similarArtist:
                 artists) {
             result.add(buildArtistPreviewFromMap(similarArtist));
@@ -419,7 +419,7 @@ class PersistenceImplementation implements Persistence {
     @Override
     public List<SongPreview> getPopularSongs(Artist artist) {
         List<SongPreview> analyticResult = new ArrayList<>();
-        List<Map<String, Object>> result = neo4j.getPopularSongs(artist.Username);
+        List<Map<String, Object>> result = neo4j.getPopularSongs(artist.username);
         for (Map<String, Object> song:
                 result) {
             analyticResult.add(buildSongPreviewFromMap(song));
@@ -429,37 +429,37 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean addFollow(User followed, User follower) {
-        return neo4j.addFollow(followed.Username, follower.Username);
+        return neo4j.addFollow(followed.username, follower.username);
     }
 
     @Override
     public boolean checkFollow(User followed, User follower) {
-        return neo4j.checkFollow(followed.Username, follower.Username);
+        return neo4j.checkFollow(followed.username, follower.username);
     }
 
     @Override
     public boolean deleteFollow(User followed, User follower) {
-        return neo4j.deleteFollow(followed.Username, follower.Username);
+        return neo4j.deleteFollow(followed.username, follower.username);
     }
 
     @Override
     public boolean addLike(User user, Song song) {
-        return neo4j.addLike(user.Username, song.ID);
+        return neo4j.addLike(user.username, song.id);
     }
 
     @Override
     public boolean checkLike(User user, Song song) {
-        return neo4j.checkLike(user.Username, song.ID);
+        return neo4j.checkLike(user.username, song.id);
     }
 
     @Override
     public boolean deleteLike(User user, Song song) {
-        return neo4j.deleteLike(user.Username, song.ID);
+        return neo4j.deleteLike(user.username, song.id);
     }
 
     @Override
     public boolean checkIfUserReviewedSong(User user, Song song) {
-        return mongo.checkIfUserReviewedSong(user.Username, song.ID);
+        return mongo.checkIfUserReviewedSong(user.username, song.id);
     }
 
     @Override
@@ -505,12 +505,12 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean reportReview(Review review) {
-        return mongo.reportReview(review.User, review.ID, review.Text, review.Song);
+        return mongo.reportReview(review.user, review.id, review.text, review.song);
     }
 
     @Override
     public boolean reportUser(User user) {
-        return mongo.reportUser(user.Username);
+        return mongo.reportUser(user.username);
     }
 
     public List<Request> getRequests(){

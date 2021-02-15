@@ -1,6 +1,5 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
-import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.*;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
@@ -13,10 +12,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.*;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceInconsistencyException;
-import javafx.collections.FXCollections;
-import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -24,18 +20,13 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.awt.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class HomePageAdminController implements UIController {
 
@@ -198,7 +189,7 @@ public class HomePageAdminController implements UIController {
         showingCommentsOf = event.report.reportedUser;
         List<Review> reviews = dbManager.getReviewsByUsername(showingCommentsOf);
         for(Review review : reviews){
-            searchBox.getChildren().add(new AdminReviewView(event.report.reportedUser, review.ID, review.Text, review.Song));
+            searchBox.getChildren().add(new AdminReviewView(event.report.reportedUser, review.id, review.text, review.song));
         }
     }
 
@@ -207,7 +198,7 @@ public class HomePageAdminController implements UIController {
         showingCommentsOf = event.user;
         List<Review> reviews = event.reviewList;
         for(Review review : reviews){
-            searchBox.getChildren().add(new AdminReviewView(event.user, review.ID, review.Text, review.Song));
+            searchBox.getChildren().add(new AdminReviewView(event.user, review.id, review.text, review.song));
         }
     }
 

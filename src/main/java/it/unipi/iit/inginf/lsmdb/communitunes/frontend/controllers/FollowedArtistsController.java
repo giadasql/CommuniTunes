@@ -5,7 +5,6 @@ import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationManag
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.Role;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ListHbox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
@@ -20,7 +19,6 @@ import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class FollowedArtistsController implements UIController {
@@ -47,7 +45,7 @@ public class FollowedArtistsController implements UIController {
         dbManager = PersistenceFactory.CreatePersistence();
         authManager = AuthenticationFactory.CreateAuthenticationManager();
 
-        List<ArtistPreview> followedArtists = dbManager.getFollowedArtists(user.Username, startIndex, count);
+        List<ArtistPreview> followedArtists = dbManager.getFollowedArtists(user.username, startIndex, count);
         prevPageBtn.setDisable(true);
         showPreviews(followedArtists);
     }
@@ -82,7 +80,7 @@ public class FollowedArtistsController implements UIController {
 
     public void nextPage(ActionEvent actionEvent) {
         startIndex = startIndex + count;
-        List<ArtistPreview> newPreviews = dbManager.getFollowedArtists(user.Username, startIndex, count);
+        List<ArtistPreview> newPreviews = dbManager.getFollowedArtists(user.username, startIndex, count);
         if(!newPreviews.isEmpty()){
             showPreviews(newPreviews);
             prevPageBtn.setDisable(false);
@@ -96,7 +94,7 @@ public class FollowedArtistsController implements UIController {
     public void prevPage(ActionEvent actionEvent) {
         if(startIndex >= count){
             startIndex = startIndex - count;
-            List<ArtistPreview> newPreviews = dbManager.getFollowedArtists(user.Username, startIndex, count);
+            List<ArtistPreview> newPreviews = dbManager.getFollowedArtists(user.username, startIndex, count);
             showPreviews(newPreviews);
             nextPageBtn.setDisable(false);
         }

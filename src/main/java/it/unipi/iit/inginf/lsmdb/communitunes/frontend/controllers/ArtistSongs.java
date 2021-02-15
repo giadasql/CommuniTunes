@@ -19,7 +19,6 @@ import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class ArtistSongs implements UIController {
@@ -45,7 +44,7 @@ public class ArtistSongs implements UIController {
         dbManager = PersistenceFactory.CreatePersistence();
         authManager = AuthenticationFactory.CreateAuthenticationManager();
 
-        List<SongPreview> followingArtists = dbManager.getArtistSongs(artist.Username, startIndex, count);
+        List<SongPreview> followingArtists = dbManager.getArtistSongs(artist.username, startIndex, count);
         prevPageBtn.setDisable(true);
         showPreviews(followingArtists);
     }
@@ -80,7 +79,7 @@ public class ArtistSongs implements UIController {
 
     public void nextPage(ActionEvent actionEvent) {
         startIndex = startIndex + count;
-        List<SongPreview> newPreviews = dbManager.getArtistSongs(artist.Username, startIndex, count);
+        List<SongPreview> newPreviews = dbManager.getArtistSongs(artist.username, startIndex, count);
         if(!newPreviews.isEmpty()){
 
             showPreviews(newPreviews);
@@ -96,7 +95,7 @@ public class ArtistSongs implements UIController {
     public void prevPage(ActionEvent actionEvent) {
         if(startIndex >= count){
             startIndex = startIndex - count;
-            List<SongPreview> newPreviews = dbManager.getArtistSongs(artist.Username, startIndex, count);
+            List<SongPreview> newPreviews = dbManager.getArtistSongs(artist.username, startIndex, count);
             showPreviews(newPreviews);
             nextPageBtn.setDisable(false);
         }

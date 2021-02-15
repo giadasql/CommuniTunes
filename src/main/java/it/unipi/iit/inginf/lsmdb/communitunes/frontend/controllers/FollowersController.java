@@ -1,7 +1,5 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
-import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationFactory;
-import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.Role;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
@@ -19,7 +17,6 @@ import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class FollowersController implements UIController {
@@ -42,7 +39,7 @@ public class FollowersController implements UIController {
         user = manager.context.getFocusedUser();
         dbManager = PersistenceFactory.CreatePersistence();
 
-        List<UserPreview> followers = dbManager.getFollowers(user.Username, startIndex, count);
+        List<UserPreview> followers = dbManager.getFollowers(user.username, startIndex, count);
         prevPageBtn.setDisable(true);
         showPreviews(followers);
     }
@@ -77,7 +74,7 @@ public class FollowersController implements UIController {
 
     public void nextPage(ActionEvent actionEvent) {
         startIndex = startIndex + count;
-        List<UserPreview> newPreviews = dbManager.getFollowers(user.Username, startIndex, count);
+        List<UserPreview> newPreviews = dbManager.getFollowers(user.username, startIndex, count);
         if(!newPreviews.isEmpty()){
             showPreviews(newPreviews);
             prevPageBtn.setDisable(false);
@@ -91,7 +88,7 @@ public class FollowersController implements UIController {
     public void prevPage(ActionEvent actionEvent) {
         if(startIndex >= count){
             startIndex = startIndex - count;
-            List<UserPreview> newPreviews = dbManager.getFollowers(user.Username, startIndex, count);
+            List<UserPreview> newPreviews = dbManager.getFollowers(user.username, startIndex, count);
             showPreviews(newPreviews);
             nextPageBtn.setDisable(false);
         }

@@ -1,6 +1,5 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
-import com.sun.javafx.application.HostServicesDelegate;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Link;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
@@ -13,11 +12,9 @@ import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.UserPreviewVBo
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.SongPreviewClickedEvent;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
 import javafx.event.ActionEvent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.image.Image;
@@ -27,8 +24,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
-import javafx.scene.web.WebView;
-import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.Map;
@@ -85,11 +80,11 @@ public class ArtistController implements UIController {
             return;
         }
         dbManager = PersistenceFactory.CreatePersistence();
-        username.setText(artist.Username);
+        username.setText(artist.username);
         Image avatar;
-        if(artist.Image != null){
+        if(artist.image != null){
             try{
-                avatar = new Image(artist.Image);
+                avatar = new Image(artist.image);
                 if (avatar.isError()) {
                     avatar = new Image(this.getClass().getResourceAsStream("/ui/img/user_default.png"));
                 }
@@ -104,8 +99,8 @@ public class ArtistController implements UIController {
 
         // check if the profile belongs to the user that is currently logged in
         if(manager.context.getAuthenticatedUser() != null &&
-                manager.context.getAuthenticatedUser().Username != null &&
-                manager.context.getAuthenticatedUser().Username.equals(artist.Username)){
+                manager.context.getAuthenticatedUser().username != null &&
+                manager.context.getAuthenticatedUser().username.equals(artist.username)){
             editProfile.setVisible(true);
             editProfile.setManaged(true);
             followUnfollow.setVisible(false);
@@ -167,8 +162,8 @@ public class ArtistController implements UIController {
         }
 
         // write info in the infoContainer
-        if(artist.FirstName != null){
-            firstName.setText(artist.FirstName);
+        if(artist.firstName != null){
+            firstName.setText(artist.firstName);
             firstNameBox.setVisible(true);
             firstNameBox.setManaged(true);
         }
@@ -177,8 +172,8 @@ public class ArtistController implements UIController {
             firstNameBox.setManaged(false);
         }
 
-        if(artist.LastName != null){
-            lastName.setText(artist.LastName);
+        if(artist.lastName != null){
+            lastName.setText(artist.lastName);
             lastNameBox.setVisible(true);
             lastNameBox.setManaged(true);
         }
@@ -187,8 +182,8 @@ public class ArtistController implements UIController {
             lastNameBox.setManaged(false);
         }
 
-        if(artist.StageName != null){
-            stageName.setText(artist.StageName);
+        if(artist.stageName != null){
+            stageName.setText(artist.stageName);
             stageNameBox.setVisible(true);
             stageNameBox.setManaged(true);
         }
@@ -197,8 +192,8 @@ public class ArtistController implements UIController {
             stageNameBox.setManaged(false);
         }
 
-        if(!artist.Links.isEmpty()){
-            for (Link link : artist.Links.stream().limit(4).collect(Collectors.toList())){
+        if(!artist.links.isEmpty()){
+            for (Link link : artist.links.stream().limit(4).collect(Collectors.toList())){
                 if(link != null && link.url != null){
                     Hyperlink hyperlink = new Hyperlink();
                     hyperlink.setText(link.name);
@@ -211,8 +206,8 @@ public class ArtistController implements UIController {
             }
         }
 
-        if(artist.Country != null){
-            country.setText(artist.Country);
+        if(artist.country != null){
+            country.setText(artist.country);
             countryBox.setVisible(true);
             countryBox.setManaged(true);
         }
@@ -220,8 +215,8 @@ public class ArtistController implements UIController {
             countryBox.setVisible(false);
             countryBox.setManaged(false);
         }
-        if(artist.Birthday != null){
-            birthday.setText(artist.Birthday.toString());
+        if(artist.birthday != null){
+            birthday.setText(artist.birthday.toString());
             birthdayBox.setVisible(true);
             birthdayBox.setManaged(true);
         }
@@ -230,8 +225,8 @@ public class ArtistController implements UIController {
             birthdayBox.setManaged(false);
         }
         
-        if(artist.ActiveYears != null){
-            activity.setText(artist.ActiveYears);
+        if(artist.activeYears != null){
+            activity.setText(artist.activeYears);
             activityBox.setVisible(true);
             activityBox.setManaged(true);
         }
@@ -240,24 +235,24 @@ public class ArtistController implements UIController {
             activityBox.setManaged(false);
         }
 
-        if(artist.Biography != null){
-            if(artist.Biography.length() > 150){
-                biography.setText(artist.Biography.substring(0, 150) + "... ");
+        if(artist.biography != null){
+            if(artist.biography.length() > 150){
+                biography.setText(artist.biography.substring(0, 150) + "... ");
                 readMoreOrLess.setText("Read more");
                 readMoreOrLess.setOnAction(this::toggleBiography);
             }
             else{
-                biography.setText(artist.Biography);
+                biography.setText(artist.biography);
             }
         }
 
-        if(artist.LoadedSongs != null){
-            for(SongPreview songPreview : artist.LoadedSongs){
+        if(artist.songPreviews != null){
+            for(SongPreview songPreview : artist.songPreviews){
                     songsHbox.getChildren().add(new SongPreviewVBox(songPreview, null));
             }
         }
 
-        for(UserPreview preview : artist.LoadedFollowed){
+        for(UserPreview preview : artist.followed){
             followedBox.getChildren().add(new UserPreviewVBox(preview, null));
         }
 
@@ -266,7 +261,7 @@ public class ArtistController implements UIController {
             followedBox.getParent().setManaged(false);
         }
 
-        for(UserPreview preview : artist.LoadedFollowers){
+        for(UserPreview preview : artist.followers){
             followersBox.getChildren().add(new UserPreviewVBox(preview, null));
         }
 
@@ -275,7 +270,7 @@ public class ArtistController implements UIController {
             followersBox.getParent().setManaged(false);
         }
 
-        for(ArtistPreview preview : artist.LoadedArtistFollowed){
+        for(ArtistPreview preview : artist.followedArtists){
             followedArtistsBox.getChildren().add(new ArtistPreviewVBox(preview, null));
         }
 
@@ -284,7 +279,7 @@ public class ArtistController implements UIController {
             followedArtistsBox.getParent().setManaged(false);
         }
 
-        for(ArtistPreview preview : artist.LoadedArtistFollowers){
+        for(ArtistPreview preview : artist.followerArtists){
             followerArtistsBox.getChildren().add(new ArtistPreviewVBox(preview, null));
         }
 
@@ -298,12 +293,12 @@ public class ArtistController implements UIController {
     private void toggleBiography(ActionEvent actionEvent) {
         if(biographyExpanded){
             biographyExpanded = false;
-            biography.setText(artist.Biography.substring(0, 150) + "... ");
+            biography.setText(artist.biography.substring(0, 150) + "... ");
             readMoreOrLess.setText("Read more");
         }
         else{
             biographyExpanded = true;
-            biography.setText(artist.Biography);
+            biography.setText(artist.biography);
             readMoreOrLess.setText("Read less");
         }
     }

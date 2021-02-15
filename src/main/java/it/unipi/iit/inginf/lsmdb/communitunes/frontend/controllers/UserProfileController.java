@@ -1,7 +1,5 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
-import it.unipi.iit.inginf.lsmdb.communitunes.authentication.Role;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.Artist;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
@@ -12,9 +10,6 @@ import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.UserPreviewVBo
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.ArtistPreviewClickedEvent;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.SongPreviewClickedEvent;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.UserPreviewClickedEvent;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
 import javafx.beans.value.ChangeListener;
@@ -69,11 +64,11 @@ public class UserProfileController implements UIController {
         this.manager = LayoutManagerFactory.getManager();
         user = manager.context.getFocusedUser();
         dbManager = PersistenceFactory.CreatePersistence();
-        username.setText(user.Username);
+        username.setText(user.username);
         Image avatar;
-        if(user.Image != null){
+        if(user.image != null){
             try{
-                avatar = new Image(user.Image);
+                avatar = new Image(user.image);
                 avatar.errorProperty().addListener(new ChangeListener<Boolean>() {
                     @Override
                     public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean t1) {
@@ -97,8 +92,8 @@ public class UserProfileController implements UIController {
 
         // check if the profile belongs to the user that is currently logged in
         if(manager.context.getAuthenticatedUser() != null &&
-                manager.context.getAuthenticatedUser().Username != null &&
-                manager.context.getAuthenticatedUser().Username.equals(manager.context.getFocusedUser().Username)){
+                manager.context.getAuthenticatedUser().username != null &&
+                manager.context.getAuthenticatedUser().username.equals(manager.context.getFocusedUser().username)){
             editProfile.setVisible(true);
             editProfile.setManaged(true);
             userAnalytics.setVisible(true);
@@ -139,8 +134,8 @@ public class UserProfileController implements UIController {
         reportText.setVisible(false);
 
         // write info in the infoContainer
-        if(user.FirstName != null){
-            firstName.setText(user.FirstName);
+        if(user.firstName != null){
+            firstName.setText(user.firstName);
             firstNameBox.setVisible(true);
             firstNameBox.setManaged(true);
         }
@@ -148,8 +143,8 @@ public class UserProfileController implements UIController {
             firstNameBox.setVisible(false);
             firstNameBox.setManaged(false);
         }
-        if(user.LastName != null){
-            lastName.setText(user.LastName);
+        if(user.lastName != null){
+            lastName.setText(user.lastName);
             lastNameBox.setVisible(true);
             lastNameBox.setManaged(true);
         }
@@ -157,8 +152,8 @@ public class UserProfileController implements UIController {
             lastNameBox.setVisible(false);
             lastNameBox.setManaged(false);
         }
-        if(user.Country != null){
-            country.setText(user.Country);
+        if(user.country != null){
+            country.setText(user.country);
             countryBox.setVisible(true);
             countryBox.setManaged(true);
         }
@@ -166,8 +161,8 @@ public class UserProfileController implements UIController {
             countryBox.setVisible(false);
             countryBox.setManaged(false);
         }
-        if(user.Birthday != null){
-            birthday.setText(user.Birthday.toString());
+        if(user.birthday != null){
+            birthday.setText(user.birthday.toString());
             birthdayBox.setVisible(true);
             birthdayBox.setManaged(true);
         }
@@ -176,7 +171,7 @@ public class UserProfileController implements UIController {
             birthdayBox.setManaged(false);
         }
 
-        for(SongPreview preview : user.LoadedLikes){
+        for(SongPreview preview : user.likes){
             likesHBox.getChildren().add(new SongPreviewVBox(preview, null));
         }
 
@@ -185,7 +180,7 @@ public class UserProfileController implements UIController {
             likesHBox.getParent().setManaged(false);
         }
 
-        for(UserPreview preview : user.LoadedFollowed){
+        for(UserPreview preview : user.followed){
             followedBox.getChildren().add(new UserPreviewVBox(preview, null));
         }
 
@@ -194,7 +189,7 @@ public class UserProfileController implements UIController {
             followedBox.getParent().setManaged(false);
         }
 
-        for(UserPreview preview : user.LoadedFollowers){
+        for(UserPreview preview : user.followers){
             followersBox.getChildren().add(new UserPreviewVBox(preview, null));
         }
 
@@ -203,7 +198,7 @@ public class UserProfileController implements UIController {
             followersBox.getParent().setManaged(false);
         }
 
-        for(ArtistPreview preview : user.LoadedArtistFollowed){
+        for(ArtistPreview preview : user.followedArtists){
             followedArtistsBox.getChildren().add(new ArtistPreviewVBox(preview, null));
         }
 
@@ -212,7 +207,7 @@ public class UserProfileController implements UIController {
             followedArtistsBox.getParent().setManaged(false);
         }
 
-        for(ArtistPreview preview : user.LoadedArtistFollowers){
+        for(ArtistPreview preview : user.followerArtists){
             followerArtistsBox.getChildren().add(new ArtistPreviewVBox(preview, null));
         }
 

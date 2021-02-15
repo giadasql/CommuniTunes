@@ -21,7 +21,6 @@ import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -95,11 +94,11 @@ public class LayoutController implements UIController {
 
     private void refreshAuthenticated(Role role){
         if(role == Role.Artist){
-            Artist authArtist = dbManager.getArtist(manager.context.getAuthenticatedArtist().Username);
+            Artist authArtist = dbManager.getArtist(manager.context.getAuthenticatedArtist().username);
             manager.context.setAuthenticatedArtist(authArtist);
         }
         else if(role == Role.User){
-            User authUser = dbManager.getUser(manager.context.getAuthenticatedUser().Username);
+            User authUser = dbManager.getUser(manager.context.getAuthenticatedUser().username);
             manager.context.setAuthenticatedUser(authUser);
         }
     }

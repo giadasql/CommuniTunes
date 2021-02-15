@@ -2,73 +2,67 @@ package it.unipi.iit.inginf.lsmdb.communitunes.entities;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.UserPreviewVBox;
-import it.unipi.iit.inginf.lsmdb.communitunes.utilities.tools.DateToLocalDateConverter;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.javatuples.Pair;
 
-import java.time.LocalDate;
 import java.util.*;
 
 public class User extends Entity {
 
-    public String Email;
+    public String string;
 
-    public String Username;
+    public String username;
 
-    public String Password;
+    public String password;
 
-    public String Country;
+    public String country;
 
-    public String Image;
+    public String image;
 
-    public String Birthday;
+    public String birthday;
 
-    public String FirstName;
+    public String firstName;
 
-    public String LastName;
+    public String lastName;
 
-    public List<SongPreview> LoadedLikes = new ArrayList<>();
+    public List<SongPreview> likes = new ArrayList<>();
 
-    public List<UserPreview> LoadedFollowed = new ArrayList<>();
+    public List<UserPreview> followed = new ArrayList<>();
 
-    public List<ArtistPreview> LoadedArtistFollowed = new ArrayList<>();
+    public List<ArtistPreview> followedArtists = new ArrayList<>();
 
-    public List<UserPreview> LoadedFollowers = new ArrayList<>();
+    public List<UserPreview> followers = new ArrayList<>();
 
-    public List<ArtistPreview> LoadedArtistFollowers = new ArrayList<>();
+    public List<ArtistPreview> followerArtists = new ArrayList<>();
 
-    public User(String username, String email, String password, String id){
+    public User(String username, String string, String password, String id){
         super(id);
-        Email = email;
-        Username = username;
-        Password =  password;
+        this.string = string;
+        this.username = username;
+        this.password =  password;
     }
 
-        // TODO: inserire l'immagine di default
-    public User(String username, String email, String password){
+    public User(String username, String string, String password){
         super(null);
-        Email = email;
-        Username = username;
-        Password =  password;
-        Image = null;
+        this.string = string;
+        this.username = username;
+        this.password =  password;
+        image = null;
     }
 
-    public User(String ID, String email, String username, String password, String country, String image, String birthday, String firstName, String lastName, List<SongPreview> loadedLikes, List<UserPreview> loadedFollowed, List<ArtistPreview> loadedArtistFollowed, List<UserPreview> loadedFollowers, List<ArtistPreview> loadedArtistFollowers) {
+    public User(String ID, String string, String username, String password, String country, String image, String birthday, String firstName, String lastName, List<SongPreview> likes, List<UserPreview> followed, List<ArtistPreview> followedArtists, List<UserPreview> followers, List<ArtistPreview> followerArtists) {
         super(ID);
-        Email = email;
-        Username = username;
-        Password = password;
-        Country = country;
-        Image = image;
-        Birthday = birthday;
-        FirstName = firstName;
-        LastName = lastName;
-        LoadedLikes = loadedLikes;
-        LoadedFollowed = loadedFollowed;
-        LoadedArtistFollowed = loadedArtistFollowed;
-        LoadedFollowers = loadedFollowers;
-        LoadedArtistFollowers = loadedArtistFollowers;
+        this.string = string;
+        this.username = username;
+        this.password = password;
+        this.country = country;
+        this.image = image;
+        this.birthday = birthday;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.likes = likes;
+        this.followed = followed;
+        this.followedArtists = followedArtists;
+        this.followers = followers;
+        this.followerArtists = followerArtists;
     }
 
     @Override
@@ -81,7 +75,7 @@ public class User extends Entity {
         }
         User user = (User)o;
 
-        return Email.equals(user.Email) && Password.equals(user.Password) && Country.equals(user.Country)
-                && Birthday.equals(user.Birthday);
+        return string.equals(user.string) && password.equals(user.password) && country.equals(user.country)
+                && birthday.equals(user.birthday);
     }
 }

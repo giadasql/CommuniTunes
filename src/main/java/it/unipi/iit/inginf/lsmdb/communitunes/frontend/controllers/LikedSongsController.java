@@ -4,7 +4,6 @@ import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationFacto
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.AuthenticationManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.authentication.Role;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ListHbox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
@@ -20,7 +19,6 @@ import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class LikedSongsController implements UIController {
@@ -46,7 +44,7 @@ public class LikedSongsController implements UIController {
         dbManager = PersistenceFactory.CreatePersistence();
         authManager = AuthenticationFactory.CreateAuthenticationManager();
 
-        List<SongPreview> followingArtists = dbManager.getLikedSongs(user.Username, startIndex, count);
+        List<SongPreview> followingArtists = dbManager.getLikedSongs(user.username, startIndex, count);
         prevPageBtn.setDisable(true);
         showPreviews(followingArtists);
     }
@@ -81,7 +79,7 @@ public class LikedSongsController implements UIController {
 
     public void nextPage(ActionEvent actionEvent) {
         startIndex = startIndex + count;
-        List<SongPreview> newPreviews = dbManager.getLikedSongs(user.Username, startIndex, count);
+        List<SongPreview> newPreviews = dbManager.getLikedSongs(user.username, startIndex, count);
         if(!newPreviews.isEmpty()){
             
             showPreviews(newPreviews);
@@ -97,7 +95,7 @@ public class LikedSongsController implements UIController {
     public void prevPage(ActionEvent actionEvent) {
         if(startIndex >= count){
             startIndex = startIndex - count;
-            List<SongPreview> newPreviews = dbManager.getLikedSongs(user.Username, startIndex, count);
+            List<SongPreview> newPreviews = dbManager.getLikedSongs(user.username, startIndex, count);
             showPreviews(newPreviews);
             nextPageBtn.setDisable(false);
         }

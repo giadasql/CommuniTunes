@@ -2,7 +2,6 @@ package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers;
 
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Link;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
@@ -30,29 +29,29 @@ public class EditSongController implements UIController {
 
     public void saveInfo(ActionEvent actionEvent) {
         if(genres.getText() == null || "".equals(genres.getText())){
-            song.Genres = null;
+            song.genres = null;
         }
         else{
             String[] arrayGenres = genres.getText().split(";");
-            song.Genres = Arrays.asList(arrayGenres);
+            song.genres = Arrays.asList(arrayGenres);
         }
         if(link.getText() == null || "".equals(link.getText())){
-            song.Links = null;
+            song.links = null;
         }
         else{
             String[] arrayLinks = link.getText().split(";");
             for(String s : arrayLinks){
                 String[] nameUrl = s.split(":", 2);
                 if(nameUrl.length >= 2){
-                    song.Links.add(new Link(nameUrl[0], nameUrl[1]));
+                    song.links.add(new Link(nameUrl[0], nameUrl[1]));
                 }
             }
         }
         if(image.getText() == null || "".equals(image.getText())){
-            song.Image = null;
+            song.image = null;
         }
         else{
-            song.Image = image.getText();
+            song.image = image.getText();
         }
         if(dbManager.editSong(song)){
             msg.setFill(Color.GREEN);
@@ -82,16 +81,16 @@ public class EditSongController implements UIController {
 
     private void setDefaultValues(){
         StringBuilder temp = new StringBuilder();
-        for(String genre : song.Genres){
+        for(String genre : song.genres){
             temp.append(genre).append(";");
         }
         genres.setText(temp.toString());
         temp = new StringBuilder();
-        for(Link link : song.Links){
+        for(Link link : song.links){
             temp.append(link.name).append(":").append(link.url).append(";");
         }
         link.setText(temp.toString());
-        image.setText(song.Image);
+        image.setText(song.image);
     }
 
     public void deleteSong(ActionEvent actionEvent) {

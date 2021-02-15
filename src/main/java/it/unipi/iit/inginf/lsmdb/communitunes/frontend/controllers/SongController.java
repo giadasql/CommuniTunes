@@ -24,9 +24,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
-import org.neo4j.driver.internal.shaded.io.netty.util.internal.StringUtil;
 
 import java.io.IOException;
 import java.util.stream.Collectors;
@@ -75,10 +73,10 @@ public class SongController implements UIController {
                 }
             }
 
-            if(song.Artist != null){
+            if(song.artist != null){
                 if(!manager.context.inAdminPanel){
                     Artist authArtist = manager.context.getAuthenticatedArtist();
-                    if(authArtist != null && (song.Artist.username != null && song.Artist.username.equals(authArtist.Username))){
+                    if(authArtist != null && (song.artist.username != null && song.artist.username.equals(authArtist.username))){
                         // the song belongs to the artist watching the page
                         likeSong.setManaged(false);
                         likeSong.setVisible(false);
@@ -100,28 +98,28 @@ public class SongController implements UIController {
                     writeReview.setVisible(false);
                 }
             }
-            if(song.Title != null){
-                if(song.Title.length() >= 60){
-                    songTitle.setText(song.Title.substring(0, 100) + "...");
+            if(song.title != null){
+                if(song.title.length() >= 60){
+                    songTitle.setText(song.title.substring(0, 100) + "...");
                 }
                 else{
-                    songTitle.setText(song.Title);
+                    songTitle.setText(song.title);
                 }
             }
 
-            if(song.Artist != null){
-                artistName.setText(song.Artist.username);
+            if(song.artist != null){
+                artistName.setText(song.artist.username);
                 artistName.setCursor(Cursor.HAND);
-                artistName.setOnMouseClicked(e -> { manager.goToArtistPage(song.Artist.username);});
+                artistName.setOnMouseClicked(e -> { manager.goToArtistPage(song.artist.username);});
             }
             else{
                 artistName.getParent().setVisible(false);
                 artistName.getParent().setManaged(false);
             }
 
-            if(song.Image != null){
+            if(song.image != null){
                 try{
-                    Image img = new Image(song.Image);
+                    Image img = new Image(song.image);
                     if (img.isError()) {
                         img = new Image(this.getClass().getResourceAsStream("/ui/img/song_default.png"));
                     }
@@ -133,19 +131,19 @@ public class SongController implements UIController {
                 }
             }
 
-            likesNumber.setText(String.valueOf(song.Likes));
+            likesNumber.setText(String.valueOf(song.likes));
 
-            if(song.Album != null){
-                albumName.setText(song.Album);
+            if(song.album != null){
+                albumName.setText(song.album);
             }
             else{
                 albumName.getParent().setVisible(false);
                 albumName.getParent().setManaged(false);
             }
 
-            if(!(song.Links == null)){
-                if(!song.Links.isEmpty()){
-                    for (Link link : song.Links.stream().limit(4).collect(Collectors.toList())){
+            if(!(song.links == null)){
+                if(!song.links.isEmpty()){
+                    for (Link link : song.links.stream().limit(4).collect(Collectors.toList())){
                         if(link != null && link.url != null){
                             Hyperlink hyperlink = new Hyperlink();
                             hyperlink.setText(link.name);
@@ -167,8 +165,8 @@ public class SongController implements UIController {
                 links.getParent().setVisible(false);
             }
 
-            if(!song.Featurings.isEmpty()){
-                for (ArtistPreview artistPreview : song.Featurings.stream().limit(4).collect(Collectors.toList())){
+            if(!song.featList.isEmpty()){
+                for (ArtistPreview artistPreview : song.featList.stream().limit(4).collect(Collectors.toList())){
                     Hyperlink hyperlink = new Hyperlink();
                     hyperlink.setText(artistPreview.username);
                     hyperlink.getStyleClass().add("artist-site");
@@ -183,8 +181,8 @@ public class SongController implements UIController {
                 feat.getParent().setManaged(false);
             }
 
-            if(!song.Genres.isEmpty()){
-                for (String genre : song.Genres){
+            if(!song.genres.isEmpty()){
+                for (String genre : song.genres){
                     Text genreName = new Text();
                     genreName.setText(" " + genre);
                     genreName.setFill(Color.WHITE);
@@ -209,8 +207,8 @@ public class SongController implements UIController {
             });
 
 
-            if(song.AvgRating != -1){
-                avgRating.setText(String.valueOf((int)Math.round(song.AvgRating)));
+            if(song.avgRating != -1){
+                avgRating.setText(String.valueOf((int)Math.round(song.avgRating)));
             }
             else{
                 avgRating.getParent().setManaged(false);
@@ -218,10 +216,10 @@ public class SongController implements UIController {
             }
 
             for (Review review:
-                 song.LoadedReviews) {
+                 song.reviews) {
                 ReviewVBox reviewBox;
                 if(!manager.context.inAdminPanel){
-                    if(manager.context.getAuthenticatedUser().Username != null && review.User.equals(manager.context.getAuthenticatedUser().Username)){
+                    if(manager.context.getAuthenticatedUser().username != null && review.user.equals(manager.context.getAuthenticatedUser().username)){
                         reviewBox = new ReviewVBox(review, true, false);
                     }
                     else{
@@ -245,13 +243,13 @@ public class SongController implements UIController {
         if(manager.context.getAuthenticatedUser() != null) {
             Review newReview;
             if(reviewComment.getText().isEmpty()){
-                newReview = new Review(manager.context.getAuthenticatedUser().Username, (int)Math.round(ratingSlider.getValue()), null, song.ID);
+                newReview = new Review(manager.context.getAuthenticatedUser().username, (int)Math.round(ratingSlider.getValue()), null, song.id);
             }
             else{
-                newReview = new Review(manager.context.getAuthenticatedUser().Username, (int)Math.round(ratingSlider.getValue()), reviewComment.getText(), song.ID);
+                newReview = new Review(manager.context.getAuthenticatedUser().username, (int)Math.round(ratingSlider.getValue()), reviewComment.getText(), song.id);
             }
             dbManager.addReview(newReview);
-            manager.goToSongPage(song.ID);
+            manager.goToSongPage(song.id);
         }
     }
 
@@ -274,14 +272,14 @@ public class SongController implements UIController {
         if(!userLikesSong){
             dbManager.addLike(authUser, song);
             userLikesSong = true;
-            likesNumber.setText(String.valueOf(song.Likes + 1));
+            likesNumber.setText(String.valueOf(song.likes + 1));
             likeSong.setText("Dislike");
         }
         else{
             dbManager.deleteLike(authUser, song);
             userLikesSong = false;
             likeSong.setText("Like");
-            likesNumber.setText(String.valueOf(song.Likes - 1));
+            likesNumber.setText(String.valueOf(song.likes - 1));
         }
     }
 }

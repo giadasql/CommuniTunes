@@ -6,19 +6,19 @@ public class Review extends Entity {
 
     public Review(String id, String user, int rating, String text, String song) {
         super(id);
-        User = user;
-        Rating = rating;
-        Text = text;
-        Song = song;
+        this.user = user;
+        this.rating = rating;
+        this.text = text;
+        this.song = song;
         timestamp = new Date();
     }
 
     public Review(String user, int rating, String text, String song) {
         super(null);
-        User = user;
-        Rating = rating;
-        Text = text;
-        Song = song;
+        this.user = user;
+        this.rating = rating;
+        this.text = text;
+        this.song = song;
         timestamp = new Date();
     }
 
@@ -26,7 +26,7 @@ public class Review extends Entity {
         super(id);
         if(user != null){
             try{
-                User = (String)user;
+                this.user = (String)user;
             }
             catch (ClassCastException exc){
                 // TODO: log the exception
@@ -34,7 +34,7 @@ public class Review extends Entity {
         }
         if(rating != null){
             try{
-                Rating = (Integer) rating;
+                this.rating = (Integer) rating;
             }
             catch (ClassCastException exc){
                 // TODO: log the exception
@@ -42,7 +42,7 @@ public class Review extends Entity {
         }
         if(text != null){
             try{
-                Text = (String)text;
+                this.text = (String)text;
             }
             catch (ClassCastException exc){
                 // TODO: log the exception
@@ -50,7 +50,7 @@ public class Review extends Entity {
         }
         if(song != null){
             try{
-                Song = (String)song;
+                this.song = (String)song;
             }
             catch (ClassCastException exc){
                 // TODO: log the exception
@@ -59,13 +59,13 @@ public class Review extends Entity {
         timestamp = new Date();
     }
 
-    public String User;
+    public String user;
 
-    public int Rating;
+    public int rating;
 
-    public String Text;
+    public String text;
 
-    public String Song;
+    public String song;
 
     public Date timestamp;
 

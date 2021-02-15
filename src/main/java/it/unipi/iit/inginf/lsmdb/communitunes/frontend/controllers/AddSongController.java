@@ -43,52 +43,52 @@ public class AddSongController implements UIController {
         }
         song = new Song(title.getText());
         Artist artist = manager.context.getFocusedArtist();
-        song.Artist = new ArtistPreview(artist.Username, artist.Image);
+        song.artist = new ArtistPreview(artist.username, artist.image);
         if(album.getText() == null || "".equals(album.getText())){
-            song.Album = null;
+            song.album = null;
         }
         else{
-            song.Album = album.getText();
+            song.album = album.getText();
         }
         if(duration.getText() == null || "".equals(duration.getText())){
-            song.Duration = null;
+            song.duration = null;
         }
         else{
-            song.Duration = duration.getText();
+            song.duration = duration.getText();
         }
         if(genres.getText() == null || "".equals(genres.getText())){
-            song.Genres = null;
+            song.genres = null;
         }
         else{
             String[] arrayGenres = genres.getText().split(";");
-            song.Genres = Arrays.asList(arrayGenres);
+            song.genres = Arrays.asList(arrayGenres);
         }
         if(link.getText() == null || "".equals(link.getText())){
-            song.Links = null;
+            song.links = null;
         }
         else{
             String[] arrayLinks = link.getText().split(";");
-            song.Links = new ArrayList<>();
+            song.links = new ArrayList<>();
             for(String s : arrayLinks){
                 String[] nameUrl = s.split(":", 2);
                 if(nameUrl.length >= 2){
-                    song.Links.add(new Link(nameUrl[0], nameUrl[1]));
+                    song.links.add(new Link(nameUrl[0], nameUrl[1]));
                 }
             }
         }
         if(image.getText() == null || "".equals(image.getText())){
-            song.Image = null;
+            song.image = null;
         }
         else{
-            song.Image = image.getText();
+            song.image = image.getText();
         }
         if(feat.getText() == null || "".equals(feat.getText())){
-            song.Featurings = new ArrayList<>();
+            song.featList = new ArrayList<>();
         }
         else{
             String[] arrayFeat = feat.getText().split(";");
             for(String s : arrayFeat){
-                song.Featurings.add(new ArtistPreview(s, null));
+                song.featList.add(new ArtistPreview(s, null));
             }
         }
         if(dbManager.addSong(song)){

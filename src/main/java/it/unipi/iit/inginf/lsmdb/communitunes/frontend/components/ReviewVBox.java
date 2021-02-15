@@ -1,12 +1,9 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.components;
 
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Review;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
-import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
-import javafx.geometry.Insets;
 import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
@@ -14,7 +11,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -42,9 +38,9 @@ public class ReviewVBox extends VBox {
         usernameLabel.setFont(new Font("Book Antiqua", 20));
         Text userName = new Text();
         userName.setFill(Color.WHITE);
-        userName.setText(review.User);
+        userName.setText(review.user);
         userName.setOnMouseClicked(e -> {
-            LayoutManagerFactory.getManager().goToUserOrArtistPage(review.User);
+            LayoutManagerFactory.getManager().goToUserOrArtistPage(review.user);
         });
         userName.setFont(Font.font("Book Antiqua", FontWeight.BOLD, 20));
         userName.setCursor(Cursor.HAND);
@@ -65,12 +61,12 @@ public class ReviewVBox extends VBox {
             headerHBox.getChildren().add(deleteBtn);
         }
         Text rating = new Text();
-        rating.setText("Rating: " + review.Rating + " /100");
+        rating.setText("Rating: " + review.rating + " /100");
         rating.setFont(Font.font("Book Antiqua", FontWeight.BOLD, 20));
         rating.setFill(Color.WHITE);
         this.getChildren().add(headerHBox);
         this.getChildren().add(rating);
-        if(review.Text != null){
+        if(review.text != null){
             if(showReportBtn){
                 reportedReview = new Text();
                 reportedReview.setText("You reported this review.");
@@ -89,7 +85,7 @@ public class ReviewVBox extends VBox {
             }
             Text commentLabel = new Text();
             Text comment = new Text();
-            comment.setText(review.Text);
+            comment.setText(review.text);
             comment.setFill(Color.WHITE);
             comment.setFont(Font.font("Book Antiqua", 20));
             comment.setWrappingWidth(780);
@@ -112,7 +108,7 @@ public class ReviewVBox extends VBox {
         Persistence dbManager = PersistenceFactory.CreatePersistence();
         if(dbManager != null){
             dbManager.deleteReview(review);
-            LayoutManagerFactory.getManager().goToSongPage(review.Song);
+            LayoutManagerFactory.getManager().goToSongPage(review.song);
         }
     }
 }
