@@ -91,12 +91,12 @@ public class ArtistController implements UIController {
             try{
                 avatar = new Image(artist.Image);
                 if (avatar.isError()) {
-                    avatar = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
+                    avatar = new Image(this.getClass().getResourceAsStream("/ui/img/user_default.png"));
                 }
                 avatarCircle.setFill(new ImagePattern(avatar));
             }
             catch(Exception exc) {
-                avatar = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
+                avatar = new Image(this.getClass().getResourceAsStream("/ui/img/user_default.png"));
                 avatarCircle.setFill(new ImagePattern(avatar));
             }
         }

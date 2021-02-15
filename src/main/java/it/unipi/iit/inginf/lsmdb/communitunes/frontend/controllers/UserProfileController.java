@@ -78,7 +78,7 @@ public class UserProfileController implements UIController {
                     @Override
                     public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean t1) {
                         if(!aBoolean && t1){
-                            Image def = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
+                            Image def = new Image(this.getClass().getResourceAsStream("/ui/img/user_default.png"));
                             avatarCircle.setFill(new ImagePattern(def));
                         }
                     }
@@ -86,12 +86,12 @@ public class UserProfileController implements UIController {
                 avatarCircle.setFill(new ImagePattern(avatar));
             }
             catch(Exception exc) {
-                avatar = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
+                avatar = new Image(this.getClass().getResourceAsStream("/ui/img/user_default.png"));
                 avatarCircle.setFill(new ImagePattern(avatar));
             }
         }
         else {
-            Image def = new Image(this.getClass().getResourceAsStream("/ui/img/profile-user.png"));
+            Image def = new Image(this.getClass().getResourceAsStream("/ui/img/user_default.png"));
             avatarCircle.setFill(new ImagePattern(def));
         }
 

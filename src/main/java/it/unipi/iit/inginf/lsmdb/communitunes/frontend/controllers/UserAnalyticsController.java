@@ -37,17 +37,13 @@ public class UserAnalyticsController implements UIController {
         dbManager = PersistenceFactory.CreatePersistence();
         user = manager.context.getAuthenticatedUser();
         List<ArtistPreview> suggestedArtistsList = dbManager.getArtistsFollowedByFriends(user);
-        System.out.println("1");
         List<UserPreview> suggestedUsersList = dbManager.getUsersFollowedByFriends(user);
-        System.out.println("2");
         Pair<List<UserPreview>, List<SongPreview>> likeMinded = dbManager.getLikeMindedUsersAndTheSongsTheyLike(user);
-        System.out.println("3");
         List<UserPreview> likemindedUsersList = likeMinded.getValue0();
         List<SongPreview> likemindedSongsList = likeMinded.getValue1();
         List<SongPreview> suggestedSongsList = dbManager.getFollowedUsersLikedSongs(user);
-        System.out.println("4");
         List<ArtistPreview> coworkers = dbManager.getCoworkersOfFollowedArtists(user);
-        System.out.println("5");
+
 
         for(ArtistPreview artist : suggestedArtistsList){
             suggestedArtists.getChildren().add(new ArtistPreviewVBox(artist, null));

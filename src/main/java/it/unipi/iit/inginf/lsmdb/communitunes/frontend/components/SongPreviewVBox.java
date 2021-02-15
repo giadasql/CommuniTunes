@@ -59,6 +59,10 @@ public class SongPreviewVBox extends PreviewVBox {
         this.fireEvent(songPreviewClickedEvent);
     }
 
-
+    @Override
+    public void setDefaultImage(){
+        Image image = new Image(this.getClass().getResourceAsStream("/ui/img/song_default.png"));
+        imageView.setImage(image);
+    }
 
 }
