@@ -39,24 +39,38 @@ class PersistenceImplementation implements Persistence {
     }
 
     public boolean checkIfUsernameExists(String username){
-
+        if (username == null) {
+            throw new IllegalArgumentException("username cannot be null");
+        }
         return mongo.checkIfUsernameExists(username) || neo4j.checkIfUsernameExists(username);
     }
 
     public boolean checkIfEmailExists(String email){
-
+        if (email == null) {
+            throw new IllegalArgumentException("email cannot be null");
+        }
         return mongo.checkIfEmailExists(email);
     }
 
     public boolean checkIfStageNameExists(String stageName)
     {
-
+        if (stageName == null) {
+            throw new IllegalArgumentException("stageName cannot be null");
+        }
         return mongo.checkIfStageNameExists(stageName);
     }
 
-    public boolean checkIfRequestExists(String username) { return mongo.checkIfRequestExists(username); }
+    public boolean checkIfRequestExists(String username) {
+        if (username == null) {
+            throw new IllegalArgumentException("username cannot be null");
+        }
+        return mongo.checkIfRequestExists(username);
+    }
 
     public boolean addNewUser(User newUser) throws PersistenceInconsistencyException {
+        if (newUser == null) {
+            throw new IllegalArgumentException("newUser cannot be null");
+        }
         String mongoID = mongo.addUser(newUser.username, newUser.string, newUser.password);
         if(mongoID != null){
             int neoID = neo4j.addUser(newUser.username);
@@ -79,6 +93,9 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean deleteUser(String username) {
+        if (username == null) {
+            throw new IllegalArgumentException("username cannot be null");
+        }
         boolean neo4jDelete = neo4j.deleteUser(username);
         boolean mongoDelete = mongo.deleteUser(username);
         return (mongoDelete && neo4jDelete && deleteReviews(username));
@@ -86,23 +103,38 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean updateUser(User newUser) {
+        if (newUser == null) {
+            throw new IllegalArgumentException("newUser cannot be null");
+        }
         return mongo.updateUser(newUser.id, newUser.password, newUser.string, newUser.country, newUser.birthday, newUser.firstName, newUser.lastName, newUser.image) && neo4j.updateUser(newUser.username, newUser.image);
     }
 
     @Override
     public boolean addArtist(Artist newArtist, String stageName) {
+        if (newArtist == null) {
+            throw new IllegalArgumentException("newArtist cannot be null");
+        }
+        if (stageName == null) {
+            throw new IllegalArgumentException("stageName cannot be null");
+        }
         newArtist.stageName = stageName;
         return mongo.addArtist(newArtist.username, stageName);
     }
 
     @Override
     public boolean updateArtist(Artist newArtist) {
+        if (newArtist == null) {
+            throw new IllegalArgumentException("newArtist cannot be null");
+        }
         return mongo.updateArtist(newArtist.id, newArtist.password, newArtist.string, newArtist.country, newArtist.birthday, newArtist.firstName, newArtist.lastName, newArtist.image, newArtist.activeYears, newArtist.biography, newArtist.stageName, newArtist.links) && neo4j.updateArtist(newArtist.username, newArtist.stageName, newArtist.image);
     }
 
 
     @Override
     public boolean addSong(Song newSong) throws PersistenceInconsistencyException {
+        if (newSong == null) {
+            throw new IllegalArgumentException("newSong cannot be null");
+        }
         String mongoID = mongo.addSong(newSong.artist.username, newSong.duration, newSong.title, newSong.album, newSong.image, newSong.links, newSong.genres);
         newSong.id = mongoID;
         if(mongoID != null){
@@ -126,11 +158,17 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean deleteSong(Song song) {
+        if (song == null) {
+            throw new IllegalArgumentException("song cannot be null");
+        }
         return deleteSong(song.id);
     }
 
     @Override
     public boolean deleteSong(String songID) {
+        if (songID == null) {
+            throw new IllegalArgumentException("songID cannot be null");
+        }
         boolean neo4jDelete = neo4j.deleteSong(songID);
         boolean mongoDelete = mongo.deleteSong(songID);
         return (mongoDelete && neo4jDelete);
@@ -138,11 +176,17 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean editSong(Song newSong) {
+        if (newSong == null) {
+            throw new IllegalArgumentException("newSong cannot be null");
+        }
         return mongo.updateSong(newSong.id, newSong.image, newSong.album, newSong.genres, newSong.links) && neo4j.updateSong(newSong.id, newSong.title, newSong.artist.username, newSong.image);
     }
 
     @Override
     public boolean addReview(Review review) {
+        if (review == null) {
+            throw new IllegalArgumentException("review cannot be null");
+        }
         String insertedId = mongo.addReview(review.user, review.rating, review.text, review.song);
         if(insertedId != null){
             review.id = insertedId;
@@ -153,21 +197,36 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean deleteReview(Review review) {
+        if (review == null) {
+            throw new IllegalArgumentException("review cannot be null");
+        }
         return deleteReview(review.id, review.song);
     }
 
     @Override
     public boolean deleteReview(String reviewID, String song) {
+        if (reviewID == null) {
+            throw new IllegalArgumentException("reviewID cannot be null");
+        }
+        if (song == null) {
+            throw new IllegalArgumentException("song cannot be null");
+        }
         return mongo.deleteReview(song, reviewID);
     }
 
     @Override
     public boolean userIsArtist(String username) {
+        if (username == null) {
+            throw new IllegalArgumentException("username cannot be null");
+        }
         return mongo.userIsArtist(username);
     }
 
     @Override
     public List<ArtistPreview> searchArtistByName(String name, int startIndex, int limit) {
+        if (name == null) {
+            throw new IllegalArgumentException("name cannot be null");
+        }
         List<HashMap<String, Object>> artistPreviewMaps = mongo.getArtistByName(name, startIndex, limit);
         List<ArtistPreview> artistPreviews = new ArrayList<>();
         for (HashMap<String, Object> artistPreviewMap:
@@ -179,6 +238,9 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<SongPreview> searchSongByTitle(String title, int startIndex, int limit) {
+        if (title == null) {
+            throw new IllegalArgumentException("title cannot be null");
+        }
         List<HashMap<String, Object>> songPreviewMaps = mongo.getSongByTitle(title, startIndex, limit);
         List<SongPreview> songPreviews = new ArrayList<>();
         for (HashMap<String, Object> songPreviewMap:
@@ -190,6 +252,10 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<UserPreview> searchUserByUsername(String name, int startIndex, int limit) {
+        if (name == null) {
+            throw new IllegalArgumentException("name cannot be null");
+        }
+
         List<HashMap<String, Object>> userPreviewMaps = mongo.searchUserByUsername(name, startIndex, limit);
         List<UserPreview> userPreviews = new ArrayList<>();
         for (HashMap<String, Object> userPreviewMap:
@@ -201,6 +267,9 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<ArtistPreview> searchArtistsByUsername(String name, int startIndex, int limit) {
+        if (name == null) {
+            throw new IllegalArgumentException("name cannot be null");
+        }
         List<HashMap<String, Object>> artistPreviewMaps = mongo.searchArtistByUsername(name, startIndex, limit);
         List<ArtistPreview> artistPreviews = new ArrayList<>();
         for (HashMap<String, Object> artistPreviewMap:
@@ -212,6 +281,9 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<UserPreview> getFollowedUsers(String username, int startIndex, int count){
+        if (username == null) {
+            throw new IllegalArgumentException("username cannot be null");
+        }
         List<UserPreview> result = new  ArrayList<>();
         List<Map<String, Object>> users = neo4j.getFollowedUsers(username, startIndex, count);
         for (Map<String, Object> user:
@@ -223,6 +295,10 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<UserPreview> getFollowers(String username, int startIndex, int count){
+        if (username == null) {
+            throw new IllegalArgumentException("username cannot be null");
+        }
+
         List<UserPreview> result = new  ArrayList<>();
         List<Map<String, Object>> users = neo4j.getFollowers(username, startIndex, count);
         for (Map<String, Object> user:
@@ -234,6 +310,9 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<ArtistPreview> getFollowedArtists(String username, int startIndex, int count){
+        if (username == null) {
+            throw new IllegalArgumentException("username cannot be null");
+        }
         List<ArtistPreview> result = new  ArrayList<>();
         List<Map<String, Object>> artists = neo4j.getFollowedArtists(username, startIndex, count);
         for (Map<String, Object> artist:
@@ -245,6 +324,9 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<ArtistPreview> getFollowingArtists(String username, int startIndex, int count){
+        if (username == null) {
+            throw new IllegalArgumentException("username cannot be null");
+        }
         List<ArtistPreview> result = new  ArrayList<>();
         List<Map<String, Object>> artists = neo4j.getFollowingArtists(username, startIndex, count);
         for (Map<String, Object> artist:
@@ -256,6 +338,9 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<SongPreview> getLikedSongs(String username, int startIndex, int count){
+        if (username == null) {
+            throw new IllegalArgumentException("username cannot be null");
+        }
         List<SongPreview> result = new  ArrayList<>();
         List<Map<String, Object>> songs = neo4j.getLikedSongs(username, startIndex, count);
         for (Map<String, Object> song:
@@ -267,6 +352,9 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<SongPreview> getArtistSongs(String username, int startIndex, int count){
+        if (username == null) {
+            throw new IllegalArgumentException("username cannot be null");
+        }
         List<SongPreview> result = new  ArrayList<>();
         List<Map<String, Object>> songs = neo4j.getArtistSongs(username, startIndex, count);
         for (Map<String, Object> song:
@@ -278,6 +366,9 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<SongPreview> getFollowedUsersLikedSongs(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("user cannot be null");
+        }
         List<SongPreview> result = new  ArrayList<>();
         List<Map<String, Object>> songs = neo4j.getFollowedUsersLikedSongs(user.username);
         for (Map<String, Object> song:
@@ -289,11 +380,17 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public HashMap<String, String> getBestAndWorstAlbum(Artist artist){
+        if (artist == null) {
+            throw new IllegalArgumentException("artist cannot be null");
+        }
         return mongo.getBestAndWorstAlbum(artist.username);
     }
 
     @Override
     public List<ArtistPreview> getCoworkersOfFollowedArtists(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("user cannot be null");
+        }
         List<ArtistPreview> result = new  ArrayList<>();
         List<Map<String, Object>> artists = neo4j.getCoworkersOfFollowedArtists(user.username);
         for (Map<String, Object> artist:
@@ -342,6 +439,9 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<ArtistPreview> getArtistsFollowedByFriends(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("user cannot be null");
+        }
         List<ArtistPreview> result = new  ArrayList<>();
         List<Map<String, Object>> artists = neo4j.getArtistsFollowedByFriends(user.username);
         for (Map<String, Object> artist:
@@ -353,6 +453,9 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<UserPreview> getUsersFollowedByFriends(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("user cannot be null");
+        }
         List<UserPreview> result = new  ArrayList<>();
         List<Map<String, Object>> users = neo4j.getUsersFollowedByFriends(user.username);
         for (Map<String, Object> suggestion:
@@ -364,6 +467,9 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public Pair<List<UserPreview>, List<SongPreview>> getLikeMindedUsersAndTheSongsTheyLike(User user){
+        if (user == null) {
+            throw new IllegalArgumentException("user cannot be null");
+        }
         List<UserPreview> suggestedUsers = new  ArrayList<>();
         List<SongPreview> suggestedSongs = new  ArrayList<>();
         Map<String, List<Map<String, Object>>> suggestions = neo4j.getLikeMindedUsersAndTheSongsTheyLike(user.username);
@@ -381,6 +487,9 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<UserPreview> getTopFans(Artist artist){
+        if (artist == null) {
+            throw new IllegalArgumentException("artist cannot be null");
+        }
         List<UserPreview> result = new  ArrayList<>();
         List<Map<String, Object>> users = neo4j.getTopFans(artist.username);
         for (Map<String, Object> suggestion:
@@ -392,6 +501,9 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<ArtistPreview> getSimilarArtists(Artist artist){
+        if (artist == null) {
+            throw new IllegalArgumentException("artist cannot be null");
+        }
         List<ArtistPreview> result = new  ArrayList<>();
         List<Map<String, Object>> artists = neo4j.getSimilarArtists(artist.username);
         for (Map<String, Object> similarArtist:
@@ -403,6 +515,9 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<SongPreview> getPopularSongs(Artist artist) {
+        if (artist == null) {
+            throw new IllegalArgumentException("artist cannot be null");
+        }
         List<SongPreview> analyticResult = new ArrayList<>();
         List<Map<String, Object>> result = neo4j.getPopularSongs(artist.username);
         for (Map<String, Object> song:
@@ -414,69 +529,144 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean addFollow(User followed, User follower) {
+        if (follower == null) {
+            throw new IllegalArgumentException("follower cannot be null");
+        }
+        if (followed == null) {
+            throw new IllegalArgumentException("followed cannot be null");
+        }
         return neo4j.addFollow(followed.username, follower.username);
     }
 
     @Override
     public boolean checkFollow(User followed, User follower) {
+        if (follower == null) {
+            throw new IllegalArgumentException("follower cannot be null");
+        }
+        if (followed == null) {
+            throw new IllegalArgumentException("followed cannot be null");
+        }
         return neo4j.checkFollow(followed.username, follower.username);
     }
 
     @Override
     public boolean deleteFollow(User followed, User follower) {
+        if (follower == null) {
+            throw new IllegalArgumentException("follower cannot be null");
+        }
+        if (followed == null) {
+            throw new IllegalArgumentException("followed cannot be null");
+        }
         return neo4j.deleteFollow(followed.username, follower.username);
     }
 
     @Override
     public boolean addLike(User user, Song song) {
+        if (user == null) {
+            throw new IllegalArgumentException("user cannot be null");
+        }
+        if (song == null) {
+            throw new IllegalArgumentException("song cannot be null");
+        }
         return neo4j.addLike(user.username, song.id);
     }
 
     @Override
     public boolean checkLike(User user, Song song) {
+        if (user == null) {
+            throw new IllegalArgumentException("user cannot be null");
+        }
+        if (song == null) {
+            throw new IllegalArgumentException("song cannot be null");
+        }
         return neo4j.checkLike(user.username, song.id);
     }
 
     @Override
     public boolean deleteLike(User user, Song song) {
+        if (user == null) {
+            throw new IllegalArgumentException("user cannot be null");
+        }
+        if (song == null) {
+            throw new IllegalArgumentException("song cannot be null");
+        }
         return neo4j.deleteLike(user.username, song.id);
     }
 
     @Override
     public boolean checkIfUserReviewedSong(User user, Song song) {
+        if (user == null) {
+            throw new IllegalArgumentException("user cannot be null");
+        }
+        if (song == null) {
+            throw new IllegalArgumentException("song cannot be null");
+        }
         return mongo.checkIfUserReviewedSong(user.username, song.id);
     }
 
     @Override
     public boolean deleteReviews(String username) {
+        if (username == null) {
+            throw new IllegalArgumentException("username cannot be null");
+        }
         return mongo.deleteReviews(username);
     }
 
     @Override
     public int checkCredentials(String username, String password) {
+        if (username == null) {
+            throw new IllegalArgumentException("username cannot be null");
+        }
+        if (password == null) {
+            throw new IllegalArgumentException("password cannot be null");
+        }
+
         return mongo.checkCredentials(username, password);
     }
 
     @Override
     public boolean checkAdminCredentials(String username, String password) {
+        if (username == null) {
+            throw new IllegalArgumentException("username cannot be null");
+        }
+        if (password == null) {
+            throw new IllegalArgumentException("password cannot be null");
+        }
+
         return mongo.checkAdminCredentials(username, password);
     }
 
     @Override
-    public boolean addRequest(Request request) { return mongo.addRequest(request.username, request.requestedStageName); }
+    public boolean addRequest(Request request) {
+        if (request == null) {
+            throw new IllegalArgumentException("request cannot be null");
+        }
+        return mongo.addRequest(request.username, request.requestedStageName);
+    }
 
     @Override
     public boolean deleteRequest(String username){
+        if (username == null) {
+            throw new IllegalArgumentException("username cannot be null");
+        }
         return mongo.deleteRequest(username);
     }
 
     @Override
     public boolean deleteReport(String username){
+        if (username == null) {
+            throw new IllegalArgumentException("username cannot be null");
+        }
         return mongo.deleteReport(username);
     }
 
     @Override
-    public boolean deleteComment(String commentId){ return mongo.deleteComment(commentId); }
+    public boolean deleteComment(String commentId){
+        if (commentId == null) {
+            throw new IllegalArgumentException("commentId cannot be null");
+        }
+        return mongo.deleteComment(commentId);
+    }
 
     @Override
     public List<Report> getReports(){
@@ -490,11 +680,17 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public boolean reportReview(Review review) {
+        if (review == null) {
+            throw new IllegalArgumentException("review cannot be null");
+        }
         return mongo.reportReview(review.user, review.id, review.text, review.song);
     }
 
     @Override
     public boolean reportUser(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("user cannot be null");
+        }
         return mongo.reportUser(user.username);
     }
 
@@ -509,6 +705,9 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public User getUser(String username) {
+        if (username == null) {
+            throw new IllegalArgumentException("username cannot be null");
+        }
         Map<String, Object> userData = mongo.getUserData(username);
         if(userData != null){
             userData.putAll(neo4j.getUserData(username));
@@ -520,6 +719,9 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public Artist getArtist(String username) {
+        if (username == null) {
+            throw new IllegalArgumentException("username cannot be null");
+        }
         Map<String, Object> artistData = mongo.getArtistData(username);
         if(artistData != null){
             artistData.putAll(neo4j.getArtistData(username));
@@ -531,6 +733,9 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public Song getSong(String songID) {
+        if (songID == null) {
+            throw new IllegalArgumentException("songID cannot be null");
+        }
         Map<String, Object> songData = mongo.getSongData(songID);
         if(songData != null){
             songData.putAll(neo4j.getSongData(songID));
@@ -542,6 +747,9 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<Review> getReviews(String songID, int startIndex, int count) {
+        if (songID == null) {
+            throw new IllegalArgumentException("songID cannot be null");
+        }
         List<Review> toReturn = new ArrayList<>();
         List<Map<String, Object>> reviewsData = new ArrayList<>(mongo.getSongReviews(songID, startIndex, count));
         for (Map<String, Object> reviewData:
@@ -554,6 +762,9 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<Review> getReviewsByUsername(String username){
+        if (username == null) {
+            throw new IllegalArgumentException("username cannot be null");
+        }
         List<Review> res = new ArrayList<>();
         List<HashMap<String, Object>> reviewList = mongo.getReviewsByUsername(username);
 
@@ -565,6 +776,9 @@ class PersistenceImplementation implements Persistence {
 
     @Override
     public List<ArtistPreview> getArtistPreviews(List<String> usernames) {
+        if (usernames == null) {
+            throw new IllegalArgumentException("usernames cannot be null");
+        }
         List<ArtistPreview> artistPreviews = new ArrayList<>();
         List<Map<String, Object>> artists = mongo.getArtistsWithFields("username", usernames, Arrays.asList("username", "image"));
         for (Map<String, Object> artist:
