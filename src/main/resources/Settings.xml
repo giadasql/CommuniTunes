@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
 <Settings>
-    <MongoDB connectionString="mongodb://172.16.3.88:27020,172.16.3.89:27020,172.16.3.90:27020/?retryWrites=true&amp;w=majority&amp;wtimeout=10000"/>
+    <MongoDB connectionString="mongodb://172.16.3.88:27020,172.16.3.89:27020,172.16.3.90:27020/?retryWrites=true&amp;w=1&amp;readPreference=nearest&amp;wtimeout=10000"/>
     <Neo4j uri="bolt://172.16.3.90:7687" username="neo4j" password="root"/>
 </Settings>

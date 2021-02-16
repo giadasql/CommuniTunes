@@ -69,7 +69,7 @@ public class UserProfileController implements UIController {
         Image avatar;
         if(user.image != null){
             try{
-                avatar = new Image(user.image);
+                avatar = new Image(user.image, true);
                 avatar.errorProperty().addListener(new ChangeListener<Boolean>() {
                     @Override
                     public void changed(ObservableValue<? extends Boolean> observableValue, Boolean aBoolean, Boolean t1) {
@@ -79,7 +79,15 @@ public class UserProfileController implements UIController {
                         }
                     }
                 });
-                avatarCircle.setFill(new ImagePattern(avatar));
+                Image finalAvatar = avatar;
+                avatar.progressProperty().addListener(new ChangeListener<Number>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number progress) {
+                        if ((Double) progress == 1.0 && !finalAvatar.isError()) {
+                            avatarCircle.setFill(new ImagePattern(finalAvatar));
+                        }
+                    }
+                });
             }
             catch(Exception exc) {
                 avatar = new Image(this.getClass().getResourceAsStream("/ui/img/user_default.png"));

@@ -134,6 +134,10 @@ public class SongController implements UIController {
                     songImg.setFill(new ImagePattern(img));
                 }
             }
+            else{
+                Image img = new Image(this.getClass().getResourceAsStream("/ui/img/song_default.png"));
+                songImg.setFill(new ImagePattern(img));
+            }
 
             likesNumber.setText(String.valueOf(song.likes));
 
