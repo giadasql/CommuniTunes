@@ -6,6 +6,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReader;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceInconsistencyException;
+import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceLayerUnreachableException;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import java.util.*;
@@ -20,7 +21,7 @@ class PersistenceImplementation implements Persistence {
     private Neo4jDriver neo4j;
 
 
-    public PersistenceImplementation(ConfigReader settingsReader) {
+    public PersistenceImplementation(ConfigReader settingsReader) throws PersistenceLayerUnreachableException {
         this.reader = settingsReader;
         neo4jInit();
         mongoInit();
@@ -33,26 +34,26 @@ class PersistenceImplementation implements Persistence {
         neo4j = new Neo4jDriver(neo4jUri, neo4jUser, neo4jPsw);
     }
 
-    private void mongoInit(){
+    private void mongoInit() throws PersistenceLayerUnreachableException {
         String connectionString = reader.getStringConfigValue("MongoDB", "connectionString");
         mongo = new MongoDriver(connectionString);
     }
 
-    public boolean checkIfUsernameExists(String username){
+    public boolean checkIfUsernameExists(String username) throws IllegalArgumentException {
         if (username == null) {
             throw new IllegalArgumentException("username cannot be null");
         }
         return mongo.checkIfUsernameExists(username) || neo4j.checkIfUsernameExists(username);
     }
 
-    public boolean checkIfEmailExists(String email){
+    public boolean checkIfEmailExists(String email) throws IllegalArgumentException {
         if (email == null) {
             throw new IllegalArgumentException("email cannot be null");
         }
         return mongo.checkIfEmailExists(email);
     }
 
-    public boolean checkIfStageNameExists(String stageName)
+    public boolean checkIfStageNameExists(String stageName) throws IllegalArgumentException
     {
         if (stageName == null) {
             throw new IllegalArgumentException("stageName cannot be null");
@@ -60,14 +61,14 @@ class PersistenceImplementation implements Persistence {
         return mongo.checkIfStageNameExists(stageName);
     }
 
-    public boolean checkIfRequestExists(String username) {
+    public boolean checkIfRequestExists(String username) throws IllegalArgumentException {
         if (username == null) {
             throw new IllegalArgumentException("username cannot be null");
         }
         return mongo.checkIfRequestExists(username);
     }
 
-    public boolean addNewUser(User newUser) throws PersistenceInconsistencyException {
+    public boolean addNewUser(User newUser) throws PersistenceInconsistencyException, IllegalArgumentException {
         if (newUser == null) {
             throw new IllegalArgumentException("newUser cannot be null");
         }
@@ -92,7 +93,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean deleteUser(String username) {
+    public boolean deleteUser(String username) throws IllegalArgumentException{
         if (username == null) {
             throw new IllegalArgumentException("username cannot be null");
         }
@@ -102,7 +103,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean updateUser(User newUser) {
+    public boolean updateUser(User newUser) throws IllegalArgumentException {
         if (newUser == null) {
             throw new IllegalArgumentException("newUser cannot be null");
         }
@@ -110,7 +111,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean addArtist(Artist newArtist, String stageName) {
+    public boolean addArtist(Artist newArtist, String stageName) throws IllegalArgumentException {
         if (newArtist == null) {
             throw new IllegalArgumentException("newArtist cannot be null");
         }
@@ -122,7 +123,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean updateArtist(Artist newArtist) {
+    public boolean updateArtist(Artist newArtist) throws IllegalArgumentException {
         if (newArtist == null) {
             throw new IllegalArgumentException("newArtist cannot be null");
         }
@@ -131,7 +132,7 @@ class PersistenceImplementation implements Persistence {
 
 
     @Override
-    public boolean addSong(Song newSong) throws PersistenceInconsistencyException {
+    public boolean addSong(Song newSong) throws PersistenceInconsistencyException, IllegalArgumentException {
         if (newSong == null) {
             throw new IllegalArgumentException("newSong cannot be null");
         }
@@ -157,7 +158,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean deleteSong(Song song) {
+    public boolean deleteSong(Song song) throws IllegalArgumentException {
         if (song == null) {
             throw new IllegalArgumentException("song cannot be null");
         }
@@ -165,7 +166,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean deleteSong(String songID) {
+    public boolean deleteSong(String songID) throws IllegalArgumentException {
         if (songID == null) {
             throw new IllegalArgumentException("songID cannot be null");
         }
@@ -175,7 +176,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean editSong(Song newSong) {
+    public boolean editSong(Song newSong) throws IllegalArgumentException {
         if (newSong == null) {
             throw new IllegalArgumentException("newSong cannot be null");
         }
@@ -183,7 +184,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean addReview(Review review) {
+    public boolean addReview(Review review) throws IllegalArgumentException {
         if (review == null) {
             throw new IllegalArgumentException("review cannot be null");
         }
@@ -196,7 +197,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean deleteReview(Review review) {
+    public boolean deleteReview(Review review) throws IllegalArgumentException  {
         if (review == null) {
             throw new IllegalArgumentException("review cannot be null");
         }
@@ -204,7 +205,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean deleteReview(String reviewID, String song) {
+    public boolean deleteReview(String reviewID, String song) throws IllegalArgumentException  {
         if (reviewID == null) {
             throw new IllegalArgumentException("reviewID cannot be null");
         }
@@ -215,7 +216,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean userIsArtist(String username) {
+    public boolean userIsArtist(String username) throws IllegalArgumentException  {
         if (username == null) {
             throw new IllegalArgumentException("username cannot be null");
         }
@@ -223,7 +224,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<ArtistPreview> searchArtistByName(String name, int startIndex, int limit) {
+    public List<ArtistPreview> searchArtistByName(String name, int startIndex, int limit) throws IllegalArgumentException  {
         if (name == null) {
             throw new IllegalArgumentException("name cannot be null");
         }
@@ -237,7 +238,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<SongPreview> searchSongByTitle(String title, int startIndex, int limit) {
+    public List<SongPreview> searchSongByTitle(String title, int startIndex, int limit) throws IllegalArgumentException  {
         if (title == null) {
             throw new IllegalArgumentException("title cannot be null");
         }
@@ -251,7 +252,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<UserPreview> searchUserByUsername(String name, int startIndex, int limit) {
+    public List<UserPreview> searchUserByUsername(String name, int startIndex, int limit) throws IllegalArgumentException  {
         if (name == null) {
             throw new IllegalArgumentException("name cannot be null");
         }
@@ -266,7 +267,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<ArtistPreview> searchArtistsByUsername(String name, int startIndex, int limit) {
+    public List<ArtistPreview> searchArtistsByUsername(String name, int startIndex, int limit) throws IllegalArgumentException  {
         if (name == null) {
             throw new IllegalArgumentException("name cannot be null");
         }
@@ -280,7 +281,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<UserPreview> getFollowedUsers(String username, int startIndex, int count){
+    public List<UserPreview> getFollowedUsers(String username, int startIndex, int count) throws IllegalArgumentException {
         if (username == null) {
             throw new IllegalArgumentException("username cannot be null");
         }
@@ -294,7 +295,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<UserPreview> getFollowers(String username, int startIndex, int count){
+    public List<UserPreview> getFollowers(String username, int startIndex, int count) throws IllegalArgumentException  {
         if (username == null) {
             throw new IllegalArgumentException("username cannot be null");
         }
@@ -309,7 +310,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<ArtistPreview> getFollowedArtists(String username, int startIndex, int count){
+    public List<ArtistPreview> getFollowedArtists(String username, int startIndex, int count) throws IllegalArgumentException {
         if (username == null) {
             throw new IllegalArgumentException("username cannot be null");
         }
@@ -323,7 +324,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<ArtistPreview> getFollowingArtists(String username, int startIndex, int count){
+    public List<ArtistPreview> getFollowingArtists(String username, int startIndex, int count) throws IllegalArgumentException {
         if (username == null) {
             throw new IllegalArgumentException("username cannot be null");
         }
@@ -337,7 +338,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<SongPreview> getLikedSongs(String username, int startIndex, int count){
+    public List<SongPreview> getLikedSongs(String username, int startIndex, int count) throws IllegalArgumentException {
         if (username == null) {
             throw new IllegalArgumentException("username cannot be null");
         }
@@ -351,7 +352,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<SongPreview> getArtistSongs(String username, int startIndex, int count){
+    public List<SongPreview> getArtistSongs(String username, int startIndex, int count) throws IllegalArgumentException {
         if (username == null) {
             throw new IllegalArgumentException("username cannot be null");
         }
@@ -365,7 +366,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<SongPreview> getFollowedUsersLikedSongs(User user) {
+    public List<SongPreview> getFollowedUsersLikedSongs(User user) throws IllegalArgumentException  {
         if (user == null) {
             throw new IllegalArgumentException("user cannot be null");
         }
@@ -379,7 +380,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public HashMap<String, String> getBestAndWorstAlbum(Artist artist){
+    public HashMap<String, String> getBestAndWorstAlbum(Artist artist) throws IllegalArgumentException {
         if (artist == null) {
             throw new IllegalArgumentException("artist cannot be null");
         }
@@ -387,7 +388,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<ArtistPreview> getCoworkersOfFollowedArtists(User user) {
+    public List<ArtistPreview> getCoworkersOfFollowedArtists(User user) throws IllegalArgumentException  {
         if (user == null) {
             throw new IllegalArgumentException("user cannot be null");
         }
@@ -438,7 +439,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<ArtistPreview> getArtistsFollowedByFriends(User user) {
+    public List<ArtistPreview> getArtistsFollowedByFriends(User user) throws IllegalArgumentException  {
         if (user == null) {
             throw new IllegalArgumentException("user cannot be null");
         }
@@ -452,7 +453,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<UserPreview> getUsersFollowedByFriends(User user) {
+    public List<UserPreview> getUsersFollowedByFriends(User user) throws IllegalArgumentException  {
         if (user == null) {
             throw new IllegalArgumentException("user cannot be null");
         }
@@ -466,7 +467,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public Pair<List<UserPreview>, List<SongPreview>> getLikeMindedUsersAndTheSongsTheyLike(User user){
+    public Pair<List<UserPreview>, List<SongPreview>> getLikeMindedUsersAndTheSongsTheyLike(User user) throws IllegalArgumentException {
         if (user == null) {
             throw new IllegalArgumentException("user cannot be null");
         }
@@ -486,7 +487,7 @@ class PersistenceImplementation implements Persistence {
 
 
     @Override
-    public List<UserPreview> getTopFans(Artist artist){
+    public List<UserPreview> getTopFans(Artist artist) throws IllegalArgumentException {
         if (artist == null) {
             throw new IllegalArgumentException("artist cannot be null");
         }
@@ -500,7 +501,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<ArtistPreview> getSimilarArtists(Artist artist){
+    public List<ArtistPreview> getSimilarArtists(Artist artist) throws IllegalArgumentException {
         if (artist == null) {
             throw new IllegalArgumentException("artist cannot be null");
         }
@@ -514,7 +515,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<SongPreview> getPopularSongs(Artist artist) {
+    public List<SongPreview> getPopularSongs(Artist artist) throws IllegalArgumentException  {
         if (artist == null) {
             throw new IllegalArgumentException("artist cannot be null");
         }
@@ -528,7 +529,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean addFollow(User followed, User follower) {
+    public boolean addFollow(User followed, User follower) throws IllegalArgumentException  {
         if (follower == null) {
             throw new IllegalArgumentException("follower cannot be null");
         }
@@ -539,7 +540,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean checkFollow(User followed, User follower) {
+    public boolean checkFollow(User followed, User follower) throws IllegalArgumentException  {
         if (follower == null) {
             throw new IllegalArgumentException("follower cannot be null");
         }
@@ -550,7 +551,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean deleteFollow(User followed, User follower) {
+    public boolean deleteFollow(User followed, User follower) throws IllegalArgumentException  {
         if (follower == null) {
             throw new IllegalArgumentException("follower cannot be null");
         }
@@ -561,7 +562,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean addLike(User user, Song song) {
+    public boolean addLike(User user, Song song) throws IllegalArgumentException  {
         if (user == null) {
             throw new IllegalArgumentException("user cannot be null");
         }
@@ -572,7 +573,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean checkLike(User user, Song song) {
+    public boolean checkLike(User user, Song song) throws IllegalArgumentException {
         if (user == null) {
             throw new IllegalArgumentException("user cannot be null");
         }
@@ -583,7 +584,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean deleteLike(User user, Song song) {
+    public boolean deleteLike(User user, Song song) throws IllegalArgumentException  {
         if (user == null) {
             throw new IllegalArgumentException("user cannot be null");
         }
@@ -594,7 +595,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean checkIfUserReviewedSong(User user, Song song) {
+    public boolean checkIfUserReviewedSong(User user, Song song) throws IllegalArgumentException  {
         if (user == null) {
             throw new IllegalArgumentException("user cannot be null");
         }
@@ -605,7 +606,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean deleteReviews(String username) {
+    public boolean deleteReviews(String username) throws IllegalArgumentException  {
         if (username == null) {
             throw new IllegalArgumentException("username cannot be null");
         }
@@ -613,7 +614,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public int checkCredentials(String username, String password) {
+    public int checkCredentials(String username, String password) throws IllegalArgumentException  {
         if (username == null) {
             throw new IllegalArgumentException("username cannot be null");
         }
@@ -625,7 +626,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean checkAdminCredentials(String username, String password) {
+    public boolean checkAdminCredentials(String username, String password) throws IllegalArgumentException  {
         if (username == null) {
             throw new IllegalArgumentException("username cannot be null");
         }
@@ -637,7 +638,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean addRequest(Request request) {
+    public boolean addRequest(Request request) throws IllegalArgumentException  {
         if (request == null) {
             throw new IllegalArgumentException("request cannot be null");
         }
@@ -645,7 +646,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean deleteRequest(String username){
+    public boolean deleteRequest(String username) throws IllegalArgumentException {
         if (username == null) {
             throw new IllegalArgumentException("username cannot be null");
         }
@@ -653,7 +654,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean deleteReport(String username){
+    public boolean deleteReport(String username) throws IllegalArgumentException {
         if (username == null) {
             throw new IllegalArgumentException("username cannot be null");
         }
@@ -661,7 +662,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean deleteComment(String commentId){
+    public boolean deleteComment(String commentId) throws IllegalArgumentException {
         if (commentId == null) {
             throw new IllegalArgumentException("commentId cannot be null");
         }
@@ -679,7 +680,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean reportReview(Review review) {
+    public boolean reportReview(Review review) throws IllegalArgumentException  {
         if (review == null) {
             throw new IllegalArgumentException("review cannot be null");
         }
@@ -687,7 +688,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public boolean reportUser(User user) {
+    public boolean reportUser(User user) throws IllegalArgumentException  {
         if (user == null) {
             throw new IllegalArgumentException("user cannot be null");
         }
@@ -704,7 +705,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public User getUser(String username) {
+    public User getUser(String username) throws IllegalArgumentException  {
         if (username == null) {
             throw new IllegalArgumentException("username cannot be null");
         }
@@ -718,7 +719,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public Artist getArtist(String username) {
+    public Artist getArtist(String username) throws IllegalArgumentException  {
         if (username == null) {
             throw new IllegalArgumentException("username cannot be null");
         }
@@ -732,7 +733,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public Song getSong(String songID) {
+    public Song getSong(String songID) throws IllegalArgumentException  {
         if (songID == null) {
             throw new IllegalArgumentException("songID cannot be null");
         }
@@ -746,7 +747,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<Review> getReviews(String songID, int startIndex, int count) {
+    public List<Review> getReviews(String songID, int startIndex, int count) throws IllegalArgumentException  {
         if (songID == null) {
             throw new IllegalArgumentException("songID cannot be null");
         }
@@ -761,7 +762,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<Review> getReviewsByUsername(String username){
+    public List<Review> getReviewsByUsername(String username) throws IllegalArgumentException {
         if (username == null) {
             throw new IllegalArgumentException("username cannot be null");
         }
@@ -775,7 +776,7 @@ class PersistenceImplementation implements Persistence {
     }
 
     @Override
-    public List<ArtistPreview> getArtistPreviews(List<String> usernames) {
+    public List<ArtistPreview> getArtistPreviews(List<String> usernames) throws IllegalArgumentException  {
         if (usernames == null) {
             throw new IllegalArgumentException("usernames cannot be null");
         }
@@ -788,7 +789,7 @@ class PersistenceImplementation implements Persistence {
         return artistPreviews;
     }
 
-    private User buildUserFromMap(Map<String, Object> userData){
+    private User buildUserFromMap(Map<String, Object> userData) throws IllegalArgumentException {
         String email, password, country, image, firstName, lastName, username, id;
         String birthday = null;
         ArrayList<ArtistPreview> artistFollowers = new ArrayList<>();
@@ -846,7 +847,7 @@ class PersistenceImplementation implements Persistence {
         return new User(id, email, username, password, country, image, birthday, firstName, lastName, likes, followed, artistFollowed, followers, artistFollowers);
     }
 
-    private Artist buildArtistFromMap( Map<String, Object> artistData){
+    private Artist buildArtistFromMap( Map<String, Object> artistData) throws IllegalArgumentException {
         String email, password, country, image, firstName, lastName, username, id, stageName, biography, yearsActive;
         String birthday;
         ArrayList<ArtistPreview> artistFollowers = new ArrayList<>();
@@ -940,7 +941,7 @@ class PersistenceImplementation implements Persistence {
         return new Artist(id, email, username, password, country, image, birthday, firstName, lastName, likes, followed, artistFollowed, followers, artistFollowers, stageName, yearsActive, biography, links, songs);
     }
 
-    private Song buildSongFromMap( Map<String, Object> songData){
+    private Song buildSongFromMap( Map<String, Object> songData) throws IllegalArgumentException {
         String title, image, album, duration, id;
         int likes;
         List<String> genres = new ArrayList<>();
@@ -1001,29 +1002,32 @@ class PersistenceImplementation implements Persistence {
         return new Song(id, artist, duration, title, image, album, loadedReviews, links, genres, featurings, likes, avgRating);
     }
 
-    private Review buildReviewFromMap( Map<String, Object> reviewData){
-        Object rating = reviewData.get("rating"),
-                text = reviewData.get("text"),
-                id = reviewData.get("id"),
-                user = reviewData.get("user"),
-                songID = reviewData.get("songID");
+    private Review buildReviewFromMap( Map<String, Object> reviewData) throws IllegalArgumentException {
+        String text, id, user, songID;
+        int rating;
+
+        text = (reviewData.get("text") instanceof String ? (String)reviewData.get("text") : null);
+        id = (reviewData.get("id") instanceof String ? (String)reviewData.get("id") : null);
+        user = (reviewData.get("user") instanceof String ? (String)reviewData.get("user") : null);
+        songID = (reviewData.get("songID") instanceof String ? (String)reviewData.get("songID") : null);
+        rating = (reviewData.get("rating") instanceof Integer ? (Integer) reviewData.get("rating") : -1);
 
         return new Review(id, user, rating, text, songID);
     }
 
-    private ArtistPreview buildArtistPreviewFromMap(Map<String, Object> artistData){
+    private ArtistPreview buildArtistPreviewFromMap(Map<String, Object> artistData) throws IllegalArgumentException {
         String username = (artistData.get("username") instanceof String ? (String)artistData.get("username") : null);
         String image = (artistData.get("image") instanceof String ? (String)artistData.get("image") : null);
         return new ArtistPreview(username, image);
     }
 
-    private UserPreview buildUserPreviewFromMap(Map<String, Object> userData){
+    private UserPreview buildUserPreviewFromMap(Map<String, Object> userData) throws IllegalArgumentException {
         String username = (userData.get("username") instanceof String ? (String)userData.get("username") : null);
         String image = (userData.get("image") instanceof String ? (String)userData.get("image") : null);
         return new UserPreview(username, image);
     }
 
-    private SongPreview buildSongPreviewFromMap(Map<String, Object> songData){
+    private SongPreview buildSongPreviewFromMap(Map<String, Object> songData) throws IllegalArgumentException {
         String id = (songData.get("_id") instanceof String ? (String)songData.get("_id") : null);
         String image = (songData.get("image") instanceof String ? (String)songData.get("image") : null);
         String artistUsername = (songData.get("artist") instanceof String ? (String)songData.get("artist") : null);

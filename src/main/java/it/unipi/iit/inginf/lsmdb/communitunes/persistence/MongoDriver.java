@@ -8,6 +8,7 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.InsertOneResult;
 import com.mongodb.client.result.UpdateResult;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.*;
+import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceLayerUnreachableException;
 import org.bson.*;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -32,7 +33,7 @@ class MongoDriver implements Closeable {
     private final MongoCollection<Document> songsCollection;
     private final MongoCollection<Document> reportsCollection;
 
-    MongoDriver(String connectionString){
+    MongoDriver(String connectionString) throws PersistenceLayerUnreachableException {
         MongoDatabase database;
         if(connectionString != null){
             mongoClient = MongoClients.create(connectionString);
@@ -42,11 +43,11 @@ class MongoDriver implements Closeable {
             reportsCollection = database.getCollection("reports");
         }
         else{
-            // TODO: raise exception
             mongoClient = null;
             usersCollection = null;
             songsCollection = null;
             reportsCollection = null;
+            throw new PersistenceLayerUnreachableException();
         }
     }
 
@@ -65,7 +66,6 @@ class MongoDriver implements Closeable {
         user.append("email", email);
         user.append("password", psw);
         InsertOneResult insertOneResult = usersCollection.insertOne(user);
-        // TODO: probabilmente non serve ritornare l'ID
         return insertOneResult.getInsertedId() == null ? null : insertOneResult.getInsertedId().asObjectId().getValue().toString();
     }
 
@@ -103,7 +103,7 @@ class MongoDriver implements Closeable {
         return updateRes.getModifiedCount() != 0;
     }
 
-    // TODO: check if a field is null. If it is, remove it from the document
+
     public boolean updateArtist(String id, String password, String email, String country, String birthday, String firstName, String lastName, String image, String activity, String biography, String stageName, List<Link> links){
         Document query = new Document();
         query.append("_id", new ObjectId(id));
@@ -167,7 +167,6 @@ class MongoDriver implements Closeable {
         return updateRes.wasAcknowledged();
     }
 
-    // TODO: check if a field is null. If it is, remove it from the document
     public boolean updateSong(String id, String image, String album, List<String> genres, List<Link> links){
         Document query = new Document();
         query.append("_id", new ObjectId(id));
@@ -589,7 +588,6 @@ class MongoDriver implements Closeable {
         user.append("username", username);
         user.append("requestedStageName", stageName);
         InsertOneResult insertOneResult = reportsCollection.insertOne(user);
-        // TODO: probabilmente non serve ritornare l'ID
         return insertOneResult.getInsertedId() != null;
     }
 

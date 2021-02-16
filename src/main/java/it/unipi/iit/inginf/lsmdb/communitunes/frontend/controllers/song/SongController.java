@@ -2,6 +2,7 @@ package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.song;
 
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.*;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.Main;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.components.ReviewVBox;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
@@ -26,6 +27,8 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.stream.Collectors;
@@ -258,8 +261,8 @@ public class SongController implements UIController {
         try {
             manager.setContent(Path.REVIEWS);
         } catch (IOException e) {
-            // TODO: log
-            e.printStackTrace();
+            Logger logger = LoggerFactory.getLogger(SongController.class);
+            logger.error("An exception occurred: ", e);
         }
     }
 

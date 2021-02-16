@@ -2,6 +2,7 @@ package it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.song;
 
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Link;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Song;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.Main;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.Path;
@@ -13,6 +14,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -99,8 +102,8 @@ public class EditSongController implements UIController {
             try {
                 manager.setContent(Path.ARTIST_PROFILE);
             } catch (IOException e) {
-                // TODO: log
-                e.printStackTrace();
+                Logger logger = LoggerFactory.getLogger(EditSongController.class);
+                logger.error("An exception occurred: ", e);
             }
         }
     }

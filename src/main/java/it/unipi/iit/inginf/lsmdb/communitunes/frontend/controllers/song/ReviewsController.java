@@ -14,6 +14,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -61,8 +63,8 @@ public class ReviewsController implements UIController {
         try {
             manager.setContent(Path.SONG_PAGE);
         } catch (IOException e) {
-            // TODO: log
-            e.printStackTrace();
+            Logger logger = LoggerFactory.getLogger(SongController.class);
+            logger.error("An exception occurred: ", e);
         }
     }
 

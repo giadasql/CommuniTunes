@@ -7,27 +7,18 @@ import it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.admin.HomePag
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.general.LayoutController;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.UIController;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
-import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
-import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReader;
-import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderFactory;
-import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderType;
-import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.ConfigurationFileNotFoundException;
-import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.InvalidConfigurationException;
 import javafx.application.HostServices;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.neo4j.driver.Driver;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.io.IOException;
-import java.io.InputStream;
 
 public class LayoutManager {
 
     private Stage primary;
-    private LayoutController layoutController;
+    private final LayoutController layoutController;
     private boolean layoutVisible = false;
     private Scene layoutScene = null;
     public final ApplicationContext context = new ApplicationContext();
@@ -35,39 +26,19 @@ public class LayoutManager {
     private HomePageAdminController adminController;
 
     LayoutManager() {
-        InputStream settingsFileStream = this.getClass().getClassLoader().getResourceAsStream("Settings.xml");
-        ConfigReader reader = null;
-        try{
-            reader = ConfigReaderFactory.CreateConfigReader(ConfigReaderType.Xml, settingsFileStream);
-            dbManager = PersistenceFactory.CreatePersistence(reader);
-        }
-        catch (ParserConfigurationException | IOException | SAXException | InvalidConfigurationException e) {
-            e.printStackTrace();
-            // TODO: log
-            return;
-        }
-        finally {
-            if(settingsFileStream != null){
-                try {
-                    settingsFileStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    // TODO: log
-                }
-            }
-        }
         FXMLLoader layoutLoader = getLoader(Path.GENERAL_LAYOUT);
         try {
             layoutScene = new Scene(layoutLoader.load(), 900, 600);
         } catch (IOException e) {
-            // TODO: log
-            e.printStackTrace();
+            Logger logger = LoggerFactory.getLogger(LayoutManager.class);
+            logger.error("An exception occurred: ", e);
         }
         layoutController = layoutLoader.getController();
     }
 
-    public void startApp(Stage primaryStage, HostServices hostServices) throws IOException {
+    public void startApp(Stage primaryStage, HostServices hostServices, Persistence dbManager) throws IOException {
         primary = primaryStage;
+        this.dbManager = dbManager;
         primaryStage.setTitle("Communitunes");
         context.hostServices = hostServices;
         showAuthenticationPage(Path.LOGIN);
@@ -143,8 +114,8 @@ public class LayoutManager {
         try {
             setContent(Path.USER_PROFILE);
         } catch (IOException e) {
-            // TODO: log
-            e.printStackTrace();
+            Logger logger = LoggerFactory.getLogger(LayoutManager.class);
+            logger.error("An exception occurred: ", e);
         }
     }
 
@@ -154,8 +125,8 @@ public class LayoutManager {
         try {
             setContent(Path.ARTIST_PROFILE);
         } catch (IOException e) {
-            // TODO: log
-            e.printStackTrace();
+            Logger logger = LoggerFactory.getLogger(LayoutManager.class);
+            logger.error("An exception occurred: ", e);
         }
     }
 
@@ -164,8 +135,8 @@ public class LayoutManager {
         try {
             setContent(Path.ARTIST_PROFILE);
         } catch (IOException e) {
-            // TODO: log
-            e.printStackTrace();
+            Logger logger = LoggerFactory.getLogger(LayoutManager.class);
+            logger.error("An exception occurred: ", e);
         }
     }
 
@@ -175,8 +146,8 @@ public class LayoutManager {
         try {
             setContent(Path.SONG_PAGE);
         } catch (IOException e) {
-            // TODO: log
-            e.printStackTrace();
+            Logger logger = LoggerFactory.getLogger(LayoutManager.class);
+            logger.error("An exception occurred: ", e);
         }
     }
 }

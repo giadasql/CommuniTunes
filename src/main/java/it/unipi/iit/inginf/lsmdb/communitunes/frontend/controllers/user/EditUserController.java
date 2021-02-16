@@ -100,6 +100,7 @@ public class EditUserController implements UIController {
         user = manager.context.getAuthenticatedUser();
         dbManager = manager.dbManager;
         authManager = AuthenticationFactory.CreateAuthenticationManager();
+        setDefaultValues();
     }
 
     public void closeEditWindow(MouseEvent mouseEvent) throws IOException {

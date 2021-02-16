@@ -5,6 +5,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReader;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderType;
+import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceLayerUnreachableException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,7 @@ public class PersistenceImplementationTest {
             "</Settings>";
 
     @BeforeEach
-    void setUp() throws IOException, ParserConfigurationException, SAXException {
+    void setUp() throws IOException, ParserConfigurationException, SAXException, PersistenceLayerUnreachableException {
         ConfigReader reader = ConfigReaderFactory.createConfigReaderFromString(ConfigReaderType.Xml, config);
         persistenceImplementation = new PersistenceImplementation(reader);
     }

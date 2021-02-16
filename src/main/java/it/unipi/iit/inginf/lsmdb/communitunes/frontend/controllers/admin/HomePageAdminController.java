@@ -27,6 +27,8 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.IOException;
@@ -136,8 +138,8 @@ public class HomePageAdminController implements UIController {
             otherStage.setScene(new Scene(node, 900, 537));
             otherStage.show();
         } catch (IOException e) {
-            // TODO: log
-            e.printStackTrace();
+            Logger logger = LoggerFactory.getLogger(HomePageAdminController.class);
+            logger.error("An exception occurred: ", e);
         }
     }
 
@@ -207,6 +209,8 @@ public class HomePageAdminController implements UIController {
             dbManager.addArtist(new Artist(username, null, null), stageName);
         }
         catch(PersistenceInconsistencyException e){
+            Logger logger = LoggerFactory.getLogger(HomePageAdminController.class);
+            logger.error("An exception occurred: ", e);
             return false;
         }
         return true;
@@ -238,8 +242,8 @@ public class HomePageAdminController implements UIController {
         try {
             manager.showAuthenticationPage(Path.LOGIN);
         } catch (IOException e) {
-            // TODO: log
-            e.printStackTrace();
+            Logger logger = LoggerFactory.getLogger(HomePageAdminController.class);
+            logger.error("An exception occurred: ", e);
         }
     }
 }
