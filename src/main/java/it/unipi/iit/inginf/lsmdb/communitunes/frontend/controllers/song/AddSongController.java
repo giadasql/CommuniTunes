@@ -109,7 +109,7 @@ public class AddSongController implements UIController {
     @Override
     public void init(){
         manager = LayoutManagerFactory.getManager();
-        dbManager = PersistenceFactory.CreatePersistence();
+        dbManager = manager.dbManager;
     }
 
     public void closeAddWindow(MouseEvent mouseEvent) throws IOException {

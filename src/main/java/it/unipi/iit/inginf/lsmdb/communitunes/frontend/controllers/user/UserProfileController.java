@@ -64,7 +64,7 @@ public class UserProfileController implements UIController {
     public void init() {
         this.manager = LayoutManagerFactory.getManager();
         user = manager.context.getFocusedUser();
-        dbManager = PersistenceFactory.CreatePersistence();
+        dbManager = manager.dbManager;
         username.setText(user.username);
         Image avatar;
         if(user.image != null){

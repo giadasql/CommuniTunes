@@ -24,7 +24,7 @@ public class HomePageController implements UIController {
     @Override
     public void init() {
         this.manager = LayoutManagerFactory.getManager();
-        dbManager = PersistenceFactory.CreatePersistence();
+        dbManager = manager.dbManager;
         Map<String, List<SongPreview>> songsList = dbManager.getBestSongsForEachGenre();
         Map<String, ArtistPreview> artistsList = dbManager.getRepresentativeArtist();
         System.out.println("ok");

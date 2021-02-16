@@ -39,7 +39,7 @@ public class ArtistAnalytics implements UIController {
 
     public void init() {
         this.manager = LayoutManagerFactory.getManager();
-        dbManager = PersistenceFactory.CreatePersistence();
+        dbManager = manager.dbManager;
         artist = manager.context.getAuthenticatedArtist();
         List<ArtistPreview> similarArtistsList = dbManager.getSimilarArtists(artist);
         List<UserPreview> topFansList = dbManager.getTopFans(artist);

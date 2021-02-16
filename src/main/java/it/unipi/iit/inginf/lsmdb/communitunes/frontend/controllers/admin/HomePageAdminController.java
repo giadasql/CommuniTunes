@@ -53,8 +53,7 @@ public class HomePageAdminController implements UIController {
     private static final Font FONT = new Font("Book Antiqua", 14.0);
 
     public void init(){
-        dbManager = PersistenceFactory.CreatePersistence();
-
+        dbManager = LayoutManagerFactory.getManager().dbManager;
         List<Report> reportList = dbManager.getReports();
         List<Request> requestList = dbManager.getRequests();
         SearchBar bar = new SearchBar();
@@ -181,9 +180,6 @@ public class HomePageAdminController implements UIController {
     private void userDeleted(UserDeletedEvent event) {
         reportBox.getChildren().remove(event.view);
         if(showingCommentsOf != null && showingCommentsOf.equals(event.username)){
-            searchBox.getChildren().clear();
-        }
-        else if(event.username.equals(searchText.getText()) && searchMenu.getValue().toString().equals("User")){
             searchBox.getChildren().clear();
         }
     }

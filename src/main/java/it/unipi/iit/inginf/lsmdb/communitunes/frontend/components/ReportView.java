@@ -1,7 +1,7 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.frontend.components;
 
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.Report;
-import it.unipi.iit.inginf.lsmdb.communitunes.entities.Review;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.*;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
@@ -62,7 +62,7 @@ public class ReportView extends VBox {
     }
 
     private void reportDeleted(MouseEvent mouseEvent) {
-        if(PersistenceFactory.CreatePersistence().deleteReport(report.reportedUser)){
+        if(LayoutManagerFactory.getManager().dbManager.deleteReport(report.reportedUser)){
             ReportDeletedEvent reportDeletedEvent = new ReportDeletedEvent(REPORT_DELETED_EVENT, report, this);
             fireEvent(reportDeletedEvent);
         }
@@ -75,7 +75,7 @@ public class ReportView extends VBox {
     public static final EventType<SeeUserProfileClicked> SEE_USER_PROFILE_CLICKED = new EventType<>(REPORT_EVENT, "SEE_USER_PROFILE_CLICKED");
 
     private void deleteUser(MouseEvent event){
-        Persistence dbManager = PersistenceFactory.CreatePersistence();
+        Persistence dbManager = LayoutManagerFactory.getManager().dbManager;
         if(dbManager.deleteUser(report.reportedUser)){
             dbManager.deleteReport(report.reportedUser);
             dbManager.deleteRequest(report.reportedUser);

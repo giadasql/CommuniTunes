@@ -80,7 +80,7 @@ public class ArtistController implements UIController {
         if(artist == null){
             return;
         }
-        dbManager = PersistenceFactory.CreatePersistence();
+        dbManager = manager.dbManager;
         username.setText(artist.username);
         Image avatar;
         if(artist.image != null){

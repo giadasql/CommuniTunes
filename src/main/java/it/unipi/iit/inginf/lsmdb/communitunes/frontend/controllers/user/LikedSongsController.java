@@ -42,7 +42,7 @@ public class LikedSongsController implements UIController {
     public void init(){
         manager = LayoutManagerFactory.getManager();
         user = manager.context.getFocusedUser();
-        dbManager = PersistenceFactory.CreatePersistence();
+        dbManager = manager.dbManager;
         authManager = AuthenticationFactory.CreateAuthenticationManager();
 
         List<SongPreview> followingArtists = dbManager.getLikedSongs(user.username, startIndex, count);

@@ -98,14 +98,14 @@ public class ReviewVBox extends VBox {
     }
 
     private void reportReview(MouseEvent mouseEvent) {
-        if(PersistenceFactory.CreatePersistence().reportReview(review)){
+        if(LayoutManagerFactory.getManager().dbManager.reportReview(review)){
             reportedReview.setVisible(true);
             reportBtn.setDisable(true);
         }
     }
 
     private void deleteReview(MouseEvent mouseEvent) {
-        Persistence dbManager = PersistenceFactory.CreatePersistence();
+        Persistence dbManager = LayoutManagerFactory.getManager().dbManager;
         if(dbManager != null){
             dbManager.deleteReview(review);
             LayoutManagerFactory.getManager().goToSongPage(review.song);

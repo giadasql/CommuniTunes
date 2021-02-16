@@ -8,24 +8,54 @@ import it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.general.Layou
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.controllers.UIController;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
+import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReader;
+import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderFactory;
+import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderType;
+import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.ConfigurationFileNotFoundException;
+import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.InvalidConfigurationException;
 import javafx.application.HostServices;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import org.neo4j.driver.Driver;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class LayoutManager {
 
     private Stage primary;
-    private final LayoutController layoutController;
+    private LayoutController layoutController;
     private boolean layoutVisible = false;
     private Scene layoutScene = null;
     public final ApplicationContext context = new ApplicationContext();
-    public final Persistence dbManager;
+    public Persistence dbManager;
     private HomePageAdminController adminController;
 
     LayoutManager() {
+        InputStream settingsFileStream = this.getClass().getClassLoader().getResourceAsStream("Settings.xml");
+        ConfigReader reader = null;
+        try{
+            reader = ConfigReaderFactory.CreateConfigReader(ConfigReaderType.Xml, settingsFileStream);
+            dbManager = PersistenceFactory.CreatePersistence(reader);
+        }
+        catch (ParserConfigurationException | IOException | SAXException | InvalidConfigurationException e) {
+            e.printStackTrace();
+            // TODO: log
+            return;
+        }
+        finally {
+            if(settingsFileStream != null){
+                try {
+                    settingsFileStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    // TODO: log
+                }
+            }
+        }
         FXMLLoader layoutLoader = getLoader(Path.GENERAL_LAYOUT);
         try {
             layoutScene = new Scene(layoutLoader.load(), 900, 600);
@@ -34,7 +64,6 @@ public class LayoutManager {
             e.printStackTrace();
         }
         layoutController = layoutLoader.getController();
-        dbManager = PersistenceFactory.CreatePersistence();
     }
 
     public void startApp(Stage primaryStage, HostServices hostServices) throws IOException {

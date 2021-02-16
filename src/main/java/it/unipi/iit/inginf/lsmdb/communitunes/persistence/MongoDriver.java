@@ -376,9 +376,10 @@ class MongoDriver implements Closeable {
 
         Bson myMatch = match(eq("reviews.user", username));
         Bson myUnwind = unwind("$reviews");
+        Bson matchWithText = match(not(eq("reviews.text", null)));
         Bson myProject = project(fields(excludeId(), include("reviews._id", "reviews.user", "reviews.text", "_id")));
 
-        songsCollection.aggregate(Arrays.asList(myMatch, myUnwind, myMatch, myProject)).forEach(doc->{
+        songsCollection.aggregate(Arrays.asList(myMatch, myUnwind, myMatch, matchWithText, myProject)).forEach(doc->{
             HashMap<String, Object> temp = new HashMap<>();
             Document step = (Document) doc.get("reviews");
             temp.put("id", step.getObjectId("_id").toString());

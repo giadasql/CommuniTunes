@@ -49,7 +49,6 @@ public class LayoutController implements UIController {
 
     @Override
     public void init() {
-        dbManager = PersistenceFactory.CreatePersistence();
         searchBarHbox.setAlignment(Pos.CENTER);
         SearchBar bar = new SearchBar(50, 400, false, false);
         bar.addEventHandler(SearchBar.FOUND_USERS_EVENT, this::showUsersPreviews);
@@ -66,6 +65,7 @@ public class LayoutController implements UIController {
         searchResultsPane.setAlignment(Pos.CENTER);
         searchResultsPane.getChildren().add(resultsVbox);
         this.manager = LayoutManagerFactory.getManager();
+        dbManager = manager.dbManager;
     }
 
     public void setContent(Node node){

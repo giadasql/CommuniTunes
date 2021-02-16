@@ -59,7 +59,7 @@ public class SongController implements UIController {
     @Override
     public void init() {
         this.manager = LayoutManagerFactory.getManager();
-        dbManager = PersistenceFactory.CreatePersistence();
+        dbManager = manager.dbManager;
         song = manager.context.getFocusedSong();
         
         if(song != null){

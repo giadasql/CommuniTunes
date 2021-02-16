@@ -34,7 +34,7 @@ public class SongPreviewVBox extends PreviewVBox {
 
     @Override
     protected void delete(MouseEvent mouseEvent) {
-        Persistence dbManager = PersistenceFactory.CreatePersistence();
+        Persistence dbManager = LayoutManagerFactory.getManager().dbManager;
         if(dbManager.deleteSong(preview.ID)){
             this.setVisible(false);
             this.setManaged(false);

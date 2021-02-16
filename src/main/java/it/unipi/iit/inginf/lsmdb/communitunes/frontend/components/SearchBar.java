@@ -4,6 +4,7 @@ import it.unipi.iit.inginf.lsmdb.communitunes.entities.Review;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.FoundArtistsEvent;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.FoundReviewsEvent;
 import it.unipi.iit.inginf.lsmdb.communitunes.frontend.events.FoundSongsEvent;
@@ -14,7 +15,6 @@ import javafx.collections.FXCollections;
 import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.scene.Cursor;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
@@ -90,7 +90,7 @@ public class SearchBar extends HBox {
     }
 
     private void sendResults() {
-        Persistence dbManager = PersistenceFactory.CreatePersistence();
+        Persistence dbManager = LayoutManagerFactory.getManager().dbManager;
         if("Stage Name".equals(choiceBox.getValue())){
             List<ArtistPreview> foundArtists = dbManager.searchArtistByName(textField.getText(), 0, 15);
             FoundArtistsEvent foundArtistsEvent = new FoundArtistsEvent(FOUND_ARTISTS_EVENT,foundArtists);

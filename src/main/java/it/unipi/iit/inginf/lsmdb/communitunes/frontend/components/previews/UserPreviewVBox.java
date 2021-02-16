@@ -33,7 +33,7 @@ public class UserPreviewVBox extends PreviewVBox {
 
     @Override
     protected void delete(MouseEvent mouseEvent) {
-        Persistence dbManager = PersistenceFactory.CreatePersistence();
+        Persistence dbManager = LayoutManagerFactory.getManager().dbManager;
         if(dbManager.deleteUser(preview.username)){
             this.setVisible(false);
             this.setManaged(false);

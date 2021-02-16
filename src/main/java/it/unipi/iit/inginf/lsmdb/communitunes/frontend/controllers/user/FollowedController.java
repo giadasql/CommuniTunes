@@ -41,7 +41,7 @@ public class FollowedController implements UIController {
     public void init(){
         manager = LayoutManagerFactory.getManager();
         user = manager.context.getFocusedUser();
-        dbManager = PersistenceFactory.CreatePersistence();
+        dbManager = manager.dbManager;
         authManager = AuthenticationFactory.CreateAuthenticationManager();
 
         List<UserPreview> followedUsers = dbManager.getFollowedUsers(user.username, startIndex, count);

@@ -70,8 +70,8 @@ public class AuthenticationController implements UIController {
     @Override
     public void init() {
         authManager = AuthenticationFactory.CreateAuthenticationManager();
-        dbManager = PersistenceFactory.CreatePersistence();
         this.manager = LayoutManagerFactory.getManager();
+        dbManager = manager.dbManager;
         errorMsg.setText("");
     }
 

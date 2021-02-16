@@ -5,44 +5,23 @@ import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.ArtistPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.SongPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.previews.UserPreview;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReader;
-import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderFactory;
-import it.unipi.iit.inginf.lsmdb.communitunes.utilities.configurations.ConfigReaderType;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceInconsistencyException;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
 class PersistenceImplementation implements Persistence {
 
-    private ConfigReader reader;
+    private final ConfigReader reader;
 
     private MongoDriver mongo;
     private Neo4jDriver neo4j;
 
 
-    public PersistenceImplementation() {
-        String settingsFileName = "Settings.xml";
-        InputStream settingsFileStream = this.getClass().getClassLoader().getResourceAsStream(settingsFileName);
-        try{
-            reader = ConfigReaderFactory.CreateConfigReader(ConfigReaderType.Xml, settingsFileStream);
-        }
-        catch (ParserConfigurationException | IOException | SAXException e) {
-            e.printStackTrace();
-            // TODO: log
-            return;
-        }
-        if(reader == null){
-            // TODO: log
-            return;
-        }
-
+    public PersistenceImplementation(ConfigReader settingsReader) {
+        this.reader = settingsReader;
         neo4jInit();
         mongoInit();
     }
@@ -60,14 +39,20 @@ class PersistenceImplementation implements Persistence {
     }
 
     public boolean checkIfUsernameExists(String username){
+
         return mongo.checkIfUsernameExists(username) || neo4j.checkIfUsernameExists(username);
     }
 
     public boolean checkIfEmailExists(String email){
+
         return mongo.checkIfEmailExists(email);
     }
 
-    public boolean checkIfStageNameExists(String stageName) { return mongo.checkIfStageNameExists(stageName); }
+    public boolean checkIfStageNameExists(String stageName)
+    {
+
+        return mongo.checkIfStageNameExists(stageName);
+    }
 
     public boolean checkIfRequestExists(String username) { return mongo.checkIfRequestExists(username); }
 

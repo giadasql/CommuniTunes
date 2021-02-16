@@ -98,7 +98,7 @@ public class EditUserController implements UIController {
     public void init() {
         manager = LayoutManagerFactory.getManager();
         user = manager.context.getAuthenticatedUser();
-        dbManager = PersistenceFactory.CreatePersistence();
+        dbManager = manager.dbManager;
         authManager = AuthenticationFactory.CreateAuthenticationManager();
     }
 

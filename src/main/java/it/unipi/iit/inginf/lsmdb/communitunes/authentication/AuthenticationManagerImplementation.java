@@ -1,4 +1,6 @@
 package it.unipi.iit.inginf.lsmdb.communitunes.authentication;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManager;
+import it.unipi.iit.inginf.lsmdb.communitunes.frontend.context.LayoutManagerFactory;
 import it.unipi.iit.inginf.lsmdb.communitunes.utilities.exceptions.PersistenceInconsistencyException;
 import it.unipi.iit.inginf.lsmdb.communitunes.entities.User;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
@@ -15,7 +17,7 @@ class AuthenticationManagerImplementation implements AuthenticationManager {
     private final Persistence persistenceManager;
 
     AuthenticationManagerImplementation(){
-        persistenceManager = PersistenceFactory.CreatePersistence();
+        persistenceManager = LayoutManagerFactory.getManager().dbManager;
     }
 
     @Override

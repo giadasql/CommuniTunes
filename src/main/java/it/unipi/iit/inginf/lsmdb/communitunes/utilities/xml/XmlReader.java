@@ -60,4 +60,5 @@ public interface XmlReader {
      * @return The last node of the path when found, Null otherwise.
      */
     Node getLastNodeOfPath(List<String> path);
+
 }

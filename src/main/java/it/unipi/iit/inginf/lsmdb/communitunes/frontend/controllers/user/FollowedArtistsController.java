@@ -43,7 +43,7 @@ public class FollowedArtistsController implements UIController {
     public void init(){
         manager = LayoutManagerFactory.getManager();
         user = manager.context.getFocusedUser();
-        dbManager = PersistenceFactory.CreatePersistence();
+        dbManager = manager.dbManager;
         authManager = AuthenticationFactory.CreateAuthenticationManager();
 
         List<ArtistPreview> followedArtists = dbManager.getFollowedArtists(user.username, startIndex, count);

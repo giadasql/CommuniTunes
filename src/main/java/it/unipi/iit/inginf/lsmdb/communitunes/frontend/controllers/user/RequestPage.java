@@ -27,7 +27,7 @@ public class RequestPage implements UIController {
     public void init(){
         this.manager = LayoutManagerFactory.getManager();
         user = manager.context.getFocusedUser();
-        dbManager = PersistenceFactory.CreatePersistence();
+        dbManager = manager.dbManager;
     }
 
     public void closeWindow(MouseEvent mouseEvent) throws IOException {

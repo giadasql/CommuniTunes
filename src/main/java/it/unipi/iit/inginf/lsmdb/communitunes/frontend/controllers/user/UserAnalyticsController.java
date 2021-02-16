@@ -35,7 +35,7 @@ public class UserAnalyticsController implements UIController {
 
     public void init() {
         this.manager = LayoutManagerFactory.getManager();
-        dbManager = PersistenceFactory.CreatePersistence();
+        dbManager = manager.dbManager;
         user = manager.context.getAuthenticatedUser();
         List<ArtistPreview> suggestedArtistsList = dbManager.getArtistsFollowedByFriends(user);
         List<UserPreview> suggestedUsersList = dbManager.getUsersFollowedByFriends(user);

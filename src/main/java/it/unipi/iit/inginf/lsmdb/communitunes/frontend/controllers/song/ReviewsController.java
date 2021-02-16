@@ -34,7 +34,7 @@ public class ReviewsController implements UIController {
     public void init() {
         manager = LayoutManagerFactory.getManager();
         song = manager.context.getFocusedSong();
-        dbManager = PersistenceFactory.CreatePersistence();
+        dbManager = manager.dbManager;
         showPreviews(dbManager.getReviews(song.id, startIndex, count));
     }
 

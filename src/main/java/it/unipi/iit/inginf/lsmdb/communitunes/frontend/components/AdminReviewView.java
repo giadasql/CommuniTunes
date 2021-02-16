@@ -5,8 +5,6 @@ import it.unipi.iit.inginf.lsmdb.communitunes.persistence.Persistence;
 import it.unipi.iit.inginf.lsmdb.communitunes.persistence.PersistenceFactory;
 import javafx.scene.Cursor;
 import javafx.scene.control.Button;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -44,7 +42,7 @@ public class AdminReviewView extends VBox {
     }
 
     private void deleteReview(MouseEvent mouseEvent) {
-        Persistence dbManager = PersistenceFactory.CreatePersistence();
+        Persistence dbManager = LayoutManagerFactory.getManager().dbManager;
         if(dbManager != null){
             if(dbManager.deleteReview(reviewID, song)){
                 this.setVisible(false);

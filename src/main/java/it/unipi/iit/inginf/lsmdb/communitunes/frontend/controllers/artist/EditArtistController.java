@@ -43,7 +43,7 @@ public class EditArtistController implements UIController {
     public void init() {
         this.manager = LayoutManagerFactory.getManager();
         this.authManager = AuthenticationFactory.CreateAuthenticationManager();
-        this.dbManager = PersistenceFactory.CreatePersistence();
+        this.dbManager = manager.dbManager;
         this.artist = manager.context.getAuthenticatedArtist();
         setDefaultValues();
     }

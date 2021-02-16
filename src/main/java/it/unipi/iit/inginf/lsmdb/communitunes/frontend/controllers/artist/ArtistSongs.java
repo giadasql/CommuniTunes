@@ -42,7 +42,7 @@ public class ArtistSongs implements UIController {
     public void init(){
         manager = LayoutManagerFactory.getManager();
         artist = manager.context.getFocusedArtist();
-        dbManager = PersistenceFactory.CreatePersistence();
+        dbManager = manager.dbManager;
         authManager = AuthenticationFactory.CreateAuthenticationManager();
 
         List<SongPreview> followingArtists = dbManager.getArtistSongs(artist.username, startIndex, count);

@@ -38,7 +38,7 @@ public class FollowersController implements UIController {
     public void init(){
         manager = LayoutManagerFactory.getManager();
         user = manager.context.getFocusedUser();
-        dbManager = PersistenceFactory.CreatePersistence();
+        dbManager = manager.dbManager;
 
         List<UserPreview> followers = dbManager.getFollowers(user.username, startIndex, count);
         prevPageBtn.setDisable(true);
